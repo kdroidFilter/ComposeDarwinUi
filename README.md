@@ -1,6 +1,6 @@
-# Darwin UI
+# Compose Darwin UI
 
-A macOS-inspired UI component library for Compose Multiplatform with full light/dark theme support.
+A Compose Multiplatform adaptation of [Darwin UI](https://github.com/surajmandalcell/darwin-ui), a macOS-inspired React component library by [Suraj Mandal](https://github.com/surajmandalcell). This port brings the same design language to Android, iOS, Desktop, and Web through Compose Multiplatform.
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.3.0-7F52FF.svg?logo=kotlin)](https://kotlinlang.org)
 [![Compose Multiplatform](https://img.shields.io/badge/Compose_Multiplatform-1.10.0-4285F4.svg?logo=jetpackcompose)](https://www.jetbrains.com/compose-multiplatform/)
