@@ -23,7 +23,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,7 +43,10 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import kotlinx.coroutines.delay
 import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
 import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 
@@ -269,53 +276,81 @@ fun DarwinAlertDialog(
     onCancel: (() -> Unit)? = null,
     glass: Boolean = false,
 ) {
-    AnimatedVisibility(
-        visible = open,
-        enter = fadeIn(animationSpec = tween(durationMillis = 200)),
-        exit = fadeOut(animationSpec = tween(durationMillis = 150)),
-    ) {
-        val colors = DarwinTheme.colors
+    // Keep the popup mounted while the exit animation plays
+    var showPopup by remember { mutableStateOf(false) }
+    var animateIn by remember { mutableStateOf(false) }
 
-        // Scrim
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(colors.scrim)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onDismissRequest,
-                ),
-            contentAlignment = Alignment.Center,
+    LaunchedEffect(open) {
+        if (open) {
+            showPopup = true
+            delay(16)
+            animateIn = true
+        } else {
+            animateIn = false
+            delay(200 + 50L)
+            showPopup = false
+        }
+    }
+
+    if (showPopup) {
+        Popup(
+            alignment = Alignment.Center,
+            onDismissRequest = onDismissRequest,
+            properties = PopupProperties(focusable = true),
         ) {
-            // Dialog card with its own animated visibility for scale
+            val colors = DarwinTheme.colors
+
+            // Scrim with fade animation
             AnimatedVisibility(
-                visible = open,
-                enter = scaleIn(
-                    initialScale = 0.9f,
-                    animationSpec = tween(durationMillis = 200),
-                ) + fadeIn(animationSpec = tween(durationMillis = 200)),
-                exit = scaleOut(
-                    targetScale = 0.9f,
-                    animationSpec = tween(durationMillis = 150),
-                ) + fadeOut(animationSpec = tween(durationMillis = 150)),
+                visible = animateIn,
+                enter = fadeIn(animationSpec = tween(durationMillis = 200)),
+                exit = fadeOut(animationSpec = tween(durationMillis = 150)),
             ) {
-                DarwinAlertDialogContent(
-                    title = title,
-                    message = message,
-                    type = type,
-                    confirmText = confirmText,
-                    cancelText = cancelText,
-                    onConfirm = {
-                        onConfirm()
-                        onDismissRequest()
-                    },
-                    onCancel = {
-                        (onCancel ?: onDismissRequest).invoke()
-                    },
-                    onDismissRequest = onDismissRequest,
-                    glass = glass,
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(colors.scrim)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onDismissRequest,
+                        ),
                 )
+            }
+
+            // Dialog card with scale animation
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                AnimatedVisibility(
+                    visible = animateIn,
+                    enter = scaleIn(
+                        initialScale = 0.9f,
+                        animationSpec = tween(durationMillis = 200),
+                    ) + fadeIn(animationSpec = tween(durationMillis = 200)),
+                    exit = scaleOut(
+                        targetScale = 0.9f,
+                        animationSpec = tween(durationMillis = 150),
+                    ) + fadeOut(animationSpec = tween(durationMillis = 150)),
+                ) {
+                    DarwinAlertDialogContent(
+                        title = title,
+                        message = message,
+                        type = type,
+                        confirmText = confirmText,
+                        cancelText = cancelText,
+                        onConfirm = {
+                            onConfirm()
+                            onDismissRequest()
+                        },
+                        onCancel = {
+                            (onCancel ?: onDismissRequest).invoke()
+                        },
+                        onDismissRequest = onDismissRequest,
+                        glass = glass,
+                    )
+                }
             }
         }
     }
