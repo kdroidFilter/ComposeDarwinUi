@@ -23,12 +23,16 @@ fun DarwinTheme(
     animations: DarwinAnimations = DarwinAnimations(),
     content: @Composable () -> Unit,
 ) {
+    // Apply Manrope font family to all text styles
+    val manrope = ManropeFontFamily()
+    val resolvedTypography = typography.withFontFamily(manrope)
+
     CompositionLocalProvider(
         LocalDarwinColors provides colors,
-        LocalDarwinTypography provides typography,
+        LocalDarwinTypography provides resolvedTypography,
         LocalDarwinShapes provides shapes,
         LocalDarwinAnimations provides animations,
-        LocalDarwinTextStyle provides typography.bodyMedium,
+        LocalDarwinTextStyle provides resolvedTypography.bodyMedium,
         LocalDarwinContentColor provides colors.textPrimary,
     ) {
         content()
