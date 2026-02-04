@@ -36,10 +36,25 @@ val Red600 = Color(0xFFDC2626)
 val Red700 = Color(0xFFB91C1C)
 val Yellow500 = Color(0xFFEAB308)
 val Yellow600 = Color(0xFFCA8A04)
+val Amber400 = Color(0xFFFBBF24)
 val Amber500 = Color(0xFFF59E0B)
+val Amber600 = Color(0xFFD97706)
 val Cyan500 = Color(0xFF06B6D4)
 val Pink500 = Color(0xFFEC4899)
 val Teal500 = Color(0xFF14B8A6)
+
+// Emerald palette (used for success/published badges)
+val Emerald400 = Color(0xFF34D399)
+val Emerald500 = Color(0xFF10B981)
+val Emerald600 = Color(0xFF059669)
+
+// Sky palette (used for info/new badges)
+val Sky400 = Color(0xFF38BDF8)
+val Sky500 = Color(0xFF0EA5E9)
+val Sky600 = Color(0xFF0284C7)
+
+// Additional reds
+val Red400 = Color(0xFFF87171)
 
 @Stable
 class DarwinColors(

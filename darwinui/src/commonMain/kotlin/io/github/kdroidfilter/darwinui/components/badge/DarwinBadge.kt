@@ -12,61 +12,70 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.theme.Blue500
+import io.github.kdroidfilter.darwinui.theme.Amber400
+import io.github.kdroidfilter.darwinui.theme.Amber500
+import io.github.kdroidfilter.darwinui.theme.Amber600
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.Green500
-import io.github.kdroidfilter.darwinui.theme.Purple500
-import io.github.kdroidfilter.darwinui.theme.Yellow500
-import io.github.kdroidfilter.darwinui.theme.Zinc400
-import io.github.kdroidfilter.darwinui.theme.Zinc500
+import io.github.kdroidfilter.darwinui.theme.Emerald400
+import io.github.kdroidfilter.darwinui.theme.Emerald500
+import io.github.kdroidfilter.darwinui.theme.Emerald600
+import io.github.kdroidfilter.darwinui.theme.Red400
+import io.github.kdroidfilter.darwinui.theme.Red500
+import io.github.kdroidfilter.darwinui.theme.Red600
+import io.github.kdroidfilter.darwinui.theme.Sky400
+import io.github.kdroidfilter.darwinui.theme.Sky500
+import io.github.kdroidfilter.darwinui.theme.Sky600
+import io.github.kdroidfilter.darwinui.theme.Zinc300
+import io.github.kdroidfilter.darwinui.theme.Zinc700
+import io.github.kdroidfilter.darwinui.theme.Zinc900
 
 /**
  * Variants available for [DarwinBadge].
  *
- * Each variant maps to a specific color combination (background and text)
- * following the Darwin UI design system.
+ * Each variant maps to a specific color combination (background, text, border)
+ * following the React darwin-ui badge component exactly.
  */
 enum class DarwinBadgeVariant {
-    /** Primary background with onPrimary text. */
+    /** Subtle bg (black/5 or white/5), subtle border (black/10 or white/10), zinc text. */
     Default,
 
-    /** Secondary background with onSecondary text. */
+    /** Subtle bg (black/5 or white/5), transparent border, zinc text. */
     Secondary,
 
-    /** Transparent background with a visible border and primary text. */
+    /** Transparent bg, visible border (black/20 or white/20), zinc text. */
     Outline,
 
-    /** Destructive tint (10% opacity background, full-color text). */
+    /** Red-500/15 bg, transparent border, red-600 or red-400 text. */
     Destructive,
 
-    /** Success tint (10% opacity background, full-color text). */
+    /** Emerald-500/15 bg, transparent border, emerald-600 or emerald-400 text. */
     Success,
 
-    /** Warning tint (10% opacity background, full-color text). */
+    /** Amber-500/15 bg, transparent border, amber-600 or amber-400 text. */
     Warning,
 
-    /** Info tint (10% opacity background, full-color text). */
+    /** Sky-500/15 bg, transparent border, sky-600 or sky-400 text. */
     Info,
 
-    /** Green tint indicating a published state. */
+    /** Same as Success: emerald-500/15 bg, emerald-600 or emerald-400 text. */
     Published,
 
-    /** Yellow tint indicating a draft state. */
+    /** Same as Warning: amber-500/15 bg, amber-600 or amber-400 text. */
     Draft,
 
-    /** Zinc-500 tint indicating an archived state. */
+    /** Same as Secondary: subtle bg, transparent border, zinc text. */
     Archived,
 
-    /** Blue tint indicating a new item. */
+    /** Same as Info: sky-500/15 bg, sky-600 or sky-400 text. */
     NewBadge,
 
-    /** Zinc-400 tint indicating a read item. */
+    /** Same as Warning/Draft: amber-500/15 bg, amber-600 or amber-400 text. */
     Read,
 
-    /** Purple tint indicating a responded item. */
+    /** Same as Success/Published: emerald-500/15 bg, emerald-600 or emerald-400 text. */
     Responded,
 
-    /** Glass-morphism effect with semi-transparent background. */
+    /** Glass-morphism: semi-transparent bg, white border, zinc text. */
     Glass,
 }
 
@@ -81,94 +90,113 @@ private data class BadgeColors(
 
 /**
  * Resolves the colors for the given [DarwinBadgeVariant] from the current theme.
+ * Pixel-perfect match with the React badge.tsx variant map.
  */
 @Composable
 private fun resolveColors(variant: DarwinBadgeVariant): BadgeColors {
-    val colors = DarwinTheme.colors
+    val isDark = DarwinTheme.colors.isDark
+
+    // Shared color helpers matching React Tailwind classes
+    val subtleBg = if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f)
+    val zincText = if (isDark) Zinc300 else Zinc700
 
     return when (variant) {
+        // default: border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-zinc-700 dark:text-zinc-300
         DarwinBadgeVariant.Default -> BadgeColors(
-            background = colors.primary,
-            text = colors.onPrimary,
-            borderColor = null,
+            background = subtleBg,
+            text = zincText,
+            borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
         )
 
+        // secondary: border-transparent bg-black/5 dark:bg-white/5 text-zinc-700 dark:text-zinc-300
         DarwinBadgeVariant.Secondary -> BadgeColors(
-            background = colors.secondary,
-            text = colors.onSecondary,
-            borderColor = null,
+            background = subtleBg,
+            text = zincText,
+            borderColor = Color.Transparent,
         )
 
+        // outline: border-black/20 dark:border-white/20 text-zinc-700 dark:text-zinc-300 bg-transparent
         DarwinBadgeVariant.Outline -> BadgeColors(
             background = Color.Transparent,
-            text = colors.textPrimary,
-            borderColor = colors.border,
+            text = zincText,
+            borderColor = if (isDark) Color.White.copy(alpha = 0.20f) else Color.Black.copy(alpha = 0.20f),
         )
 
-        DarwinBadgeVariant.Destructive -> BadgeColors(
-            background = colors.destructive.copy(alpha = 0.1f),
-            text = colors.destructive,
-            borderColor = null,
-        )
-
-        DarwinBadgeVariant.Success -> BadgeColors(
-            background = colors.success.copy(alpha = 0.1f),
-            text = colors.success,
-            borderColor = null,
-        )
-
-        DarwinBadgeVariant.Warning -> BadgeColors(
-            background = colors.warning.copy(alpha = 0.1f),
-            text = colors.warning,
-            borderColor = null,
-        )
-
-        DarwinBadgeVariant.Info -> BadgeColors(
-            background = colors.info.copy(alpha = 0.1f),
-            text = colors.info,
-            borderColor = null,
-        )
-
-        DarwinBadgeVariant.Published -> BadgeColors(
-            background = Green500.copy(alpha = 0.1f),
-            text = Green500,
-            borderColor = null,
-        )
-
-        DarwinBadgeVariant.Draft -> BadgeColors(
-            background = Yellow500.copy(alpha = 0.1f),
-            text = Yellow500,
-            borderColor = null,
-        )
-
-        DarwinBadgeVariant.Archived -> BadgeColors(
-            background = Zinc500.copy(alpha = 0.1f),
-            text = Zinc500,
-            borderColor = null,
-        )
-
-        DarwinBadgeVariant.NewBadge -> BadgeColors(
-            background = Blue500.copy(alpha = 0.1f),
-            text = Blue500,
-            borderColor = null,
-        )
-
-        DarwinBadgeVariant.Read -> BadgeColors(
-            background = Zinc400.copy(alpha = 0.1f),
-            text = Zinc400,
-            borderColor = null,
-        )
-
-        DarwinBadgeVariant.Responded -> BadgeColors(
-            background = Purple500.copy(alpha = 0.1f),
-            text = Purple500,
-            borderColor = null,
-        )
-
+        // glass: bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border-white/30 dark:border-white/10 text-zinc-700 dark:text-zinc-300
         DarwinBadgeVariant.Glass -> BadgeColors(
-            background = colors.glassBackground,
-            text = colors.textPrimary,
-            borderColor = colors.glassBorder,
+            background = if (isDark) Zinc900.copy(alpha = 0.60f) else Color.White.copy(alpha = 0.60f),
+            text = zincText,
+            borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.White.copy(alpha = 0.30f),
+        )
+
+        // destructive: border-transparent bg-red-500/15 text-red-600 dark:text-red-400
+        DarwinBadgeVariant.Destructive -> BadgeColors(
+            background = Red500.copy(alpha = 0.15f),
+            text = if (isDark) Red400 else Red600,
+            borderColor = Color.Transparent,
+        )
+
+        // success: border-transparent bg-emerald-500/15 text-emerald-600 dark:text-emerald-400
+        DarwinBadgeVariant.Success -> BadgeColors(
+            background = Emerald500.copy(alpha = 0.15f),
+            text = if (isDark) Emerald400 else Emerald600,
+            borderColor = Color.Transparent,
+        )
+
+        // published: border-transparent bg-emerald-500/15 text-emerald-600 dark:text-emerald-400
+        DarwinBadgeVariant.Published -> BadgeColors(
+            background = Emerald500.copy(alpha = 0.15f),
+            text = if (isDark) Emerald400 else Emerald600,
+            borderColor = Color.Transparent,
+        )
+
+        // responded: border-transparent bg-emerald-500/15 text-emerald-600 dark:text-emerald-400
+        DarwinBadgeVariant.Responded -> BadgeColors(
+            background = Emerald500.copy(alpha = 0.15f),
+            text = if (isDark) Emerald400 else Emerald600,
+            borderColor = Color.Transparent,
+        )
+
+        // warning: border-transparent bg-amber-500/15 text-amber-600 dark:text-amber-400
+        DarwinBadgeVariant.Warning -> BadgeColors(
+            background = Amber500.copy(alpha = 0.15f),
+            text = if (isDark) Amber400 else Amber600,
+            borderColor = Color.Transparent,
+        )
+
+        // draft: border-transparent bg-amber-500/15 text-amber-600 dark:text-amber-400
+        DarwinBadgeVariant.Draft -> BadgeColors(
+            background = Amber500.copy(alpha = 0.15f),
+            text = if (isDark) Amber400 else Amber600,
+            borderColor = Color.Transparent,
+        )
+
+        // read: border-transparent bg-amber-500/15 text-amber-600 dark:text-amber-400
+        DarwinBadgeVariant.Read -> BadgeColors(
+            background = Amber500.copy(alpha = 0.15f),
+            text = if (isDark) Amber400 else Amber600,
+            borderColor = Color.Transparent,
+        )
+
+        // info: border-transparent bg-sky-500/15 text-sky-600 dark:text-sky-400
+        DarwinBadgeVariant.Info -> BadgeColors(
+            background = Sky500.copy(alpha = 0.15f),
+            text = if (isDark) Sky400 else Sky600,
+            borderColor = Color.Transparent,
+        )
+
+        // new: border-transparent bg-sky-500/15 text-sky-600 dark:text-sky-400
+        DarwinBadgeVariant.NewBadge -> BadgeColors(
+            background = Sky500.copy(alpha = 0.15f),
+            text = if (isDark) Sky400 else Sky600,
+            borderColor = Color.Transparent,
+        )
+
+        // archived: border-transparent bg-black/5 dark:bg-white/5 text-zinc-700 dark:text-zinc-300
+        DarwinBadgeVariant.Archived -> BadgeColors(
+            background = subtleBg,
+            text = zincText,
+            borderColor = Color.Transparent,
         )
     }
 }
@@ -179,6 +207,9 @@ private fun resolveColors(variant: DarwinBadgeVariant): BadgeColors {
  * Badges are used to highlight status, categories, or counts. They come in 14 variants
  * covering common UI states such as success, warning, destructive, draft, published, etc.
  *
+ * Pixel-perfect match with the React darwin-ui Badge component:
+ * - `rounded-full border px-2.5 py-0.5 text-xs font-medium`
+ *
  * Usage:
  * ```
  * DarwinBadge(variant = DarwinBadgeVariant.Success) {
@@ -186,7 +217,7 @@ private fun resolveColors(variant: DarwinBadgeVariant): BadgeColors {
  * }
  * ```
  *
- * @param variant The visual variant determining background and text colors.
+ * @param variant The visual variant determining background, text, and border colors.
  *                Defaults to [DarwinBadgeVariant.Default].
  * @param modifier Modifier to be applied to the badge container.
  * @param content The composable content displayed inside the badge, typically a [Text].
@@ -198,23 +229,26 @@ fun DarwinBadge(
     content: @Composable () -> Unit,
 ) {
     val badgeColors = resolveColors(variant)
-    val shape = DarwinTheme.shapes.full
+    val shape = DarwinTheme.shapes.full // rounded-full
 
     val textStyle = DarwinTheme.typography.labelSmall.merge(
         TextStyle(color = badgeColors.text)
     )
 
+    // rounded-full border px-2.5 py-0.5
     val badgeModifier = modifier
         .clip(shape)
         .background(badgeColors.background, shape)
         .then(
-            if (badgeColors.borderColor != null) {
+            if (badgeColors.borderColor != null && badgeColors.borderColor != Color.Transparent) {
                 Modifier.border(width = 1.dp, color = badgeColors.borderColor, shape = shape)
             } else {
-                Modifier
+                // React always has `border` class but uses border-transparent for these variants.
+                // We add a transparent border to keep consistent sizing.
+                Modifier.border(width = 1.dp, color = Color.Transparent, shape = shape)
             }
         )
-        .padding(horizontal = 10.dp, vertical = 2.dp)
+        .padding(horizontal = 10.dp, vertical = 2.dp) // px-2.5 = 10dp, py-0.5 = 2dp
 
     CompositionLocalProvider(LocalDarwinTextStyle provides textStyle) {
         Box(modifier = badgeModifier) {
