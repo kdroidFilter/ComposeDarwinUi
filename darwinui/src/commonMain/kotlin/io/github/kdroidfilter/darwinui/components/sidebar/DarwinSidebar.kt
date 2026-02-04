@@ -1,13 +1,8 @@
 package io.github.kdroidfilter.darwinui.components.sidebar
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
@@ -39,8 +34,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.icons.DarwinIcon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronsLeft
@@ -184,12 +181,24 @@ fun DarwinSidebar(
                 )
                 .padding(animatedPadding),
         ) {
-            // ---- Pinned header (fades + shrinks with same spring as width) ----
+            // ---- Pinned header (height fraction + alpha, stays in tree) ----
             if (header != null) {
-                AnimatedVisibility(
-                    visible = !collapsed,
-                    enter = expandVertically(sidebarSpring()) + fadeIn(sidebarSpring()),
-                    exit = shrinkVertically(sidebarSpring()) + fadeOut(sidebarSpring()),
+                val headerFraction by animateFloatAsState(
+                    targetValue = if (collapsed) 0f else 1f,
+                    animationSpec = sidebarSpring(),
+                )
+
+                Box(
+                    modifier = Modifier
+                        .clipToBounds()
+                        .graphicsLayer { alpha = headerFraction }
+                        .layout { measurable, constraints ->
+                            val placeable = measurable.measure(constraints)
+                            val h = (placeable.height * headerFraction).roundToInt()
+                            layout(placeable.width, h) {
+                                placeable.placeRelative(0, 0)
+                            }
+                        },
                 ) {
                     header()
                 }
