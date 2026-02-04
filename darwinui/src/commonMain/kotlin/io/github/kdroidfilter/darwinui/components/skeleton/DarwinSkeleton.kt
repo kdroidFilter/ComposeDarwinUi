@@ -1,18 +1,8 @@
 package io.github.kdroidfilter.darwinui.components.skeleton
 
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,23 +20,6 @@ import io.github.kdroidfilter.darwinui.theme.Zinc900
 // DarwinSkeleton
 // ===========================================================================
 
-/**
- * A loading placeholder shape with a pulsing animation.
- *
- * Pixel-perfect match with the React darwin-ui Skeleton component:
- * - Default: `bg-black/10 dark:bg-white/10 animate-pulse rounded-lg`
- * - Glass:   `bg-white/40 dark:bg-zinc-900/40 backdrop-blur-sm`
- *
- * The CSS `animate-pulse` keyframe oscillates opacity between 1.0 and 0.5
- * over 2 seconds with `cubic-bezier(0.4, 0, 0.6, 1)`.
- *
- * @param modifier Modifier applied to the placeholder. Use this to set the
- *                 desired width and height for the skeleton.
- * @param shape    Shape of the placeholder. Defaults to
- *                 [DarwinTheme.shapes.small] (8dp rounded corners = `rounded-lg`).
- * @param glass    When true, applies the glass-morphism effect instead of
- *                 the default skeleton background.
- */
 @Composable
 fun DarwinSkeleton(
     modifier: Modifier = Modifier,
@@ -55,7 +28,6 @@ fun DarwinSkeleton(
 ) {
     val isDark = DarwinTheme.colors.isDark
 
-    // Background color matching React exactly
     val backgroundColor = if (glass) {
         // glass: bg-white/40 dark:bg-zinc-900/40
         if (isDark) Zinc900.copy(alpha = 0.40f) else Color.White.copy(alpha = 0.40f)
@@ -88,13 +60,6 @@ fun DarwinSkeleton(
 // Convenience composables
 // ===========================================================================
 
-/**
- * Line widths used by [DarwinSkeletonText] to create a natural-looking
- * multi-line text placeholder.
- *
- * The pattern cycles through 100%, 75%, and 50% of the available width,
- * matching the React demo pattern: `w-full`, `w-3/4`, `w-1/2`.
- */
 private val SkeletonLineWidthFractions = listOf(1f, 0.75f, 0.5f)
 
 /**

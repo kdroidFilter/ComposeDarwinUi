@@ -56,20 +56,6 @@ data class DarwinSelectOption(
     val disabled: Boolean = false,
 )
 
-/**
- * Darwin UI single-selection dropdown.
- *
- * Mirrors the React darwin-ui Select component with macOS-inspired styling.
- *
- * @param options         Available options to choose from.
- * @param selectedValue   Currently selected option value, or null if nothing is selected.
- * @param onValueChange   Callback invoked when the user selects an option.
- * @param placeholder     Text displayed when no option is selected.
- * @param enabled         Whether the component is interactive.
- * @param glass           Whether to apply the glass-morphism effect.
- * @param label           Optional label text displayed above the trigger.
- * @param modifier        Modifier applied to the root layout.
- */
 @Composable
 fun DarwinSelect(
     options: List<DarwinSelectOption>,
@@ -104,7 +90,6 @@ fun DarwinSelect(
         else -> glassBorderOrDefault(glass, colors.inputBorder)
     }
 
-    // React: bg-black/5 dark:bg-white/5, hover:bg-black/10 dark:hover:bg-white/10
     val backgroundColor = when {
         glass -> glassOrDefault(glass, colors.inputBackground)
         isTriggerHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.04f)
@@ -273,7 +258,6 @@ fun DarwinSelect(
                         val itemInteractionSource = remember { MutableInteractionSource() }
                         val isItemHovered by itemInteractionSource.collectIsHoveredAsState()
 
-                        // React: selected bg-black/10 dark:bg-white/10,
                         // hover bg-black/5 dark:bg-white/5
                         // Compose renders alpha slightly heavier than CSS, so values are lowered
                         val itemBackgroundColor = when {

@@ -4,15 +4,6 @@ import androidx.compose.animation.core.*
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 
-/**
- * Darwin UI Animation Configuration
- * Mirrors the React library's animation-config.ts:
- *   instant: 0ms, fast: 100ms, normal: 150ms, slow: 200ms, reveal: 400ms
- *   snappy: {stiffness: 400, damping: 25}
- *   smooth: {stiffness: 200, damping: 25}
- *   gentle: {stiffness: 120, damping: 20}
- */
-
 enum class DarwinDuration(val millis: Int) {
     Instant(0),
     Fast(100),

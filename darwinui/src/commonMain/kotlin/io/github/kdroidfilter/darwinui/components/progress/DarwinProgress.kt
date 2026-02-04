@@ -21,27 +21,12 @@ import io.github.kdroidfilter.darwinui.theme.*
 
 // ==================== Enums ====================
 
-/**
- * Size variants for the linear progress bar.
- *
- * Maps to React Tailwind classes: sm → h-1, md → h-2, lg → h-3.
- */
 enum class DarwinProgressSize(val height: Dp) {
     Sm(4.dp),   // h-1 = 4dp
     Md(8.dp),   // h-2 = 8dp
     Lg(12.dp),  // h-3 = 12dp
 }
 
-/**
- * Color variants for both linear and circular progress indicators.
- *
- * Pixel-perfect match with the React progress.tsx `variantClasses`:
- * - default → `bg-blue-500`
- * - success → `bg-emerald-500`
- * - warning → `bg-amber-500`
- * - danger  → `bg-red-500`
- * - gradient → `bg-linear-to-r from-blue-500 via-violet-500 to-red-500`
- */
 enum class DarwinProgressVariant {
     Default,
     Success,
@@ -52,10 +37,6 @@ enum class DarwinProgressVariant {
 
 // ==================== Color Helpers ====================
 
-/**
- * Resolves the solid fill color for a given variant.
- * Pixel-perfect match with React Tailwind color classes.
- */
 private fun variantColor(variant: DarwinProgressVariant): Color = when (variant) {
     DarwinProgressVariant.Default -> Blue500       // bg-blue-500
     DarwinProgressVariant.Success -> Emerald500    // bg-emerald-500
@@ -64,10 +45,6 @@ private fun variantColor(variant: DarwinProgressVariant): Color = when (variant)
     DarwinProgressVariant.Gradient -> Blue500      // fallback; gradient handled separately
 }
 
-/**
- * Three-stop gradient brush matching React:
- * `bg-linear-to-r from-blue-500 via-violet-500 to-red-500`
- */
 private fun gradientBrush(width: Float): Brush = Brush.linearGradient(
     colors = listOf(Blue500, Violet500, Red500),
     start = Offset.Zero,
@@ -76,25 +53,6 @@ private fun gradientBrush(width: Float): Brush = Brush.linearGradient(
 
 // ==================== Linear Progress ====================
 
-/**
- * Darwin UI Linear Progress — a horizontal progress bar.
- *
- * Pixel-perfect match with the React darwin-ui Progress component:
- * - Track: `bg-black/10 dark:bg-white/10` (or glass: `bg-white/40 dark:bg-zinc-900/40`)
- * - Shape: `rounded-full`
- * - Indeterminate: `w-1/3` bar sliding x -100% → 400% over 1.5s easeInOut
- * - Determinate: width 0 → percentage% over 0.4s easeOut
- * - showValue: `mt-1 text-right text-xs text-zinc-600 dark:text-zinc-400` (BELOW the bar)
- *
- * @param value Current progress value (0 to [max]).
- * @param max Maximum progress value.
- * @param size Size variant controlling bar height.
- * @param variant Color variant for the filled portion.
- * @param indeterminate When true, plays an infinite sliding animation ignoring [value].
- * @param showValue When true, displays the percentage below and right-aligned.
- * @param glass When true, uses a semi-transparent glass background for the track.
- * @param modifier Modifier applied to the root layout.
- */
 @Composable
 fun DarwinLinearProgress(
     value: Float = 0f,
@@ -118,7 +76,6 @@ fun DarwinLinearProgress(
     val fillColor = variantColor(variant)
     val useGradient = variant == DarwinProgressVariant.Gradient
 
-    // Determinate: animate fill fraction (React: duration 0.4s, ease "easeOut")
     // CSS ease-out = cubic-bezier(0, 0, 0.58, 1)
     val targetFraction = if (indeterminate) 0f else (value / max).coerceIn(0f, 1f)
     val animatedFraction by animateFloatAsState(
@@ -150,7 +107,6 @@ fun DarwinLinearProgress(
 
     val percentage = ((value / max) * 100f).coerceIn(0f, 100f).toInt()
 
-    // React: showValue is a <div> below the bar with mt-1 text-right
     Column(modifier = modifier) {
         Canvas(
             modifier = Modifier
@@ -229,33 +185,12 @@ fun DarwinLinearProgress(
 
 // ==================== Circular Progress ====================
 
-/**
- * Darwin UI Circular Progress — a circular arc progress indicator.
- *
- * Pixel-perfect match with the React darwin-ui CircularProgress component:
- * - Track: `text-black/10 dark:text-white/10`
- * - Default size: 40px, strokeWidth: 4px
- * - SVG with `-rotate-90` (starts from top)
- * - Variants: default=blue-500, success=emerald-500, warning=amber-500, danger=red-500
- * - Indeterminate: strokeDashoffset [C, -C] + rotate [0, 360] over 2s linear
- * - Determinate: strokeDashoffset from C to offset over 0.4s easeOut
- * - showValue: `text-xs font-medium text-zinc-700 dark:text-zinc-300`
- *
- * @param value Current progress value (0 to [max]).
- * @param max Maximum progress value.
- * @param size Diameter of the circular indicator (React default: 40).
- * @param strokeWidth Width of the arc stroke (React default: 4).
- * @param variant Color variant for the progress arc.
- * @param indeterminate When true, plays an infinite animation ignoring [value].
- * @param showValue When true, displays the percentage in the center of the circle.
- * @param modifier Modifier applied to the container.
- */
 @Composable
 fun DarwinCircularProgress(
     value: Float = 0f,
     max: Float = 100f,
-    size: Dp = 40.dp, // React default: size=40
-    strokeWidth: Dp = 4.dp, // React default: strokeWidth=4
+    size: Dp = 40.dp,
+    strokeWidth: Dp = 4.dp,
     variant: DarwinProgressVariant = DarwinProgressVariant.Default,
     indeterminate: Boolean = false,
     showValue: Boolean = false,
@@ -266,10 +201,8 @@ fun DarwinCircularProgress(
     // Track color: text-black/10 dark:text-white/10
     val trackColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
-    // Circular does not support gradient variant in React
     val fillColor = variantColor(variant)
 
-    // Determinate: animate sweep (React: duration 0.4s, ease "easeOut")
     val targetFraction = if (indeterminate) 0f else (value / max).coerceIn(0f, 1f)
     val animatedFraction by animateFloatAsState(
         targetValue = targetFraction,
@@ -279,7 +212,6 @@ fun DarwinCircularProgress(
         ),
     )
 
-    // Indeterminate: React animates strokeDashoffset [C, -C] and rotate [0, 360]
     // over 2s linear. This creates a drawing/erasing arc that also rotates.
     // We model this with a single 0→1 progress that maps to startAngle + sweepAngle.
     val infiniteTransition = rememberInfiniteTransition(label = "circular_indeterminate")
@@ -322,7 +254,7 @@ fun DarwinCircularProgress(
             )
 
             if (indeterminate) {
-                // Models the React SVG animation exactly:
+
                 //   SVG parent: -rotate-90 (path starts at top)
                 //   strokeDasharray: C, strokeDashoffset: [C, -C]
                 //   rotate: [0, 360], duration: 2s linear

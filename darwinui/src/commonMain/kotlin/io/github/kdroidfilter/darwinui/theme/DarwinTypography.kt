@@ -14,12 +14,6 @@ import darwinui.darwinui.generated.resources.manrope_regular
 import darwinui.darwinui.generated.resources.manrope_semibold
 import org.jetbrains.compose.resources.Font
 
-/**
- * Manrope font family — the same font used in the React darwin-ui.
- *
- * Must be called inside a @Composable scope because [Font] is a
- * composable resource loader.
- */
 @Composable
 fun ManropeFontFamily(): FontFamily = FontFamily(
     Font(Res.font.manrope_regular, FontWeight.Normal),
@@ -28,10 +22,6 @@ fun ManropeFontFamily(): FontFamily = FontFamily(
     Font(Res.font.manrope_bold, FontWeight.Bold),
 )
 
-/**
- * Darwin UI Typography System
- * Uses the Manrope font to match the React darwin-ui library.
- */
 @Immutable
 data class DarwinTypography(
     // Display

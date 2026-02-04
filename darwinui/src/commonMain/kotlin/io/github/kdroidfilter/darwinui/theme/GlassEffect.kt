@@ -10,14 +10,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-/**
- * Glass-morphism effect modifier.
- * In the React library, glass={true} applies:
- *   bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-white/20 dark:border-white/10
- *
- * Since backdrop-blur is not natively available in Compose Multiplatform,
- * we simulate the glass effect with semi-transparent backgrounds and borders.
- */
 @Composable
 fun Modifier.glassEffect(
     enabled: Boolean = true,

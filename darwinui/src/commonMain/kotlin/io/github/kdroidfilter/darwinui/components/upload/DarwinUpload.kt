@@ -34,9 +34,6 @@ import io.github.kdroidfilter.darwinui.theme.Amber500
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.Red500
 
-/**
- * Upload variant matching the React darwin-ui Upload component.
- */
 enum class DarwinUploadVariant {
     /** Large dropzone with icon, text, image grid, and upload button */
     Default,
@@ -57,13 +54,6 @@ data class DarwinUploadFile(
     val error: String? = null,
 )
 
-/**
- * Darwin UI Upload component.
- * File upload area with multiple variants, image grid, cover selection,
- * reordering, progress tracking, and glass morphism support.
- *
- * Pixel-perfect match with the React darwin-ui Upload component.
- */
 @Composable
 fun DarwinUpload(
     files: List<DarwinUploadFile> = emptyList(),

@@ -37,15 +37,6 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.window.rememberPopupPositionProviderAtPosition
 
-/**
- * Darwin-styled context menu representation for desktop.
- *
- * Pixel-perfect match with the React darwin-ui ContextMenu content:
- * - `min-w-45 rounded-xl border p-1 shadow-xl`
- * - `bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-black/10 dark:border-white/10`
- * - Items: `rounded-lg px-2 py-1.5 text-sm text-zinc-700 dark:text-zinc-300`
- * - Hover: `hover:bg-black/10 dark:hover:bg-white/10`
- */
 private class DarwinContextMenuRepresentation : ContextMenuRepresentation {
     @Composable
     override fun Representation(

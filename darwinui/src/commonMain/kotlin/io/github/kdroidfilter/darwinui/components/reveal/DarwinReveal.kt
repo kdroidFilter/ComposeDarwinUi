@@ -13,18 +13,6 @@ enum class DarwinRevealDirection {
     Up, Down, Left, Right,
 }
 
-/**
- * Darwin UI Reveal component.
- * Animates content entry with fade + slide from a specified direction.
- * Mirrors the React darwin-ui Reveal component.
- *
- * Usage:
- * ```
- * DarwinReveal(visible = showContent, direction = DarwinRevealDirection.Up) {
- *     Text("This slides up and fades in")
- * }
- * ```
- */
 @Composable
 fun DarwinReveal(
     visible: Boolean,

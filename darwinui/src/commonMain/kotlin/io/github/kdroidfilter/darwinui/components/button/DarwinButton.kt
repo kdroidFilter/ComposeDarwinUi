@@ -56,9 +56,6 @@ import io.github.kdroidfilter.darwinui.theme.Zinc900
 import io.github.kdroidfilter.darwinui.theme.darwinTween
 import io.github.kdroidfilter.darwinui.theme.glassEffect
 
-/**
- * Button variant matching the React darwin-ui Button component.
- */
 enum class DarwinButtonVariant {
     Default,
     Primary,
@@ -73,9 +70,6 @@ enum class DarwinButtonVariant {
     Accent,
 }
 
-/**
- * Button size matching the React darwin-ui Button sizes.
- */
 enum class DarwinButtonSize {
     /** Small: height 32dp, smaller text, tighter padding */
     Small,
@@ -114,27 +108,6 @@ private data class ButtonDimensions(
 // Composable
 // ===========================================================================
 
-/**
- * Darwin UI Button -- a macOS-inspired button for Compose Multiplatform.
- *
- * Mirrors the React darwin-ui `<Button>` component, supporting 11 variants,
- * 4 sizes, loading state, icon slots, glass morphism, and animated
- * press / hover feedback.
- *
- * @param onClick Called when the button is clicked.
- * @param modifier Modifier applied to the root container.
- * @param variant Visual style variant.
- * @param size Size preset.
- * @param enabled Whether the button is interactive.
- * @param loading When true, shows a spinner and optional [loadingText].
- * @param loadingText Text to display while [loading] is true. Falls back to
- *   the regular [content] when null.
- * @param glass When true, applies a glass-morphism effect over the button.
- * @param fullWidth When true, the button fills the maximum available width.
- * @param leftIcon Optional composable rendered before the label.
- * @param rightIcon Optional composable rendered after the label.
- * @param content The label content of the button (typically a [Text]).
- */
 @Composable
 fun DarwinButton(
     onClick: () -> Unit,
@@ -355,70 +328,70 @@ private fun resolveButtonColors(
     variant: DarwinButtonVariant,
     colors: DarwinColors,
 ): ButtonColors {
-    // Colors match the React darwin-ui button.tsx variantClasses exactly.
+
     return when (variant) {
-        // React: bg-zinc-200 dark:bg-white/10 text-zinc-900 dark:text-zinc-100 border-zinc-300 dark:border-white/10
+
         DarwinButtonVariant.Default -> ButtonColors(
             background = if (colors.isDark) Color.White.copy(alpha = 0.10f) else Zinc200,
             contentColor = if (colors.isDark) Zinc100 else Zinc900,
             borderColor = if (colors.isDark) Color.White.copy(alpha = 0.10f) else Zinc300,
         )
-        // React: bg-blue-500 text-white
+
         DarwinButtonVariant.Primary -> ButtonColors(
             background = Blue500,
             contentColor = Color.White,
             borderColor = null,
         )
-        // React: bg-zinc-100 dark:bg-white/5 text-zinc-800 dark:text-zinc-300 border-zinc-200 dark:border-white/10
+
         DarwinButtonVariant.Secondary -> ButtonColors(
             background = if (colors.isDark) Color.White.copy(alpha = 0.05f) else Zinc100,
             contentColor = if (colors.isDark) Zinc300 else Zinc800,
             borderColor = if (colors.isDark) Color.White.copy(alpha = 0.10f) else Zinc200,
         )
-        // React: bg-emerald-500 text-white
+
         DarwinButtonVariant.Success -> ButtonColors(
             background = colors.success,
             contentColor = Color.White,
             borderColor = null,
         )
-        // React: bg-amber-500 text-black
+
         DarwinButtonVariant.Warning -> ButtonColors(
             background = colors.warning,
             contentColor = Color.Black,
             borderColor = null,
         )
-        // React: bg-sky-500 text-white
+
         DarwinButtonVariant.Info -> ButtonColors(
             background = colors.info,
             contentColor = Color.White,
             borderColor = null,
         )
-        // React: bg-red-500 text-white
+
         DarwinButtonVariant.Destructive -> ButtonColors(
             background = Red500,
             contentColor = Color.White,
             borderColor = null,
         )
-        // React: border-2 border-zinc-400 dark:border-zinc-500 bg-transparent text-zinc-800 dark:text-zinc-200
+
         DarwinButtonVariant.Outline -> ButtonColors(
             background = Color.Transparent,
             contentColor = if (colors.isDark) Zinc200 else Zinc800,
             borderColor = if (colors.isDark) Zinc500 else Zinc400,
             borderWidth = 2.dp,
         )
-        // React: hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-800 dark:text-zinc-300
+
         DarwinButtonVariant.Ghost -> ButtonColors(
             background = Color.Transparent,
             contentColor = if (colors.isDark) Zinc300 else Zinc800,
             borderColor = null,
         )
-        // React: text-blue-600 dark:text-blue-400
+
         DarwinButtonVariant.Link -> ButtonColors(
             background = Color.Transparent,
             contentColor = if (colors.isDark) Color(0xFF60A5FA) else Blue600,
             borderColor = null,
         )
-        // React: bg-violet-500 text-white
+
         DarwinButtonVariant.Accent -> ButtonColors(
             background = Purple500,
             contentColor = Color.White,
@@ -432,7 +405,7 @@ private fun resolveButtonDimensions(
     size: DarwinButtonSize,
     typography: DarwinTypography,
 ): ButtonDimensions {
-    // Dimensions match React button.tsx sizeClasses: sm=h-8, default=h-9, lg=h-10, icon=h-9 w-9
+
     return when (size) {
         DarwinButtonSize.Small -> ButtonDimensions(
             height = 32.dp,           // h-8

@@ -55,23 +55,6 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
 
-/**
- * Darwin UI multiple-selection dropdown.
- *
- * Mirrors the React darwin-ui MultiSelect component with macOS-inspired styling.
- * The trigger displays a text summary; selected items appear as removable tags
- * below the trigger (matching the React layout).
- *
- * @param options          Available options to choose from.
- * @param selectedValues   Currently selected option values.
- * @param onValuesChange   Callback invoked with the updated list of selected values.
- * @param placeholder      Text displayed when nothing is selected.
- * @param enabled          Whether the component is interactive.
- * @param glass            Whether to apply the glass-morphism effect.
- * @param showTags         Whether to display tags below the trigger.
- * @param label            Optional label text displayed above the trigger.
- * @param modifier         Modifier applied to the root layout.
- */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DarwinMultiSelect(
@@ -108,7 +91,6 @@ fun DarwinMultiSelect(
         else -> glassBorderOrDefault(glass, colors.inputBorder)
     }
 
-    // React: bg-black/5 hover:bg-black/10
     val backgroundColor = when {
         glass -> glassOrDefault(glass, colors.inputBackground)
         isTriggerHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.04f)
@@ -159,7 +141,6 @@ fun DarwinMultiSelect(
             )
         }
 
-        // Trigger — fixed height, text only (React: h-9 = 36px)
         Box {
             Row(
                 modifier = Modifier
@@ -286,7 +267,6 @@ fun DarwinMultiSelect(
                         val itemInteractionSource = remember { MutableInteractionSource() }
                         val isItemHovered by itemInteractionSource.collectIsHoveredAsState()
 
-                        // React: hover:bg-black/10 dark:hover:bg-white/10
                         val itemBackgroundColor = when {
                             isHighlighted || isItemHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.035f)
                             else -> Color.Transparent
@@ -313,7 +293,7 @@ fun DarwinMultiSelect(
                                 .padding(start = 8.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            // Check indicator — React: absolute left-2, blue Check icon
+
                             Box(
                                 modifier = Modifier.size(16.dp),
                                 contentAlignment = Alignment.Center,
@@ -346,7 +326,6 @@ fun DarwinMultiSelect(
             }
         }
 
-        // Tags below trigger — React: flex flex-wrap gap-1.5 mt-2
         if (showTags && selectedValues.isNotEmpty()) {
             FlowRow(
                 modifier = Modifier.padding(top = 8.dp),

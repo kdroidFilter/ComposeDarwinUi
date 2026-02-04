@@ -57,9 +57,6 @@ import kotlinx.coroutines.delay
 // Dialog Size
 // ===========================================================================
 
-/**
- * Size presets for [DarwinDialogContent], matching the React darwin-ui sizes.
- */
 enum class DarwinDialogSize(val maxWidth: Dp) {
     Sm(384.dp),
     Md(448.dp),
@@ -82,17 +79,6 @@ internal val LocalDialogContext = compositionLocalOf<DialogContextValue?> { null
 // DarwinDialog (root)
 // ===========================================================================
 
-/**
- * Darwin UI Dialog component — a modal overlay rendered via [Popup] so it works
- * from anywhere in the composition tree (including inside scrollable containers).
- *
- * Features animated scrim (fade), content animation (scale/fade/slide), and
- * compound sub-components mirroring the React darwin-ui Dialog.
- *
- * @param open        Whether the dialog is visible.
- * @param onOpenChange Callback invoked when the dialog should open or close.
- * @param content     Slot for the dialog tree (typically [DarwinDialogContent]).
- */
 @Composable
 fun DarwinDialog(
     open: Boolean,
@@ -129,7 +115,7 @@ fun DarwinDialog(
         ) {
             CompositionLocalProvider(LocalDialogContext provides contextValue) {
                 val colors = DarwinTheme.colors
-                // React: bg-black/30 dark:bg-black/50
+
                 val scrimColor = if (colors.isDark) Color.Black.copy(alpha = 0.50f) else Color.Black.copy(alpha = 0.30f)
 
                 // Scrim with fade animation
@@ -190,18 +176,6 @@ fun DarwinDialog(
 // DarwinDialogContent
 // ===========================================================================
 
-/**
- * The content panel of the dialog, centered within the scrim.
- *
- * React styling:
- * - rounded-2xl, shadow-2xl
- * - bg-white/95 dark:bg-zinc-900/95, backdrop-blur-md
- * - border black/10 dark:white/10
- *
- * @param size  Size preset controlling the max width.
- * @param glass Enable frosted glass effect on the panel.
- * @param showCloseButton Show a close (X) button at the top-right corner (React: absolute right-4 top-4).
- */
 @Composable
 fun DarwinDialogContent(
     modifier: Modifier = Modifier,
@@ -213,7 +187,6 @@ fun DarwinDialogContent(
     val colors = DarwinTheme.colors
     val shape = RoundedCornerShape(16.dp) // rounded-2xl
 
-    // React: bg-white/95 dark:bg-zinc-900/95
     val bgColor = if (glass) {
         glassOrDefault(true, colors.surface)
     } else {
@@ -221,7 +194,6 @@ fun DarwinDialogContent(
         else Color.White.copy(alpha = 0.95f)
     }
 
-    // React: border-black/10 dark:border-white/10
     val borderColor = if (glass) {
         glassBorderOrDefault(true, colors.borderSubtle)
     } else {
@@ -247,7 +219,6 @@ fun DarwinDialogContent(
             content()
         }
 
-        // React: DialogClose at absolute right-4 top-4
         if (showCloseButton) {
             Box(
                 modifier = Modifier
@@ -264,10 +235,6 @@ fun DarwinDialogContent(
 // DarwinDialogHeader
 // ===========================================================================
 
-/**
- * Header area of the dialog.
- * React: px-6 pt-6 pb-0
- */
 @Composable
 fun DarwinDialogHeader(
     modifier: Modifier = Modifier,
@@ -286,10 +253,6 @@ fun DarwinDialogHeader(
 // DarwinDialogTitle
 // ===========================================================================
 
-/**
- * Title text for the dialog header.
- * React: text-lg font-semibold text-zinc-900 dark:text-zinc-100
- */
 @Composable
 fun DarwinDialogTitle(
     text: String,
@@ -308,10 +271,6 @@ fun DarwinDialogTitle(
 // DarwinDialogDescription
 // ===========================================================================
 
-/**
- * Description text beneath the dialog title.
- * React: text-sm mt-1 text-zinc-500 dark:text-zinc-400
- */
 @Composable
 fun DarwinDialogDescription(
     text: String,
@@ -329,10 +288,6 @@ fun DarwinDialogDescription(
 // DarwinDialogBody
 // ===========================================================================
 
-/**
- * Body / main content area of the dialog.
- * React: px-6 py-4
- */
 @Composable
 fun DarwinDialogBody(
     modifier: Modifier = Modifier,
@@ -351,10 +306,6 @@ fun DarwinDialogBody(
 // DarwinDialogFooter
 // ===========================================================================
 
-/**
- * Footer area with action buttons, aligned to the end (right).
- * React: flex items-center justify-end gap-2, px-6 pb-6 pt-0
- */
 @Composable
 fun DarwinDialogFooter(
     modifier: Modifier = Modifier,
@@ -375,15 +326,6 @@ fun DarwinDialogFooter(
 // DarwinDialogClose
 // ===========================================================================
 
-/**
- * A close trigger that dismisses the dialog when clicked.
- *
- * If no content is provided, renders a default close button (Lucide X icon)
- * matching the React dialog close button:
- * - p-1, rounded-lg
- * - text-zinc-500 dark:text-zinc-400
- * - hover: text-zinc-700 dark:text-zinc-200, bg-black/5 dark:bg-white/10
- */
 @Composable
 fun DarwinDialogClose(
     modifier: Modifier = Modifier,

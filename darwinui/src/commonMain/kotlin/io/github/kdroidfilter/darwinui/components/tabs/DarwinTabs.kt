@@ -124,20 +124,6 @@ fun DarwinTabs(
 // DarwinTabsList — pill-shaped container for tab triggers
 // =============================================================================
 
-/**
- * Pill-shaped container for [DarwinTabsTrigger] composables.
- *
- * Renders a rounded container with a subtle background and border,
- * matching the React `TabsList` styling:
- * - `inline-flex h-10 rounded-xl p-1`
- * - Normal: `bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10`
- * - Glass: `bg-white/60 dark:bg-zinc-900/60 border-white/20 dark:border-white/10`
- *
- * An animated background indicator slides behind the selected trigger.
- *
- * @param modifier Modifier applied to the outer container.
- * @param content Row-scoped content — typically several [DarwinTabsTrigger]s.
- */
 @Composable
 fun DarwinTabsList(
     modifier: Modifier = Modifier,
@@ -226,24 +212,6 @@ fun DarwinTabsList(
 // DarwinTabsTrigger — individual tab button
 // =============================================================================
 
-/**
- * Individual tab button within a [DarwinTabsList].
- *
- * Selection state and click handling are derived from [DarwinTabsState] via
- * the parent [DarwinTabs] context — the caller only needs to supply the tab
- * [value] and label [content].
- *
- * Matches the React `TabsTrigger` styling:
- * - `rounded-lg px-3 py-1.5 text-sm font-medium`
- * - Selected: `text-zinc-900 dark:text-zinc-100`
- * - Default: `text-zinc-800 dark:text-zinc-200`
- *
- * @param value The unique identifier for this tab.
- * @param modifier Modifier applied to the trigger container.
- * @param enabled When `false`, the trigger is non-interactive and half-transparent.
- * @param icon Optional icon composable rendered before the label (16 dp, gap-2).
- * @param content The label content, typically a [DarwinText][io.github.kdroidfilter.darwinui.DarwinText].
- */
 @Composable
 fun DarwinTabsTrigger(
     value: String,
@@ -318,17 +286,6 @@ fun DarwinTabsTrigger(
 // DarwinTabsContent — content panel for a tab
 // =============================================================================
 
-/**
- * Content panel that is visible only when [value] matches the selected tab.
- *
- * Matches the React `TabsContent` behaviour: the non-selected panel returns
- * `null` immediately (no exit animation), and the newly selected panel
- * fades + slides in (`opacity 0→1, y 10→0, duration 0.2s`).
- *
- * @param value The tab value this content is associated with.
- * @param modifier Modifier applied to the content wrapper.
- * @param content The composable content displayed when this tab is active.
- */
 @Composable
 fun DarwinTabsContent(
     value: String,
@@ -337,7 +294,6 @@ fun DarwinTabsContent(
 ) {
     val state = LocalDarwinTabsState.current
 
-    // React: if (!isSelected) return null; — no exit animation
     if (value != state.selectedTab) return
 
     val density = LocalDensity.current

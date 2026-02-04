@@ -7,35 +7,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.VisualTransformation
 import io.github.kdroidfilter.darwinui.icons.DarwinIcon
 import io.github.kdroidfilter.darwinui.icons.LucideSearch
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
-/**
- * A search input field with a leading search icon.
- *
- * Mirrors the React darwin-ui `Input.Search` component — a convenience wrapper
- * around [DarwinTextField] that pre-sets a [LucideSearch] leading icon.
- *
- * @param value The current text value.
- * @param onValueChange Callback invoked when the text changes.
- * @param modifier Modifier applied to the outer container.
- * @param placeholder Placeholder text shown when [value] is empty.
- * @param label Label text displayed above the input.
- * @param supportingText Supporting text displayed below the input.
- * @param isError When true, applies a red border and triggers a shake animation.
- * @param isSuccess When true, applies a green border.
- * @param enabled When false, the input is not editable and appears at reduced opacity.
- * @param singleLine Whether this is a single-line input. Defaults to true.
- * @param size The size variant of the input. Defaults to [DarwinInputSize.Md].
- * @param glass When true, applies glass-morphism styling.
- * @param trailingIcon Optional composable rendered at the end of the input row.
- * @param keyboardOptions Software keyboard options forwarded to the underlying text field.
- * @param keyboardActions Software keyboard actions forwarded to the underlying text field.
- * @param focusRequester Optional [FocusRequester] to control focus programmatically.
- * @param textStyle The text style for the input content.
- */
 @Composable
 fun DarwinSearchField(
     value: String,

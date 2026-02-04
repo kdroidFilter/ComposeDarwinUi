@@ -67,22 +67,6 @@ import io.github.kdroidfilter.darwinui.theme.Zinc900
 // CompositionLocal to allow items to auto-close the menu
 internal val LocalContextMenuClose = staticCompositionLocalOf<() -> Unit> { {} }
 
-/**
- * A context menu triggered by right-click.
- *
- * Pixel-perfect match with the React darwin-ui ContextMenu component:
- * - Content: `min-w-45 rounded-xl border p-1 shadow-xl`
- * - Default: `bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-black/10 dark:border-white/10`
- * - Glass: `bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-white/20 dark:border-white/10`
- * - Animation: scale 0.95 → 1, opacity 0 → 1, 150ms easeOut, transform-origin top-left
- *
- * @param glass When true, applies a glass-morphism effect.
- * @param modifier Modifier applied to the root container.
- * @param trigger The composable that responds to right-click.
- * @param content The menu content composed of [DarwinContextMenuItem],
- *   [DarwinContextMenuCheckboxItem], [DarwinContextMenuLabel],
- *   [DarwinContextMenuSeparator], etc.
- */
 @Composable
 fun DarwinContextMenu(
     glass: Boolean = false,
@@ -183,23 +167,6 @@ fun DarwinContextMenu(
 // Context Menu Item
 // =============================================================================
 
-/**
- * A clickable item within a [DarwinContextMenu].
- *
- * Pixel-perfect match with React ContextMenuItem:
- * - `rounded-lg px-2 py-1.5 text-sm text-zinc-700 dark:text-zinc-300`
- * - `hover:bg-black/10 dark:hover:bg-white/10 hover:text-zinc-900 dark:hover:text-zinc-100`
- * - Destructive: `text-red-500 hover:text-red-500 hover:bg-red-500/10`
- *
- * Items auto-close the context menu when clicked.
- *
- * @param onSelect Callback invoked when the item is clicked.
- * @param enabled Whether the item is interactive.
- * @param destructive When true, the item is styled as destructive (red text).
- * @param modifier Modifier applied to the item row.
- * @param trailingContent Optional composable after the label (e.g., [DarwinContextMenuShortcut]).
- * @param content The item label, typically a [DarwinText] composable.
- */
 @Composable
 fun DarwinContextMenuItem(
     onSelect: () -> Unit,
@@ -282,19 +249,6 @@ fun DarwinContextMenuItem(
 // Context Menu Checkbox Item
 // =============================================================================
 
-/**
- * A checkbox item within a [DarwinContextMenu].
- *
- * Pixel-perfect match with React ContextMenuCheckboxItem:
- * - Same styling as [DarwinContextMenuItem] with a leading check indicator.
- * - Check indicator: `mr-2 h-4 w-4` box with `h-3 w-3` check icon.
- *
- * @param checked Whether the checkbox is currently checked.
- * @param onCheckedChange Callback invoked when toggled.
- * @param enabled Whether the item is interactive.
- * @param modifier Modifier applied to the item row.
- * @param content The item label.
- */
 @Composable
 fun DarwinContextMenuCheckboxItem(
     checked: Boolean,
@@ -378,15 +332,6 @@ fun DarwinContextMenuCheckboxItem(
 // Context Menu Label
 // =============================================================================
 
-/**
- * A non-interactive label within a [DarwinContextMenu].
- *
- * Pixel-perfect match with React ContextMenuLabel:
- * - `px-2 py-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400`
- *
- * @param text The label text to display.
- * @param modifier Modifier applied to the label.
- */
 @Composable
 fun DarwinContextMenuLabel(
     text: String,
@@ -419,15 +364,6 @@ fun DarwinContextMenuLabel(
 // Context Menu Separator
 // =============================================================================
 
-/**
- * A horizontal separator within a [DarwinContextMenu].
- *
- * Pixel-perfect match with React ContextMenuSeparator:
- * - `-mx-1 my-1 h-px bg-black/10 dark:bg-white/10`
- * - Extends full width (cancels container's horizontal padding).
- *
- * @param modifier Modifier applied to the separator.
- */
 @Composable
 fun DarwinContextMenuSeparator(modifier: Modifier = Modifier) {
     val colors = DarwinTheme.colors
@@ -449,17 +385,6 @@ fun DarwinContextMenuSeparator(modifier: Modifier = Modifier) {
 // Context Menu Shortcut
 // =============================================================================
 
-/**
- * A keyboard shortcut hint within a [DarwinContextMenuItem].
- *
- * Pixel-perfect match with React ContextMenuShortcut:
- * - `ml-auto text-xs tracking-widest text-zinc-500 dark:text-zinc-400`
- *
- * Typically used as [trailingContent] of [DarwinContextMenuItem].
- *
- * @param text The shortcut text (e.g., "Cmd+C").
- * @param modifier Modifier applied to the text.
- */
 @Composable
 fun DarwinContextMenuShortcut(
     text: String,

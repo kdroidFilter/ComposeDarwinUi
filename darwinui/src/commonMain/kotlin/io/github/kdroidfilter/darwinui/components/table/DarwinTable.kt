@@ -49,20 +49,6 @@ import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 
 // ==================== DarwinTable ====================
 
-/**
- * A table container that follows the Darwin UI design system.
- *
- * Uses a compound-component pattern with [DarwinTableHead], [DarwinTableBody],
- * [DarwinTableRow], [DarwinTableCell], and [DarwinTableHeaderCell] as children.
- *
- * The table is rendered as a [Column] with border, rounded corners (12dp), and
- * overflow clipping, mirroring the React darwin-ui Table component.
- *
- * @param glass When true, applies a glass-morphism effect (semi-transparent background
- *              with a subtle border). When false, uses the standard card background.
- * @param modifier Modifier applied to the table container.
- * @param content The table content, typically composed of [DarwinTableHead] and [DarwinTableBody].
- */
 @Composable
 fun DarwinTable(
     glass: Boolean = false,
@@ -86,15 +72,6 @@ fun DarwinTable(
 
 // ==================== DarwinTableHead ====================
 
-/**
- * Header section of a [DarwinTable].
- *
- * Displays a slightly differentiated background (muted or surface color) with a
- * bottom border, mirroring the React `<thead>` with `bg-black/5 dark:bg-white/5`.
- *
- * @param modifier Modifier applied to the header container.
- * @param content The header content, typically a [DarwinTableRow] with [DarwinTableHeaderCell] children.
- */
 @Composable
 fun DarwinTableHead(
     modifier: Modifier = Modifier,

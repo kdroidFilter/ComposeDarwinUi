@@ -45,37 +45,6 @@ enum class DarwinInputSize(val height: Dp) {
     Lg(40.dp),
 }
 
-/**
- * A macOS-inspired text input field mirroring the React darwin-ui Input component.
- *
- * The component uses ring-based borders that transition between idle, focused, error,
- * and success states, matching the Tailwind CSS-based styling of the React library:
- * - Idle: ring-1 ring-inset ring-black/10 (light) or ring-white/10 (dark)
- * - Focused: ring-2 ring-blue-500
- * - Error: ring-2 ring-red-500 with optional shake animation
- * - Success: ring-2 ring-green-500
- *
- * @param value The current text value.
- * @param onValueChange Callback invoked when the text changes.
- * @param modifier Modifier applied to the outer container (label + field + supportingText).
- * @param placeholder Placeholder text shown when [value] is empty.
- * @param label Label text displayed above the input.
- * @param supportingText Supporting text displayed below the input (e.g. error messages).
- * @param isError When true, applies a red border and triggers a shake animation.
- * @param isSuccess When true, applies a green border.
- * @param enabled When false, the input is not editable and appears at reduced opacity.
- * @param password When true, the text is visually obscured.
- * @param singleLine Whether this is a single-line input. Defaults to true.
- * @param size The size variant of the input. Defaults to [DarwinInputSize.Md].
- * @param glass When true, applies glass-morphism styling instead of the default background.
- * @param leadingIcon Optional composable rendered at the start of the input row.
- * @param trailingIcon Optional composable rendered at the end of the input row.
- * @param keyboardOptions Software keyboard options forwarded to [BasicTextField].
- * @param keyboardActions Software keyboard actions forwarded to [BasicTextField].
- * @param visualTransformation Visual transformation applied to the text. Overridden when [password] is true.
- * @param focusRequester Optional [FocusRequester] to control focus programmatically.
- * @param textStyle The text style for the input content. Defaults to the theme's bodyMedium.
- */
 @Composable
 fun DarwinTextField(
     value: String,
@@ -147,7 +116,6 @@ fun DarwinTextField(
         }
     }
 
-    // ---- Background color (animated on focus, matching React focus:bg-white/90 / dark:focus:bg-zinc-900/90) ----
     // We animate alpha separately to avoid interpolating between two very different colors
     // (e.g. semi-transparent black → near-opaque white) which produces ugly intermediate grays.
     val focusAlpha by animateFloatAsState(
@@ -242,7 +210,6 @@ fun DarwinTextField(
                             innerTextField()
                         }
 
-                        // Trailing icon — auto error/success icons mirror React behaviour
                         val autoTrailingIcon: @Composable (() -> Unit)? = when {
                             isError -> {{ io.github.kdroidfilter.darwinui.icons.DarwinIcon(io.github.kdroidfilter.darwinui.icons.LucideX, tint = colors.destructive) }}
                             isSuccess -> {{ io.github.kdroidfilter.darwinui.icons.DarwinIcon(io.github.kdroidfilter.darwinui.icons.LucideCheck, tint = colors.success) }}

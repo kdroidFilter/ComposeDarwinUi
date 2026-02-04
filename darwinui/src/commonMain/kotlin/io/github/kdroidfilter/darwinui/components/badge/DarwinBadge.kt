@@ -29,12 +29,6 @@ import io.github.kdroidfilter.darwinui.theme.Zinc300
 import io.github.kdroidfilter.darwinui.theme.Zinc700
 import io.github.kdroidfilter.darwinui.theme.Zinc900
 
-/**
- * Variants available for [DarwinBadge].
- *
- * Each variant maps to a specific color combination (background, text, border)
- * following the React darwin-ui badge component exactly.
- */
 enum class DarwinBadgeVariant {
     /** Subtle bg (black/5 or white/5), subtle border (black/10 or white/10), zinc text. */
     Default,
@@ -88,15 +82,10 @@ private data class BadgeColors(
     val borderColor: Color?,
 )
 
-/**
- * Resolves the colors for the given [DarwinBadgeVariant] from the current theme.
- * Pixel-perfect match with the React badge.tsx variant map.
- */
 @Composable
 private fun resolveColors(variant: DarwinBadgeVariant): BadgeColors {
     val isDark = DarwinTheme.colors.isDark
 
-    // Shared color helpers matching React Tailwind classes
     val subtleBg = if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f)
     val zincText = if (isDark) Zinc300 else Zinc700
 
@@ -201,27 +190,6 @@ private fun resolveColors(variant: DarwinBadgeVariant): BadgeColors {
     }
 }
 
-/**
- * A small label component following the Darwin UI design system.
- *
- * Badges are used to highlight status, categories, or counts. They come in 14 variants
- * covering common UI states such as success, warning, destructive, draft, published, etc.
- *
- * Pixel-perfect match with the React darwin-ui Badge component:
- * - `rounded-full border px-2.5 py-0.5 text-xs font-medium`
- *
- * Usage:
- * ```
- * DarwinBadge(variant = DarwinBadgeVariant.Success) {
- *     Text("Active")
- * }
- * ```
- *
- * @param variant The visual variant determining background, text, and border colors.
- *                Defaults to [DarwinBadgeVariant.Default].
- * @param modifier Modifier to be applied to the badge container.
- * @param content The composable content displayed inside the badge, typically a [Text].
- */
 @Composable
 fun DarwinBadge(
     variant: DarwinBadgeVariant = DarwinBadgeVariant.Default,
@@ -243,7 +211,7 @@ fun DarwinBadge(
             if (badgeColors.borderColor != null && badgeColors.borderColor != Color.Transparent) {
                 Modifier.border(width = 1.dp, color = badgeColors.borderColor, shape = shape)
             } else {
-                // React always has `border` class but uses border-transparent for these variants.
+
                 // We add a transparent border to keep consistent sizing.
                 Modifier.border(width = 1.dp, color = Color.Transparent, shape = shape)
             }

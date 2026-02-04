@@ -98,7 +98,6 @@ fun DarwinDropdownMenu(
     val isDark = colors.isDark
     val shapes = DarwinTheme.shapes
 
-    // React: bg-white/95 dark:bg-zinc-900/95, border-black/10 dark:border-white/10
     val nonGlassBg = if (isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
     val nonGlassBorder = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
@@ -139,7 +138,6 @@ fun DarwinDropdownMenu(
                 ) {
                     val scrollState = rememberScrollState()
 
-                    // React: min-w-45 rounded-xl p-1 shadow-xl
                     Column(
                         modifier = Modifier
                             .width(IntrinsicSize.Max)
@@ -191,7 +189,6 @@ fun DarwinDropdownMenuItem(
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
-    // React: hover:bg-black/5 dark:hover:bg-white/10
     // Destructive: hover:bg-red-500/10
     val itemBackground = when {
         !enabled -> Color.Transparent
@@ -200,7 +197,6 @@ fun DarwinDropdownMenuItem(
         else -> Color.Transparent
     }
 
-    // React: text-zinc-700 dark:text-zinc-300, hover → text-zinc-900 dark:text-zinc-100
     // Destructive: text-red-500 (always)
     val textColor = when {
         destructive -> Red500
@@ -210,7 +206,6 @@ fun DarwinDropdownMenuItem(
 
     val contentStyle = typography.bodyMedium.merge(TextStyle(color = textColor))
 
-    // React: px-2 py-1.5 rounded-lg (within p-1 container)
     // Outer padding(horizontal=4.dp) simulates the p-1 container inset
     Row(
         modifier = modifier
@@ -282,7 +277,7 @@ fun DarwinDropdownMenuCheckboxItem(
         enabled = enabled,
         modifier = modifier,
         leadingIcon = {
-            // React: mr-2 h-4 w-4 centered, check h-3 w-3
+
             Box(
                 modifier = Modifier.size(16.dp),
                 contentAlignment = Alignment.Center,
@@ -318,7 +313,6 @@ fun DarwinDropdownMenuLabel(
     val isDark = DarwinTheme.colors.isDark
     val typography = DarwinTheme.typography
 
-    // React: px-2 py-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400
     // Outer horizontal padding 4dp (container p-1 inset) + inner px-2 (8dp)
     Box(
         modifier = modifier
@@ -351,7 +345,6 @@ fun DarwinDropdownMenuLabel(
 fun DarwinDropdownMenuSeparator(modifier: Modifier = Modifier) {
     val isDark = DarwinTheme.colors.isDark
 
-    // React: -mx-1 my-1 h-px bg-black/10 dark:bg-white/10
     // -mx-1 extends past the container p-1 → edge-to-edge within the border.
     // Since the Column has no horizontal padding, separator fills full width.
     Box(
@@ -384,7 +377,6 @@ fun DarwinDropdownMenuShortcut(
     val isDark = DarwinTheme.colors.isDark
     val typography = DarwinTheme.typography
 
-    // React: ml-auto text-xs tracking-widest text-zinc-500 dark:text-zinc-400
     BasicText(
         text = text,
         style = typography.labelMedium.merge(

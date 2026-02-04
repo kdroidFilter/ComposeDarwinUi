@@ -43,14 +43,6 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import kotlin.math.round
 import kotlin.math.roundToInt
 
-/**
- * Size variants for the Darwin slider.
- *
- * Matches React Tailwind classes:
- * - sm: track h-1 (4px), thumb h-3 w-3 (12px)
- * - md: track h-2 (8px), thumb h-4 w-4 (16px)
- * - lg: track h-3 (12px), thumb h-5 w-5 (20px)
- */
 enum class DarwinSliderSize(val trackHeight: Dp, val thumbSize: Dp) {
     Sm(trackHeight = 4.dp, thumbSize = 12.dp),
     Md(trackHeight = 8.dp, thumbSize = 16.dp),
@@ -59,25 +51,6 @@ enum class DarwinSliderSize(val trackHeight: Dp, val thumbSize: Dp) {
 
 private val Blue500 = Color(0xFF3B82F6)
 
-/**
- * Darwin UI Slider — a range slider component mirroring the React darwin-ui Slider.
- *
- * Features a rounded track with a filled portion indicating current progress,
- * a draggable circular thumb with a blue ring, hover/tap scale animations,
- * and an optional value label shown below the track (right-aligned).
- *
- * @param value Current value of the slider.
- * @param onValueChange Callback invoked when the value changes during drag or tap.
- * @param onValueChangeFinished Callback invoked when the user finishes dragging.
- * @param min Minimum value of the slider range.
- * @param max Maximum value of the slider range.
- * @param step Step increment for snapping.
- * @param size Size variant controlling track height and thumb diameter.
- * @param showValue Whether to display the current value below the slider.
- * @param enabled Whether the slider is interactive.
- * @param glass Whether to use semi-transparent glass styling on the track.
- * @param modifier Modifier applied to the root layout.
- */
 @Composable
 fun DarwinSlider(
     value: Float = 0f,
@@ -95,13 +68,11 @@ fun DarwinSlider(
     val colors = DarwinTheme.colors
     val disabledAlpha = if (enabled) 1f else 0.5f
 
-    // React: bg-black/10 dark:bg-white/10
     val trackColor = when {
         glass -> if (colors.isDark) Color(0xFF18181B).copy(alpha = 0.40f) else Color.White.copy(alpha = 0.40f)
         else -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
     }
 
-    // React: bg-blue-500
     val filledColor = Blue500
 
     // Snap value to step
@@ -115,7 +86,6 @@ fun DarwinSlider(
     val fraction = ((value - min) / (max - min)).coerceIn(0f, 1f)
     var isDragging by remember { mutableStateOf(false) }
 
-    // Instant during drag, animated otherwise (React: duration 0 during drag, 0.1 otherwise)
     val animatedFraction by animateFloatAsState(
         targetValue = fraction,
         animationSpec = if (isDragging) tween(durationMillis = 0) else tween(durationMillis = 100),
@@ -129,7 +99,6 @@ fun DarwinSlider(
     val thumbInteractionSource = remember { MutableInteractionSource() }
     val isThumbHovered by thumbInteractionSource.collectIsHoveredAsState()
 
-    // React: whileHover scale 1.1, whileTap scale 0.95, dragging scale 1.1
     val thumbScale by animateFloatAsState(
         targetValue = when {
             isDragging -> 1.1f
@@ -215,7 +184,6 @@ fun DarwinSlider(
                 }
             }
 
-            // Thumb — React: white, shadow-md, ring-2 ring-blue-500/50
             val trackWidthPx = containerSize.width.toFloat() - thumbSizePx
             val thumbOffsetPx = animatedFraction * trackWidthPx
             val thumbOffsetDp = with(density) { thumbOffsetPx.toDp() }
@@ -244,7 +212,6 @@ fun DarwinSlider(
             )
         }
 
-        // Value display — React: mt-1 text-right text-xs text-zinc-500 dark:text-zinc-400
         if (showValue) {
             DarwinText(
                 text = if (step >= 1f) value.roundToInt().toString()

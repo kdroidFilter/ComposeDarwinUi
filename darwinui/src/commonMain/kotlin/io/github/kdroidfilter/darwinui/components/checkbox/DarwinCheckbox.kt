@@ -41,23 +41,8 @@ import io.github.kdroidfilter.darwinui.theme.Zinc800
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 
-// Circular checkbox shape matching the React darwin-ui screenshot
 private val CheckboxShape = CircleShape
 
-/**
- * A macOS-inspired checkbox component matching the React darwin-ui Checkbox.
- *
- * Mirrors the React implementation: 16px square box with rounded-sm corners,
- * animated checkmark / indeterminate dash, and optional label.
- *
- * @param checked Whether the checkbox is currently checked.
- * @param onCheckedChange Callback invoked when the user toggles the checkbox.
- * @param modifier Modifier applied to the root row container.
- * @param indeterminate When true, displays a dash icon instead of a checkmark.
- * @param label Optional text label displayed to the right of the checkbox.
- * @param enabled Whether the checkbox is interactive.
- * @param glass When true, applies a glass-morphism style to the checkbox background.
- */
 @Composable
 fun DarwinCheckbox(
     checked: Boolean,
@@ -84,7 +69,6 @@ fun DarwinCheckbox(
 
     val disabledAlpha = if (enabled) 1f else 0.5f
 
-    // Colors matching React exactly:
     // active:  bg-blue-500 border-blue-500
     // glass:   bg-white/60 dark:bg-zinc-900/60 border-white/30 dark:border-white/10
     // default: bg-white dark:bg-zinc-800 border-black/20 dark:border-zinc-600
@@ -115,7 +99,7 @@ fun DarwinCheckbox(
                 indication = null,
             ),
     ) {
-        // Checkbox box — 16dp matching React's h-4 w-4
+
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -131,7 +115,7 @@ fun DarwinCheckbox(
             if (animationProgress > 0f) {
                 Canvas(
                     modifier = Modifier
-                        .size(11.dp) // React: h-2.75 w-2.75 ≈ 11px
+                        .size(11.dp)
                         .graphicsLayer {
                             scaleX = animationProgress
                             scaleY = animationProgress
@@ -147,7 +131,6 @@ fun DarwinCheckbox(
             }
         }
 
-        // Optional label — React: gap-2 text-[13px]
         if (label != null) {
             Spacer(modifier = Modifier.width(8.dp))
             BasicText(
@@ -163,16 +146,10 @@ fun DarwinCheckbox(
     }
 }
 
-/**
- * Draws a checkmark path matching React's SVG polyline:
- * points="3.5 8.5 6.5 11.5 12.5 4.5" in a 16x16 viewBox,
- * strokeWidth=1.8, strokeLinecap=round, strokeLinejoin=round.
- */
 private fun DrawScope.drawCheckmark(color: Color, progress: Float) {
     val w = size.width
     val h = size.height
 
-    // React SVG points (in 16x16 viewBox): 3.5,8.5 -> 6.5,11.5 -> 12.5,4.5
     // Normalized: start(0.219, 0.531) mid(0.406, 0.719) end(0.781, 0.281)
     val startX = w * 0.219f
     val startY = h * 0.531f
@@ -181,7 +158,7 @@ private fun DrawScope.drawCheckmark(color: Color, progress: Float) {
     val endX = w * 0.781f
     val endY = h * 0.281f
 
-    val strokeWidth = w * (1.8f / 16f) // React: strokeWidth=1.8 in 16px viewBox
+    val strokeWidth = w * (1.8f / 16f)
 
     val path = Path().apply {
         moveTo(startX, startY)
@@ -210,12 +187,8 @@ private fun DrawScope.drawCheckmark(color: Color, progress: Float) {
     )
 }
 
-/**
- * Draws a horizontal dash for the indeterminate state.
- * Matches React: w-2 h-0.5 bg-white rounded (8px × 2px pill).
- */
 private fun DrawScope.drawIndeterminateDash(color: Color) {
-    // React: w-2 (8px) h-0.5 (2px) centered in a 16px box with rounded ends
+
     val dashWidth = size.width * 0.72f  // ~8px in 11px canvas
     val dashHeight = size.height * 0.18f // ~2px in 11px canvas
     val left = (size.width - dashWidth) / 2f

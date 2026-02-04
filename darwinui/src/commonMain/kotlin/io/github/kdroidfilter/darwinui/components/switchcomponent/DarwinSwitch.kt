@@ -30,22 +30,8 @@ import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.Zinc600
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 
-// Emerald-500 — the React darwin-ui switch "on" color
 private val Emerald500 = Color(0xFF10B981)
 
-/**
- * A macOS-inspired toggle switch matching the React darwin-ui Switch.
- *
- * React dimensions: track w-9 h-5 (36×20px), thumb h-4 w-4 (16px),
- * track padding px-0.5 (2px), thumb travel 16px.
- *
- * @param checked Whether the switch is currently in the "on" position.
- * @param onCheckedChange Callback invoked when the user toggles the switch.
- * @param modifier Modifier applied to the root row container.
- * @param label Optional text label displayed to the right of the switch.
- * @param enabled Whether the switch is interactive.
- * @param glass When true, applies a glass-morphism style to the switch track.
- */
 @Composable
 fun DarwinSwitch(
     checked: Boolean,
@@ -61,15 +47,13 @@ fun DarwinSwitch(
 
     val interactionSource = remember { MutableInteractionSource() }
 
-    // React: w-9 h-5 = 36×20px
     val trackWidth = 36.dp
     val trackHeight = 20.dp
-    // React: h-4 w-4 = 16px
+
     val thumbSize = 16.dp
-    // React: px-0.5 = 2px
+
     val thumbPadding = 2.dp
 
-    // React: animate x from 0 to 16
     val thumbOffset by animateDpAsState(
         targetValue = if (checked) 16.dp else 0.dp,
         animationSpec = darwinSpring(preset = DarwinSpringPreset.Snappy),
@@ -78,7 +62,6 @@ fun DarwinSwitch(
 
     val disabledAlpha = if (enabled) 1f else 0.5f
 
-    // Track color — React:
     // checked: bg-emerald-500
     // glass unchecked: bg-white/60 dark:bg-zinc-900/60
     // default unchecked: bg-zinc-600 (same for light and dark)
@@ -110,7 +93,7 @@ fun DarwinSwitch(
                 .clip(shapes.full)
                 .background(trackColor, shapes.full),
         ) {
-            // Thumb — React: h-4 w-4 rounded-full bg-white shadow-sm
+
             Box(
                 modifier = Modifier
                     .offset(x = thumbOffset + thumbPadding)
@@ -126,7 +109,6 @@ fun DarwinSwitch(
             )
         }
 
-        // Optional label — React: gap-2 text-[13px]
         if (label != null) {
             Spacer(modifier = Modifier.width(8.dp))
             BasicText(

@@ -27,30 +27,6 @@ import io.github.kdroidfilter.darwinui.theme.darwinTween
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 
-/**
- * A macOS-inspired multi-line text area mirroring the React darwin-ui TextArea component.
- *
- * Uses the same ring-based border styling as [DarwinTextField] but operates in
- * multi-line mode with configurable [minLines] and [maxLines]. The text area
- * auto-expands as the user types, up to [maxLines].
- *
- * @param value The current text value.
- * @param onValueChange Callback invoked when the text changes.
- * @param modifier Modifier applied to the outer container (label + area + supportingText).
- * @param placeholder Placeholder text shown when [value] is empty.
- * @param label Label text displayed above the text area.
- * @param supportingText Supporting text displayed below the text area (e.g. error messages).
- * @param isError When true, applies a red border and triggers a shake animation.
- * @param isSuccess When true, applies a green border.
- * @param enabled When false, the text area is not editable and appears at reduced opacity.
- * @param minLines Minimum number of visible lines. Defaults to 3.
- * @param maxLines Maximum number of visible lines before scrolling. Defaults to 6.
- * @param glass When true, applies glass-morphism styling instead of the default background.
- * @param keyboardOptions Software keyboard options forwarded to [BasicTextField].
- * @param keyboardActions Software keyboard actions forwarded to [BasicTextField].
- * @param focusRequester Optional [FocusRequester] to control focus programmatically.
- * @param textStyle The text style for the text area content. Defaults to the theme's bodyMedium.
- */
 @Composable
 fun DarwinTextArea(
     value: String,

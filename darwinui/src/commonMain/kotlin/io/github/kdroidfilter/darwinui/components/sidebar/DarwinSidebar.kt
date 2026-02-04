@@ -92,36 +92,6 @@ data class DarwinSidebarItem(
 // DarwinSidebar — main component
 // =============================================================================
 
-/**
- * macOS-style navigation sidebar matching the React darwin-ui `Sidebar` component.
- *
- * Renders a vertical panel with navigation items, an optional collapse toggle,
- * and an optional logout button at the bottom. Automatically separates "Settings"
- * from other items, placing it in the bottom section (matching React behaviour).
- *
- * When items use [DarwinSidebarItem.group], items are rendered in groups with
- * a label header above each group. Groups are displayed in the order they first
- * appear in the list.
- *
- * Desktop width animates between 200dp (expanded) and 56dp (collapsed) using
- * a spring animation. Labels are revealed naturally by the growing width
- * (Apple-style push from start to end).
- *
- * @param items List of navigation items. The "Settings" item is automatically
- *   moved to the bottom section.
- * @param activeItem The [DarwinSidebarItem.id] of the currently active item.
- * @param modifier Modifier applied to the sidebar root.
- * @param onLogout Optional callback for the logout button. When null, the
- *   logout button is hidden.
- * @param collapsed Whether the sidebar is in collapsed (icon-only) mode.
- * @param onCollapsedChange Callback invoked when the collapse toggle is clicked.
- *   When non-null, the collapse toggle button is shown by default.
- * @param collapsible Whether to show the collapse toggle button. Defaults to
- *   `true` when [onCollapsedChange] is provided.
- * @param glass When true, applies frosted-glass background and right border.
- * @param showBorder When true, renders a 1dp right border. Defaults to [glass].
- * @param header Optional composable pinned above the scrollable items.
- */
 @Composable
 fun DarwinSidebar(
     items: List<DarwinSidebarItem>,
@@ -139,7 +109,6 @@ fun DarwinSidebar(
     val typography = DarwinTheme.typography
     val isDark = colors.isDark
 
-    // Separate Settings from top items (like React)
     val topItems = items.filter { it.label != "Settings" }
     val settingsItem = items.find { it.label == "Settings" }
     val hasGroups = items.any { it.group != null }

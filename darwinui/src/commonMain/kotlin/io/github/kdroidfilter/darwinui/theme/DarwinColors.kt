@@ -3,12 +3,6 @@ package io.github.kdroidfilter.darwinui.theme
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 
-/**
- * Darwin UI Color System
- * HSL-based color tokens mirroring the React darwin-ui CSS variables.
- * Dark mode is default (matching the React library's behavior).
- */
-
 // ==================== Base Palette ====================
 
 // Zinc palette (used extensively)
