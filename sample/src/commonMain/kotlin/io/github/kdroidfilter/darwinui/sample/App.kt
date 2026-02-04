@@ -1022,8 +1022,21 @@ fun PopoverDefaultExample() {
 @GalleryExample("DropdownMenu", "Default")
 @Composable
 fun DropdownMenuDefaultExample() {
-    var dropdownExpanded by remember { mutableStateOf(false) }; var checkboxState by remember { mutableStateOf(false) }
+    var dropdownExpanded by remember { mutableStateOf(false) }
     DarwinDropdownMenu(expanded = dropdownExpanded, onDismissRequest = { dropdownExpanded = false }, trigger = { DarwinButton(text = "Open Menu", onClick = { dropdownExpanded = !dropdownExpanded }, variant = DarwinButtonVariant.Outline) }) {
+        DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }) { DarwinText("Profile") }
+        DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }) { DarwinText("Settings") }
+        DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }) { DarwinText("Preferences") }
+        DarwinDropdownMenuSeparator()
+        DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }, destructive = true) { DarwinText("Log out") }
+    }
+}
+
+@GalleryExample("DropdownMenu", "With Labels & Shortcuts")
+@Composable
+fun DropdownMenuLabelsExample() {
+    var dropdownExpanded by remember { mutableStateOf(false) }; var checkboxState by remember { mutableStateOf(false) }
+    DarwinDropdownMenu(expanded = dropdownExpanded, onDismissRequest = { dropdownExpanded = false }, trigger = { DarwinButton(text = "Actions", onClick = { dropdownExpanded = !dropdownExpanded }, variant = DarwinButtonVariant.Outline) }) {
         DarwinDropdownMenuLabel(text = "Actions")
         DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }, trailingContent = { DarwinDropdownMenuShortcut(text = "Cmd+N") }) { DarwinText("New File") }
         DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }, trailingContent = { DarwinDropdownMenuShortcut(text = "Cmd+O") }) { DarwinText("Open") }
@@ -1546,6 +1559,7 @@ private fun DropdownMenuPage() {
     GalleryPage("Dropdown Menu", "Displays a menu to the user with a list of actions.") {
         SectionHeader("Examples")
         ExampleCard(title = "Default", sourceCode = GallerySources.DropdownMenuDefaultExample) { DropdownMenuDefaultExample() }
+        ExampleCard(title = "With Labels & Shortcuts", sourceCode = GallerySources.DropdownMenuLabelsExample) { DropdownMenuLabelsExample() }
     }
 }
 
