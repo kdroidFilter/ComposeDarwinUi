@@ -6,10 +6,14 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,29 +21,37 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.icons.DarwinIcon
+import io.github.kdroidfilter.darwinui.icons.LucideX
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
+import kotlinx.coroutines.delay
 
 // ===========================================================================
 // Dialog Size
@@ -71,27 +83,11 @@ internal val LocalDialogContext = compositionLocalOf<DialogContextValue?> { null
 // ===========================================================================
 
 /**
- * Darwin UI Dialog component — a modal overlay with scrim, scale/fade animation,
- * and compound sub-components mirroring the React darwin-ui Dialog.
+ * Darwin UI Dialog component — a modal overlay rendered via [Popup] so it works
+ * from anywhere in the composition tree (including inside scrollable containers).
  *
- * Usage:
- * ```
- * DarwinDialog(open = showDialog, onOpenChange = { showDialog = it }) {
- *     DarwinDialogContent {
- *         DarwinDialogHeader {
- *             DarwinDialogTitle("Edit Profile")
- *             DarwinDialogDescription("Make changes to your profile here.")
- *         }
- *         DarwinDialogBody {
- *             DarwinText("Dialog body content")
- *         }
- *         DarwinDialogFooter {
- *             DarwinDialogClose { DarwinText("Cancel") }
- *             DarwinButton(onClick = { /* save */ }) { DarwinText("Save") }
- *         }
- *     }
- * }
- * ```
+ * Features animated scrim (fade), content animation (scale/fade/slide), and
+ * compound sub-components mirroring the React darwin-ui Dialog.
  *
  * @param open        Whether the dialog is visible.
  * @param onOpenChange Callback invoked when the dialog should open or close.
@@ -107,25 +103,84 @@ fun DarwinDialog(
         DialogContextValue(onDismiss = { onOpenChange(false) })
     }
 
-    CompositionLocalProvider(LocalDialogContext provides contextValue) {
-        AnimatedVisibility(
-            visible = open,
-            enter = fadeIn(animationSpec = tween(DarwinDuration.Fast.millis)),
-            exit = fadeOut(animationSpec = tween(DarwinDuration.Fast.millis)),
+    // Keep the popup mounted while the exit animation plays
+    var showPopup by remember { mutableStateOf(false) }
+    var animateIn by remember { mutableStateOf(false) }
+
+    LaunchedEffect(open) {
+        if (open) {
+            showPopup = true
+            // Small delay so the Popup is mounted before triggering the enter animation
+            delay(16)
+            animateIn = true
+        } else {
+            animateIn = false
+            // Wait for exit animation to finish before removing the Popup
+            delay(DarwinDuration.Slow.millis.toLong() + 50)
+            showPopup = false
+        }
+    }
+
+    if (showPopup) {
+        Popup(
+            alignment = Alignment.Center,
+            onDismissRequest = { onOpenChange(false) },
+            properties = PopupProperties(focusable = true),
         ) {
-            // Scrim
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(DarwinTheme.colors.scrim)
-                    .clickable(
-                        indication = null,
-                        interactionSource = remember { MutableInteractionSource() },
-                        onClick = { onOpenChange(false) },
-                    ),
-                contentAlignment = Alignment.Center,
-            ) {
-                content()
+            CompositionLocalProvider(LocalDialogContext provides contextValue) {
+                val colors = DarwinTheme.colors
+                // React: bg-black/30 dark:bg-black/50
+                val scrimColor = if (colors.isDark) Color.Black.copy(alpha = 0.50f) else Color.Black.copy(alpha = 0.30f)
+
+                // Scrim with fade animation
+                AnimatedVisibility(
+                    visible = animateIn,
+                    enter = fadeIn(tween(DarwinDuration.Fast.millis)),
+                    exit = fadeOut(tween(DarwinDuration.Slow.millis)),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(scrimColor)
+                            .clickable(
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() },
+                                onClick = { onOpenChange(false) },
+                            ),
+                    )
+                }
+
+                // Content with scale + fade + slide animation
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AnimatedVisibility(
+                        visible = animateIn,
+                        enter = fadeIn(tween(DarwinDuration.Slow.millis)) +
+                                scaleIn(
+                                    initialScale = 0.95f,
+                                    transformOrigin = TransformOrigin.Center,
+                                    animationSpec = tween(DarwinDuration.Slow.millis),
+                                ) +
+                                slideInVertically(
+                                    initialOffsetY = { 10 },
+                                    animationSpec = tween(DarwinDuration.Slow.millis),
+                                ),
+                        exit = fadeOut(tween(DarwinDuration.Slow.millis)) +
+                                scaleOut(
+                                    targetScale = 0.95f,
+                                    transformOrigin = TransformOrigin.Center,
+                                    animationSpec = tween(DarwinDuration.Slow.millis),
+                                ) +
+                                slideOutVertically(
+                                    targetOffsetY = { 10 },
+                                    animationSpec = tween(DarwinDuration.Slow.millis),
+                                ),
+                    ) {
+                        content()
+                    }
+                }
             }
         }
     }
@@ -138,6 +193,11 @@ fun DarwinDialog(
 /**
  * The content panel of the dialog, centered within the scrim.
  *
+ * React styling:
+ * - rounded-2xl, shadow-2xl
+ * - bg-white/95 dark:bg-zinc-900/95, backdrop-blur-md
+ * - border black/10 dark:white/10
+ *
  * @param size  Size preset controlling the max width.
  * @param glass Enable frosted glass effect on the panel.
  */
@@ -149,52 +209,40 @@ fun DarwinDialogContent(
     content: @Composable () -> Unit,
 ) {
     val colors = DarwinTheme.colors
-    val shape = RoundedCornerShape(16.dp)
+    val shape = RoundedCornerShape(16.dp) // rounded-2xl
 
+    // React: bg-white/95 dark:bg-zinc-900/95
     val bgColor = if (glass) {
         glassOrDefault(true, colors.surface)
     } else {
-        if (colors.isDark) colors.surface.copy(alpha = 0.95f)
+        if (colors.isDark) Color(0xFF18181B).copy(alpha = 0.95f)
         else Color.White.copy(alpha = 0.95f)
     }
 
-    val borderColor = glassBorderOrDefault(glass, colors.borderSubtle)
+    // React: border-black/10 dark:border-white/10
+    val borderColor = if (glass) {
+        glassBorderOrDefault(true, colors.borderSubtle)
+    } else {
+        if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
+    }
 
-    AnimatedVisibility(
-        visible = true,
-        enter = fadeIn(tween(DarwinDuration.Slow.millis)) +
-                scaleIn(
-                    initialScale = 0.95f,
-                    animationSpec = tween(DarwinDuration.Slow.millis),
-                ),
-        exit = fadeOut(tween(DarwinDuration.Slow.millis)) +
-                scaleOut(
-                    targetScale = 0.95f,
-                    animationSpec = tween(DarwinDuration.Slow.millis),
-                ),
+    Box(
+        modifier = modifier
+            .widthIn(max = size.maxWidth)
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .shadow(elevation = 24.dp, shape = shape)
+            .clip(shape)
+            .background(bgColor, shape)
+            .border(1.dp, borderColor, shape)
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = { /* consume click to prevent scrim dismiss */ },
+            ),
     ) {
-        Box(
-            modifier = modifier
-                .widthIn(max = size.maxWidth)
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .shadow(elevation = 24.dp, shape = shape)
-                .clip(shape)
-                .background(bgColor, shape)
-                .border(1.dp, borderColor, shape)
-                .clickable(
-                    indication = null,
-                    interactionSource = remember { MutableInteractionSource() },
-                    onClick = { /* consume click to prevent scrim dismiss */ },
-                ),
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
-            ) {
-                content()
-            }
+        Column(modifier = Modifier.fillMaxWidth()) {
+            content()
         }
     }
 }
@@ -204,7 +252,8 @@ fun DarwinDialogContent(
 // ===========================================================================
 
 /**
- * Header area of the dialog (padding: horizontal 24dp, top 24dp).
+ * Header area of the dialog.
+ * React: px-6 pt-6 pb-0
  */
 @Composable
 fun DarwinDialogHeader(
@@ -226,19 +275,19 @@ fun DarwinDialogHeader(
 
 /**
  * Title text for the dialog header.
+ * React: text-lg font-semibold text-zinc-900 dark:text-zinc-100
  */
 @Composable
 fun DarwinDialogTitle(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    val colors = DarwinTheme.colors
     DarwinText(
         text = text,
         modifier = modifier,
         fontSize = 18.sp,
         fontWeight = FontWeight.SemiBold,
-        color = colors.textPrimary,
+        color = DarwinTheme.colors.textPrimary,
     )
 }
 
@@ -248,18 +297,18 @@ fun DarwinDialogTitle(
 
 /**
  * Description text beneath the dialog title.
+ * React: text-sm mt-1 text-zinc-500 dark:text-zinc-400
  */
 @Composable
 fun DarwinDialogDescription(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    val colors = DarwinTheme.colors
     DarwinText(
         text = text,
         modifier = modifier.padding(top = 4.dp),
         style = DarwinTheme.typography.bodySmall,
-        color = colors.textTertiary,
+        color = DarwinTheme.colors.textTertiary,
     )
 }
 
@@ -269,6 +318,7 @@ fun DarwinDialogDescription(
 
 /**
  * Body / main content area of the dialog.
+ * React: px-6 py-4
  */
 @Composable
 fun DarwinDialogBody(
@@ -290,6 +340,7 @@ fun DarwinDialogBody(
 
 /**
  * Footer area with action buttons, aligned to the end (right).
+ * React: flex items-center justify-end gap-2, px-6 pb-6 pt-0
  */
 @Composable
 fun DarwinDialogFooter(
@@ -313,10 +364,12 @@ fun DarwinDialogFooter(
 
 /**
  * A close trigger that dismisses the dialog when clicked.
- * Renders its [content] as a clickable element that calls `onOpenChange(false)`.
  *
- * If no content is provided, renders a default "X" close button positioned
- * at the top-right corner.
+ * If no content is provided, renders a default close button (Lucide X icon)
+ * matching the React dialog close button:
+ * - p-1, rounded-lg
+ * - text-zinc-500 dark:text-zinc-400
+ * - hover: text-zinc-700 dark:text-zinc-200, bg-black/5 dark:bg-white/10
  */
 @Composable
 fun DarwinDialogClose(
@@ -328,19 +381,46 @@ fun DarwinDialogClose(
 
     if (content != null) {
         Box(
-            modifier = modifier.clickable(onClick = context.onDismiss),
+            modifier = modifier.clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = context.onDismiss,
+            ),
         ) {
             content()
         }
     } else {
-        // Default X button
-        DarwinText(
-            text = "\u2715", // ✕
+        val interactionSource = remember { MutableInteractionSource() }
+        val isHovered by interactionSource.collectIsHoveredAsState()
+        val closeShape = RoundedCornerShape(8.dp)
+
+        Box(
             modifier = modifier
-                .clickable(onClick = context.onDismiss)
-                .padding(4.dp),
-            fontSize = 16.sp,
-            color = colors.textTertiary,
-        )
+                .size(28.dp)
+                .clip(closeShape)
+                .hoverable(interactionSource)
+                .background(
+                    if (isHovered) {
+                        if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.05f)
+                    } else Color.Transparent,
+                    closeShape,
+                )
+                .clickable(
+                    indication = null,
+                    interactionSource = interactionSource,
+                    onClick = context.onDismiss,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            DarwinIcon(
+                imageVector = LucideX,
+                tint = if (isHovered) {
+                    if (colors.isDark) Color(0xFFE4E4E7) else Color(0xFF3F3F46)
+                } else {
+                    if (colors.isDark) Color(0xFFA1A1AA) else Color(0xFF71717A)
+                },
+                size = 16.dp,
+            )
+        }
     }
 }

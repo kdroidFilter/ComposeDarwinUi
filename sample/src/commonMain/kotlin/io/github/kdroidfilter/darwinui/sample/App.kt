@@ -152,7 +152,7 @@ private val sidebarEntries = listOf(
     SidebarEntry("skeleton", "Skeleton", "DATA DISPLAY"),
     SidebarEntry("alert", "Alert", "FEEDBACK"),
     SidebarEntry("toast", "Toast", "FEEDBACK"),
-    SidebarEntry("dialog", "Dialog", "FEEDBACK"),
+    SidebarEntry("dialog", "Dialog", "OVERLAYS"),
     SidebarEntry("tooltip", "Tooltip", "OVERLAYS"),
     SidebarEntry("popover", "Popover", "OVERLAYS"),
     SidebarEntry("dropdown", "Dropdown Menu", "OVERLAYS"),
@@ -893,7 +893,9 @@ fun ToastClickToShowExample(toastState: DarwinToastState) {
 @Composable
 fun DialogDefaultExample() {
     var showDialog by remember { mutableStateOf(false) }
-    DarwinButton(text = "Open Dialog", onClick = { showDialog = true }, variant = DarwinButtonVariant.Accent)
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+        DarwinButton(text = "Open Dialog", onClick = { showDialog = true }, variant = DarwinButtonVariant.Primary)
+    }
     DarwinDialog(open = showDialog, onOpenChange = { showDialog = it }) {
         DarwinDialogContent {
             DarwinDialogHeader { DarwinDialogTitle("Edit Profile"); DarwinDialogDescription("Make changes to your profile here.") }
