@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.darwinTween
 import io.github.kdroidfilter.darwinui.theme.glassOrDefault
@@ -223,18 +224,12 @@ fun DarwinAccordionTrigger(
         label = "darwin_accordion_chevron_rotation",
     )
 
-    // Hover background
-    val hoverBackground = if (isHovered) {
-        if (colors.isDark) Color.White.copy(alpha = 0.03f)
-        else Color.Black.copy(alpha = 0.03f)
-    } else {
-        Color.Transparent
-    }
+    // Hover: textTertiary (zinc-500) gives clear contrast from textPrimary in both themes
+    val textColor = if (isHovered) colors.textTertiary else colors.textPrimary
 
-    // Text style for the trigger content
     val textStyle = typography.bodyMedium.merge(
         TextStyle(
-            color = if (isHovered) colors.textSecondary else colors.textPrimary,
+            color = textColor,
             fontWeight = FontWeight.Medium,
         )
     )
@@ -242,11 +237,10 @@ fun DarwinAccordionTrigger(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(hoverBackground)
             .hoverable(interactionSource = interactionSource)
             .clickable(
-                interactionSource = interactionSource,
                 indication = null,
+                interactionSource = interactionSource,
                 role = Role.Button,
                 onClick = onClick,
             )
@@ -261,6 +255,7 @@ fun DarwinAccordionTrigger(
         ) {
             CompositionLocalProvider(
                 LocalDarwinTextStyle provides textStyle,
+                LocalDarwinContentColor provides textColor,
             ) {
                 content()
             }
