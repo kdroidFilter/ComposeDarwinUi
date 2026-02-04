@@ -44,8 +44,10 @@ import io.github.kdroidfilter.darwinui.icons.LucideDownload
 import io.github.kdroidfilter.darwinui.icons.LucideHeart
 import io.github.kdroidfilter.darwinui.icons.LucideMoon
 import io.github.kdroidfilter.darwinui.icons.LucidePlus
+import io.github.kdroidfilter.darwinui.icons.LucideSearch
 import io.github.kdroidfilter.darwinui.icons.LucideSettings
 import io.github.kdroidfilter.darwinui.icons.LucideShare2
+import io.github.kdroidfilter.darwinui.icons.LucideStar
 import io.github.kdroidfilter.darwinui.icons.LucideSun
 import io.github.kdroidfilter.darwinui.icons.LucideTrash2
 import androidx.compose.ui.unit.dp
@@ -1052,16 +1054,50 @@ fun DropdownMenuDefaultExample() {
 @GalleryExample("Tabs", "Default")
 @Composable
 fun TabsDefaultExample() {
-    var selectedTab by remember { mutableStateOf("tab1") }
+    var selectedTab by remember { mutableStateOf("account") }
     DarwinTabs(selectedTab = selectedTab, onTabSelected = { selectedTab = it }) {
         DarwinTabsList {
-            DarwinTabsTrigger(value = "tab1", selected = selectedTab == "tab1", onClick = { selectedTab = "tab1" }) { DarwinText("Account") }
-            DarwinTabsTrigger(value = "tab2", selected = selectedTab == "tab2", onClick = { selectedTab = "tab2" }) { DarwinText("Settings") }
-            DarwinTabsTrigger(value = "tab3", selected = selectedTab == "tab3", onClick = { selectedTab = "tab3" }) { DarwinText("Notifications") }
+            DarwinTabsTrigger(value = "account") { DarwinText("Account") }
+            DarwinTabsTrigger(value = "settings") { DarwinText("Settings") }
+            DarwinTabsTrigger(value = "notifications") { DarwinText("Notifications") }
         }
-        DarwinTabsContent(value = "tab1", selectedTab = selectedTab) { DarwinCard { DarwinCardContent { DarwinText("Account settings and profile information.", color = DarwinTheme.colors.textSecondary) } } }
-        DarwinTabsContent(value = "tab2", selectedTab = selectedTab) { DarwinCard { DarwinCardContent { DarwinText("Application preferences and configuration.", color = DarwinTheme.colors.textSecondary) } } }
-        DarwinTabsContent(value = "tab3", selectedTab = selectedTab) { DarwinCard { DarwinCardContent { DarwinText("Notification preferences and history.", color = DarwinTheme.colors.textSecondary) } } }
+        DarwinTabsContent(value = "account") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Account settings and profile information.", color = DarwinTheme.colors.textSecondary) } } }
+        DarwinTabsContent(value = "settings") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Application preferences and configuration.", color = DarwinTheme.colors.textSecondary) } } }
+        DarwinTabsContent(value = "notifications") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Notification preferences and history.", color = DarwinTheme.colors.textSecondary) } } }
+    }
+}
+
+@GalleryExample("Tabs", "With Icons")
+@Composable
+fun TabsWithIconsExample() {
+    var selectedTab by remember { mutableStateOf("search") }
+    DarwinTabs(selectedTab = selectedTab, onTabSelected = { selectedTab = it }) {
+        DarwinTabsList {
+            DarwinTabsTrigger(value = "search", icon = { DarwinIcon(LucideSearch) }) { DarwinText("Search") }
+            DarwinTabsTrigger(value = "favorites", icon = { DarwinIcon(LucideStar) }) { DarwinText("Favorites") }
+            DarwinTabsTrigger(value = "settings", icon = { DarwinIcon(LucideSettings) }) { DarwinText("Settings") }
+        }
+        DarwinTabsContent(value = "search") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Search across all your content.", color = DarwinTheme.colors.textSecondary) } } }
+        DarwinTabsContent(value = "favorites") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Your starred and bookmarked items.", color = DarwinTheme.colors.textSecondary) } } }
+        DarwinTabsContent(value = "settings") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Manage your preferences.", color = DarwinTheme.colors.textSecondary) } } }
+    }
+}
+
+@GalleryExample("Tabs", "Glass Effect")
+@Composable
+fun TabsGlassEffectExample() {
+    var selectedTab by remember { mutableStateOf("overview") }
+    DarwinTabs(selectedTab = selectedTab, onTabSelected = { selectedTab = it }, glass = true) {
+        DarwinTabsList {
+            DarwinTabsTrigger(value = "overview") { DarwinText("Overview") }
+            DarwinTabsTrigger(value = "analytics") { DarwinText("Analytics") }
+            DarwinTabsTrigger(value = "reports") { DarwinText("Reports") }
+            DarwinTabsTrigger(value = "export", enabled = false) { DarwinText("Export") }
+        }
+        DarwinTabsContent(value = "overview") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Dashboard overview and key metrics.", color = DarwinTheme.colors.textSecondary) } } }
+        DarwinTabsContent(value = "analytics") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Detailed analytics and insights.", color = DarwinTheme.colors.textSecondary) } } }
+        DarwinTabsContent(value = "reports") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Generated reports and summaries.", color = DarwinTheme.colors.textSecondary) } } }
+        DarwinTabsContent(value = "export") { DarwinCard { DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) { DarwinText("Export your data.", color = DarwinTheme.colors.textSecondary) } } }
     }
 }
 
@@ -1507,6 +1543,8 @@ private fun TabsPage() {
     GalleryPage("Tabs", "A set of layered sections of content, known as tab panels.") {
         SectionHeader("Examples")
         ExampleCard(title = "Default", sourceCode = GallerySources.TabsDefaultExample) { TabsDefaultExample() }
+        ExampleCard(title = "With Icons", sourceCode = GallerySources.TabsWithIconsExample) { TabsWithIconsExample() }
+        ExampleCard(title = "Glass Effect", sourceCode = GallerySources.TabsGlassEffectExample) { TabsGlassEffectExample() }
     }
 }
 
