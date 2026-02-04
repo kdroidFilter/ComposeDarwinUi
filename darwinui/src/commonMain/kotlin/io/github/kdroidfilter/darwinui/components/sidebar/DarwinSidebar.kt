@@ -1,7 +1,6 @@
 package io.github.kdroidfilter.darwinui.components.sidebar
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -22,6 +21,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -285,8 +285,12 @@ fun DarwinSidebar(
 }
 
 /**
- * Renders a single sidebar item with appropriate animated visibility
- * based on whether the item has an icon or not.
+ * Renders a single sidebar item with appropriate animation based on
+ * whether the item has an icon or not.
+ *
+ * Icon items: always present, label clips naturally via the sidebar width.
+ * Text-only items: height + alpha animate to 0 when collapsed. The element
+ * stays in the composition tree so [Arrangement.spacedBy] gaps don't snap.
  */
 @Composable
 private fun SidebarItemWithVisibility(
@@ -303,10 +307,20 @@ private fun SidebarItemWithVisibility(
             isCollapsed = collapsed,
         )
     } else {
-        AnimatedVisibility(
-            visible = !collapsed,
-            enter = EnterTransition.None,
-            exit = shrinkVertically(sidebarSpring()) + fadeOut(darwinTween(DarwinDuration.Fast)),
+        val alpha by animateFloatAsState(
+            targetValue = if (collapsed) 0f else 1f,
+            animationSpec = sidebarSpring(),
+        )
+        val itemHeight by animateDpAsState(
+            targetValue = if (collapsed) 0.dp else 40.dp,
+            animationSpec = sidebarSpring(),
+        )
+
+        Box(
+            modifier = Modifier
+                .height(itemHeight)
+                .clipToBounds()
+                .graphicsLayer { this.alpha = alpha },
         ) {
             SidebarItemRow(
                 label = item.label,
@@ -322,16 +336,33 @@ private fun SidebarItemWithVisibility(
 /**
  * Group header label displayed above a group of sidebar items.
  * Hides with animation when the sidebar is collapsed.
+ *
+ * Uses manual height + alpha animation instead of [AnimatedVisibility]
+ * so the element stays in the composition tree and [Arrangement.spacedBy]
+ * gaps don't snap when the exit animation completes.
  */
 @Composable
 private fun GroupHeader(text: String, isCollapsed: Boolean) {
     val typography = DarwinTheme.typography
     val colors = DarwinTheme.colors
 
-    AnimatedVisibility(
-        visible = !isCollapsed,
-        enter = expandVertically() + fadeIn(),
-        exit = shrinkVertically(sidebarSpring()) + fadeOut(darwinTween(DarwinDuration.Fast)),
+    val alpha by animateFloatAsState(
+        targetValue = if (isCollapsed) 0f else 1f,
+        animationSpec = sidebarSpring(),
+    )
+    // 40dp is a generous upper bound (content is ~28dp with padding).
+    // When expanded, the content is smaller so 40dp doesn't constrain it.
+    // When collapsing, it smoothly shrinks and clips the content to 0.
+    val maxHeight by animateDpAsState(
+        targetValue = if (isCollapsed) 0.dp else 40.dp,
+        animationSpec = sidebarSpring(),
+    )
+
+    Box(
+        modifier = Modifier
+            .heightIn(max = maxHeight)
+            .clipToBounds()
+            .graphicsLayer { this.alpha = alpha },
     ) {
         DarwinText(
             text = text,
