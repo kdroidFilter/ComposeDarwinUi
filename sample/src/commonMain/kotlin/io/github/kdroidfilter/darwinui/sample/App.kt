@@ -117,6 +117,8 @@ import io.github.kdroidfilter.darwinui.components.topbar.DarwinTopbar
 import io.github.kdroidfilter.darwinui.components.upload.DarwinUpload
 import io.github.kdroidfilter.darwinui.components.upload.DarwinUploadFile
 import io.github.kdroidfilter.darwinui.components.upload.DarwinUploadVariant
+import io.github.kdroidfilter.darwinui.components.dateselect.DarwinDateSelect
+import io.github.kdroidfilter.darwinui.components.dateselect.DateConfig
 import io.github.kdroidfilter.darwinui.components.window.DarwinWindow
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
@@ -142,6 +144,7 @@ private val sidebarEntries = listOf(
     SidebarEntry("multiselect", "Multi Select", "FORM CONTROLS"),
     SidebarEntry("searchinput", "Search Input", "FORM CONTROLS"),
     SidebarEntry("slider", "Slider", "FORM CONTROLS"),
+    SidebarEntry("dateselect", "Date Select", "FORM CONTROLS"),
     SidebarEntry("upload", "Upload", "FORM CONTROLS"),
     SidebarEntry("badge", "Badge", "DATA DISPLAY"),
     SidebarEntry("avatar", "Avatar", "DATA DISPLAY"),
@@ -264,6 +267,7 @@ fun App() {
                         "multiselect" -> MultiSelectPage()
                         "slider" -> SliderPage()
                         "upload" -> UploadPage()
+                        "dateselect" -> DateSelectPage()
                         "badge" -> BadgePage()
                         "avatar" -> AvatarPage()
                         "card" -> CardPage()
@@ -1382,5 +1386,40 @@ private fun RevealPage() {
     GalleryPage("Reveal", "Animate content into view with a fade and slide effect.") {
         SectionHeader("Examples")
         ExampleCard(title = "Reveal Once", sourceCode = GallerySources.RevealOnceExample) { RevealOnceExample() }
+    }
+}
+
+// --- Date Select ---
+
+@GalleryExample("DateSelect", "Default")
+@Composable
+fun DateSelectDefaultExample() {
+    var selectedConfig by remember { mutableStateOf<DateConfig?>(null) }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+        DarwinDateSelect(
+            label = "Select a date",
+            onChange = { selectedConfig = it },
+        )
+        if (selectedConfig != null) {
+            DarwinText(
+                text = "Selected: ${selectedConfig!!.selectedDate ?: "—"}",
+                style = DarwinTheme.typography.bodySmall,
+                color = DarwinTheme.colors.textSecondary,
+            )
+        }
+    }
+}
+
+@Composable
+private fun DateSelectPage() {
+    GalleryPage("Date Select", "A sophisticated date/time selector with single and recurring event support.") {
+        SectionHeader("Usage")
+        CodeBlock("""DarwinDateSelect(
+    label = "Select a date",
+    onChange = { config -> /* handle config */ },
+)""")
+
+        SectionHeader("Examples")
+        ExampleCard(title = "Default", description = "Date select with label and change callback", sourceCode = GallerySources.DateSelectDefaultExample) { DateSelectDefaultExample() }
     }
 }

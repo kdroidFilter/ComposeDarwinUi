@@ -417,3 +417,91 @@ val LucideCircleX: ImageVector
         return _LucideCircleX!!
     }
 private var _LucideCircleX: ImageVector? = null
+
+// =============================================================================
+// Calendar
+// =============================================================================
+
+val LucideCalendar: ImageVector
+    get() {
+        if (_LucideCalendar != null) return _LucideCalendar!!
+        _LucideCalendar = ImageVector.Builder(
+            name = "calendar", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(8f, 2f); verticalLineToRelative(4f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(16f, 2f); verticalLineToRelative(4f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(19f, 4f); horizontalLineTo(5f); arcToRelative(2f, 2f, 0f, false, false, -2f, 2f); verticalLineToRelative(14f); arcToRelative(2f, 2f, 0f, false, false, 2f, 2f); horizontalLineToRelative(14f); arcToRelative(2f, 2f, 0f, false, false, 2f, -2f); verticalLineTo(6f); arcToRelative(2f, 2f, 0f, false, false, -2f, -2f); close()
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(3f, 10f); horizontalLineToRelative(18f)
+            }
+        }.build()
+        return _LucideCalendar!!
+    }
+private var _LucideCalendar: ImageVector? = null
+
+// =============================================================================
+// ChevronLeft
+// =============================================================================
+
+val LucideChevronLeft: ImageVector
+    get() {
+        if (_LucideChevronLeft != null) return _LucideChevronLeft!!
+        _LucideChevronLeft = ImageVector.Builder(
+            name = "chevron-left", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(15f, 18f); lineToRelative(-6f, -6f); lineToRelative(6f, -6f)
+            }
+        }.build()
+        return _LucideChevronLeft!!
+    }
+private var _LucideChevronLeft: ImageVector? = null
+
+// =============================================================================
+// Copy
+// =============================================================================
+
+val LucideCopy: ImageVector
+    get() {
+        if (_LucideCopy != null) return _LucideCopy!!
+        _LucideCopy = ImageVector.Builder(
+            name = "copy", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(10f, 8f); horizontalLineToRelative(10f); arcToRelative(2f, 2f, 0f, false, true, 2f, 2f); verticalLineToRelative(10f); arcToRelative(2f, 2f, 0f, false, true, -2f, 2f); horizontalLineTo(10f); arcToRelative(2f, 2f, 0f, false, true, -2f, -2f); verticalLineTo(10f); arcToRelative(2f, 2f, 0f, false, true, 2f, -2f)
+            }
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(4f, 16f); curveToRelative(-1.1f, 0f, -2f, -0.9f, -2f, -2f); verticalLineTo(4f); curveToRelative(0f, -1.1f, 0.9f, -2f, 2f, -2f); horizontalLineToRelative(10f); curveToRelative(1.1f, 0f, 2f, 0.9f, 2f, 2f)
+            }
+        }.build()
+        return _LucideCopy!!
+    }
+private var _LucideCopy: ImageVector? = null
+
+// =============================================================================
+// ChevronRight
+// =============================================================================
+
+val LucideChevronRight: ImageVector
+    get() {
+        if (_LucideChevronRight != null) return _LucideChevronRight!!
+        _LucideChevronRight = ImageVector.Builder(
+            name = "chevron-right", defaultWidth = 24.dp, defaultHeight = 24.dp,
+            viewportWidth = 24f, viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.Transparent), stroke = SolidColor(Color.Black), strokeLineWidth = 2f, strokeLineCap = StrokeCap.Round, strokeLineJoin = StrokeJoin.Round) {
+                moveTo(9f, 18f); lineToRelative(6f, -6f); lineToRelative(-6f, -6f)
+            }
+        }.build()
+        return _LucideChevronRight!!
+    }
+private var _LucideChevronRight: ImageVector? = null
