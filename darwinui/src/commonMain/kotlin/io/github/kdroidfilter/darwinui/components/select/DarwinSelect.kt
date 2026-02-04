@@ -44,6 +44,7 @@ import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.icons.DarwinIcon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import androidx.compose.ui.tooling.preview.Preview
 
 /**
  * Option model for DarwinSelect and DarwinMultiSelect.
@@ -300,5 +301,23 @@ fun DarwinSelect(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinSelectPreview() {
+    DarwinTheme {
+        var selected by remember { mutableStateOf<String?>(null) }
+        DarwinSelect(
+            options = listOf(
+                DarwinSelectOption("apple", "Apple"),
+                DarwinSelectOption("banana", "Banana"),
+                DarwinSelectOption("cherry", "Cherry"),
+            ),
+            selectedValue = selected,
+            onValueChange = { selected = it },
+            label = "Fruit",
+        )
     }
 }

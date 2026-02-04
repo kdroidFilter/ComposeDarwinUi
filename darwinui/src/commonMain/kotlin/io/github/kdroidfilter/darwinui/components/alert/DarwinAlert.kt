@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
@@ -618,4 +619,16 @@ private fun DrawScope.drawAlertCloseIcon(color: Color) {
         end = Offset(cx - half, cy + half),
         strokeWidth = strokeWidth,
     )
+}
+
+@Preview
+@Composable
+private fun DarwinAlertPreview() {
+    DarwinTheme {
+        DarwinAlertBanner(
+            message = "Your changes have been saved.",
+            title = "Success",
+            type = DarwinAlertType.Success,
+        )
+    }
 }

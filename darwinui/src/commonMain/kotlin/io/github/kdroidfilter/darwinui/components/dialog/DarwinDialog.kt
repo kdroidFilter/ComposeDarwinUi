@@ -49,6 +49,8 @@ import io.github.kdroidfilter.darwinui.icons.DarwinIcon
 import io.github.kdroidfilter.darwinui.icons.LucideX
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.components.button.DarwinButton
+import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.delay
 
 // ===========================================================================
@@ -365,6 +367,22 @@ fun DarwinDialogClose(
                 },
                 size = 16.dp,
             )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinDialogPreview() {
+    DarwinTheme {
+        DarwinDialog(open = true, onOpenChange = {}) {
+            DarwinDialogContent {
+                DarwinDialogHeader { DarwinDialogTitle("Dialog Title") }
+                DarwinDialogBody { DarwinText("Dialog body content.") }
+                DarwinDialogFooter {
+                    DarwinButton(onClick = {}) { DarwinText("OK") }
+                }
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.Amber400
@@ -27,6 +28,7 @@ import io.github.kdroidfilter.darwinui.theme.Sky500
 import io.github.kdroidfilter.darwinui.theme.Sky600
 import io.github.kdroidfilter.darwinui.theme.Zinc300
 import io.github.kdroidfilter.darwinui.theme.Zinc700
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
 
 enum class DarwinBadgeVariant {
     /** Subtle bg (black/5 or white/5), subtle border (black/10 or white/10), zinc text. */
@@ -211,5 +213,13 @@ fun DarwinBadge(
         Box(modifier = badgeModifier) {
             content()
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinBadgePreview() {
+    DarwinTheme {
+        DarwinBadge { DarwinText("Badge") }
     }
 }

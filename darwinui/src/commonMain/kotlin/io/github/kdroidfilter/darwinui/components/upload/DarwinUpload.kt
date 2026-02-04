@@ -33,6 +33,7 @@ import io.github.kdroidfilter.darwinui.icons.LucideX
 import io.github.kdroidfilter.darwinui.theme.Amber500
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.Red500
+import androidx.compose.ui.tooling.preview.Preview
 
 enum class DarwinUploadVariant {
     /** Large dropzone with icon, text, image grid, and upload button */
@@ -944,5 +945,13 @@ private fun InlineVariant(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinUploadPreview() {
+    DarwinTheme {
+        DarwinUpload(onPickFiles = {}, onRemoveFile = {})
     }
 }

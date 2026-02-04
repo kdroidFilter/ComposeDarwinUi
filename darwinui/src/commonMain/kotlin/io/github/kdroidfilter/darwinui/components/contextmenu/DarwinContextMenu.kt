@@ -63,6 +63,8 @@ import io.github.kdroidfilter.darwinui.theme.Zinc400
 import io.github.kdroidfilter.darwinui.theme.Zinc500
 import io.github.kdroidfilter.darwinui.theme.Zinc700
 import io.github.kdroidfilter.darwinui.theme.Zinc900
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import androidx.compose.ui.tooling.preview.Preview
 
 // CompositionLocal to allow items to auto-close the menu
 internal val LocalContextMenuClose = staticCompositionLocalOf<() -> Unit> { {} }
@@ -395,4 +397,18 @@ fun DarwinContextMenuShortcut(
         ),
         modifier = modifier,
     )
+}
+
+@Preview
+@Composable
+private fun DarwinContextMenuPreview() {
+    DarwinTheme {
+        DarwinContextMenu(
+            trigger = { DarwinText("Right-click me") },
+        ) {
+            DarwinContextMenuItem(onSelect = {}) { DarwinText("Copy") }
+            DarwinContextMenuSeparator()
+            DarwinContextMenuItem(onSelect = {}, destructive = true) { DarwinText("Delete") }
+        }
+    }
 }

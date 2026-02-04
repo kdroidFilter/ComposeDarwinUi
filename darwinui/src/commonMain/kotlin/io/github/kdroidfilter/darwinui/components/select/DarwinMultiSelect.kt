@@ -52,6 +52,7 @@ import io.github.kdroidfilter.darwinui.icons.LucideCheck
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.icons.LucideX
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -388,5 +389,23 @@ fun DarwinMultiSelect(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinMultiSelectPreview() {
+    DarwinTheme {
+        var selected by remember { mutableStateOf(emptyList<String>()) }
+        DarwinMultiSelect(
+            options = listOf(
+                DarwinSelectOption("a", "Apple"),
+                DarwinSelectOption("b", "Banana"),
+                DarwinSelectOption("c", "Cherry"),
+            ),
+            selectedValues = selected,
+            onValuesChange = { selected = it },
+            label = "Fruits",
+        )
     }
 }

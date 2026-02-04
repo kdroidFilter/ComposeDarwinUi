@@ -12,8 +12,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
+import androidx.compose.ui.tooling.preview.Preview
 
 /**
  * Darwin UI Text composable — a drop-in replacement for `material3.Text` that
@@ -68,4 +70,12 @@ fun DarwinText(
         maxLines = maxLines,
         minLines = minLines,
     )
+}
+
+@Preview
+@Composable
+private fun DarwinTextPreview() {
+    DarwinTheme {
+        DarwinText("Hello, DarwinUI")
+    }
 }

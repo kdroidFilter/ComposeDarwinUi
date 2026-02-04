@@ -57,6 +57,9 @@ import io.github.kdroidfilter.darwinui.icons.DarwinIcon
 import io.github.kdroidfilter.darwinui.icons.LucideCheck
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
+import io.github.kdroidfilter.darwinui.components.button.DarwinButton
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import androidx.compose.ui.tooling.preview.Preview
 import io.github.kdroidfilter.darwinui.theme.Red500
 import io.github.kdroidfilter.darwinui.theme.Zinc100
 import io.github.kdroidfilter.darwinui.theme.Zinc300
@@ -380,4 +383,22 @@ fun DarwinDropdownMenuShortcut(
         ),
         modifier = modifier,
     )
+}
+
+@Preview
+@Composable
+private fun DarwinDropdownMenuPreview() {
+    DarwinTheme {
+        var expanded by remember { mutableStateOf(false) }
+        DarwinDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            trigger = {
+                DarwinButton(onClick = { expanded = !expanded }) { DarwinText("Menu") }
+            },
+        ) {
+            DarwinDropdownMenuItem(onClick = {}) { DarwinText("Item 1") }
+            DarwinDropdownMenuItem(onClick = {}) { DarwinText("Item 2") }
+        }
+    }
 }

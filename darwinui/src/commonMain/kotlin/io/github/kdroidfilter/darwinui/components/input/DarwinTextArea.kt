@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinTween
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun DarwinTextArea(
@@ -172,5 +173,14 @@ fun DarwinTextArea(
                 modifier = Modifier.padding(top = 4.dp, start = 2.dp),
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinTextAreaPreview() {
+    DarwinTheme {
+        var text by remember { mutableStateOf("") }
+        DarwinTextArea(value = text, onValueChange = { text = it }, placeholder = "Enter description…", label = "Description")
     }
 }

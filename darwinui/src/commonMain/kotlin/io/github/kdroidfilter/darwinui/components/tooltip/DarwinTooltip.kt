@@ -28,6 +28,8 @@ import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.Zinc100
 import io.github.kdroidfilter.darwinui.theme.Zinc900
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.delay
 
 /**
@@ -127,6 +129,16 @@ fun DarwinTooltip(
                     )
                 }
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinTooltipPreview() {
+    DarwinTheme {
+        DarwinTooltip(text = "Helpful tooltip") {
+            DarwinText("Hover me")
         }
     }
 }

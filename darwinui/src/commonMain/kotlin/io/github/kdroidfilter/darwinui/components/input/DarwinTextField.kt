@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinTween
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
+import androidx.compose.ui.tooling.preview.Preview
 
 /**
  * Size variants for [DarwinTextField].
@@ -241,5 +242,14 @@ fun DarwinTextField(
                 modifier = Modifier.padding(top = 4.dp, start = 2.dp),
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinTextFieldPreview() {
+    DarwinTheme {
+        var text by remember { mutableStateOf("") }
+        DarwinTextField(value = text, onValueChange = { text = it }, placeholder = "Type here…", label = "Name")
     }
 }

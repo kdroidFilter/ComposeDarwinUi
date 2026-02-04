@@ -10,6 +10,10 @@ import androidx.compose.ui.text.TextStyle
 import io.github.kdroidfilter.darwinui.icons.DarwinIcon
 import io.github.kdroidfilter.darwinui.icons.LucideSearch
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun DarwinSearchField(
@@ -56,4 +60,13 @@ fun DarwinSearchField(
         focusRequester = focusRequester,
         textStyle = textStyle,
     )
+}
+
+@Preview
+@Composable
+private fun DarwinSearchFieldPreview() {
+    DarwinTheme {
+        var query by remember { mutableStateOf("") }
+        DarwinSearchField(value = query, onValueChange = { query = it })
+    }
 }

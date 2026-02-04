@@ -52,7 +52,9 @@ import io.github.kdroidfilter.darwinui.theme.Zinc800
 import io.github.kdroidfilter.darwinui.theme.Zinc900
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import io.github.kdroidfilter.darwinui.theme.darwinTween
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import kotlinx.coroutines.launch
+import androidx.compose.ui.tooling.preview.Preview
 
 // =============================================================================
 // State
@@ -305,5 +307,19 @@ fun DarwinTabsContent(
             },
     ) {
         content()
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinTabsPreview() {
+    DarwinTheme {
+        var selectedTab by remember { mutableStateOf("account") }
+        DarwinTabs(selectedTab = selectedTab, onTabSelected = { selectedTab = it }) {
+            DarwinTabsList {
+                DarwinTabsTrigger("account") { DarwinText("Account") }
+                DarwinTabsTrigger("password") { DarwinText("Password") }
+            }
+        }
     }
 }

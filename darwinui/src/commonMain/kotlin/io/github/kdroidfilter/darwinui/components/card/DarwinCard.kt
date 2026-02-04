@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun DarwinCard(
@@ -122,6 +124,17 @@ fun DarwinCardFooter(
         verticalAlignment = Alignment.CenterVertically, // items-center
         content = content,
     )
+}
+
+@Preview
+@Composable
+private fun DarwinCardPreview() {
+    DarwinTheme {
+        DarwinCard {
+            DarwinCardHeader { DarwinCardTitle { DarwinText("Card Title") } }
+            DarwinCardContent { DarwinText("Card content goes here.") }
+        }
+    }
 }
 
 @Composable

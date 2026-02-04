@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.theme.*
+import androidx.compose.ui.tooling.preview.Preview
 
 // ==================== Enums ====================
 
@@ -303,6 +304,17 @@ fun DarwinCircularProgress(
                 color = if (isDark) Zinc300 else Zinc700,
                 textAlign = TextAlign.Center,
             )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinProgressPreview() {
+    DarwinTheme {
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            DarwinLinearProgress(value = 60f)
+            DarwinCircularProgress(value = 75f, showValue = true)
         }
     }
 }

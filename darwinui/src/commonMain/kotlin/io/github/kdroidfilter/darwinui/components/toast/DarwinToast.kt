@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import kotlinx.coroutines.delay
+import androidx.compose.ui.tooling.preview.Preview
 
 // ===========================================================================
 // Toast Type
@@ -467,4 +468,13 @@ private fun DrawScope.drawCloseIcon(color: Color) {
         end = Offset(cx - half, cy + half),
         strokeWidth = strokeWidth,
     )
+}
+
+@Preview
+@Composable
+private fun DarwinToastPreview() {
+    DarwinTheme {
+        val state = rememberDarwinToastState()
+        DarwinToastHost(state = state)
+    }
 }

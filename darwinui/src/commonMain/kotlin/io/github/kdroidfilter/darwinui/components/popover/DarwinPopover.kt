@@ -21,6 +21,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import io.github.kdroidfilter.darwinui.components.button.DarwinButton
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import androidx.compose.ui.tooling.preview.Preview
 
 /**
  * A click-triggered popover component for Darwin UI.
@@ -96,6 +103,23 @@ fun DarwinPopover(
                     }
                 }
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinPopoverPreview() {
+    DarwinTheme {
+        var expanded by remember { mutableStateOf(false) }
+        DarwinPopover(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            trigger = {
+                DarwinButton(onClick = { expanded = !expanded }) { DarwinText("Open Popover") }
+            },
+        ) {
+            DarwinText("Popover content")
         }
     }
 }

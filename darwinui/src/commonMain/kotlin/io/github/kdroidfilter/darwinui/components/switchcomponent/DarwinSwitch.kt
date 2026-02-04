@@ -29,6 +29,9 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.Zinc600
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.tooling.preview.Preview
 
 private val Emerald500 = Color(0xFF10B981)
 
@@ -115,5 +118,14 @@ fun DarwinSwitch(
                 ),
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinSwitchPreview() {
+    DarwinTheme {
+        var checked by remember { mutableStateOf(true) }
+        DarwinSwitch(checked = checked, onCheckedChange = { checked = it }, label = "Notifications")
     }
 }

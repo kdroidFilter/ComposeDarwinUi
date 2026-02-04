@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinTween
+import androidx.compose.ui.tooling.preview.Preview
 
 // ==================== DarwinTable ====================
 
@@ -419,6 +420,27 @@ fun DarwinTableLoadingRows(
                                 .background(skeletonColor),
                         )
                     }
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinTablePreview() {
+    DarwinTheme {
+        DarwinTable {
+            DarwinTableHead {
+                DarwinTableRow {
+                    DarwinTableHeaderCell { DarwinText("Name") }
+                    DarwinTableHeaderCell { DarwinText("Email") }
+                }
+            }
+            DarwinTableBody {
+                DarwinTableRow {
+                    DarwinTableCell { DarwinText("Alice") }
+                    DarwinTableCell { DarwinText("alice@example.com") }
                 }
             }
         }

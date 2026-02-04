@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import androidx.compose.ui.tooling.preview.Preview
 
 // ===========================================================================
 // DarwinSkeleton
@@ -97,4 +98,16 @@ fun DarwinSkeletonCircle(
         modifier = modifier.size(size),
         shape = CircleShape,
     )
+}
+
+@Preview
+@Composable
+private fun DarwinSkeletonPreview() {
+    DarwinTheme {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            DarwinSkeleton(Modifier.fillMaxWidth().height(20.dp))
+            DarwinSkeleton(Modifier.fillMaxWidth().height(20.dp))
+            DarwinSkeleton(Modifier.width(160.dp).height(20.dp))
+        }
+    }
 }

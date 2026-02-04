@@ -46,6 +46,10 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.darwinTween
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.tooling.preview.Preview
+import io.github.kdroidfilter.darwinui.components.text.DarwinText
 
 // =============================================================================
 // Accordion type
@@ -330,6 +334,23 @@ fun DarwinAccordionContent(
             ) {
                 content()
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinAccordionPreview() {
+    DarwinTheme {
+        var expanded by remember { mutableStateOf(true) }
+        DarwinAccordion {
+            DarwinAccordionItem(
+                value = "item-1",
+                expanded = expanded,
+                onToggle = { expanded = !expanded },
+                trigger = { DarwinText("Is it accessible?") },
+                content = { DarwinText("Yes. It follows WAI-ARIA design patterns.") },
+            )
         }
     }
 }

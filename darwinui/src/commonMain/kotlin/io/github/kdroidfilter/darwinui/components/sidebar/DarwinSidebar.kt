@@ -54,6 +54,7 @@ import io.github.kdroidfilter.darwinui.theme.Zinc600
 import io.github.kdroidfilter.darwinui.theme.Zinc700
 import io.github.kdroidfilter.darwinui.theme.Zinc900
 import io.github.kdroidfilter.darwinui.theme.darwinTween
+import androidx.compose.ui.tooling.preview.Preview
 
 // =============================================================================
 // Animation helper — critically damped spring (no overshoot) with Smooth stiffness
@@ -529,6 +530,20 @@ private fun CollapseToggle(
             maxLines = 1,
             overflow = TextOverflow.Clip,
             modifier = Modifier.graphicsLayer { alpha = labelAlpha },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinSidebarPreview() {
+    DarwinTheme {
+        DarwinSidebar(
+            items = listOf(
+                DarwinSidebarItem(label = "Home", onClick = {}),
+                DarwinSidebarItem(label = "Settings", onClick = {}),
+            ),
+            activeItem = "Home",
         )
     }
 }

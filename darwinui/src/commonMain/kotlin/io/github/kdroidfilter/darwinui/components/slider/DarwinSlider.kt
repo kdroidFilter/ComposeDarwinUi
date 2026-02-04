@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import androidx.compose.ui.tooling.preview.Preview
 import kotlin.math.round
 import kotlin.math.roundToInt
 
@@ -220,5 +221,14 @@ fun DarwinSlider(
                 textAlign = androidx.compose.ui.text.style.TextAlign.End,
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinSliderPreview() {
+    DarwinTheme {
+        var value by remember { mutableStateOf(50f) }
+        DarwinSlider(value = value, onValueChange = { value = it })
     }
 }

@@ -54,6 +54,7 @@ import io.github.kdroidfilter.darwinui.theme.Zinc500
 import io.github.kdroidfilter.darwinui.theme.Zinc800
 import io.github.kdroidfilter.darwinui.theme.Zinc900
 import io.github.kdroidfilter.darwinui.theme.darwinTween
+import androidx.compose.ui.tooling.preview.Preview
 
 enum class DarwinButtonVariant {
     Default,
@@ -425,5 +426,13 @@ private fun resolveButtonDimensions(
             indicatorSize = 16.dp,
             indicatorStrokeWidth = 2.dp,
         )
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinButtonPreview() {
+    DarwinTheme {
+        DarwinButton(onClick = {}) { DarwinText("Button") }
     }
 }

@@ -40,6 +40,9 @@ import io.github.kdroidfilter.darwinui.theme.Zinc600
 import io.github.kdroidfilter.darwinui.theme.Zinc800
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.tooling.preview.Preview
 
 private val CheckboxShape = CircleShape
 
@@ -191,4 +194,13 @@ private fun DrawScope.drawIndeterminateDash(color: Color) {
         size = Size(dashWidth, dashHeight),
         cornerRadius = CornerRadius(cornerRadius, cornerRadius),
     )
+}
+
+@Preview
+@Composable
+private fun DarwinCheckboxPreview() {
+    DarwinTheme {
+        var checked by remember { mutableStateOf(false) }
+        DarwinCheckbox(checked = checked, onCheckedChange = { checked = it }, label = "Accept terms")
+    }
 }

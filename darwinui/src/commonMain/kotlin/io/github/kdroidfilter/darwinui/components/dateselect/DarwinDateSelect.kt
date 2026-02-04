@@ -67,6 +67,7 @@ import io.github.kdroidfilter.darwinui.icons.LucideChevronLeft
 import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
 import io.github.kdroidfilter.darwinui.theme.Blue500
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
@@ -1043,5 +1044,13 @@ fun DarwinDateSelect(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinDateSelectPreview() {
+    DarwinTheme {
+        DarwinDateSelect(label = "Event date")
     }
 }

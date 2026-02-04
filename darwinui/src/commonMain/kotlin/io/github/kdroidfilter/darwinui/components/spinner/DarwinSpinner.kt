@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import androidx.compose.ui.tooling.preview.Preview
 
 /**
  * A small indeterminate circular spinner drawn with Canvas.
@@ -68,5 +70,13 @@ fun DarwinSpinner(
             size = arcSize,
             style = stroke,
         )
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinSpinnerPreview() {
+    DarwinTheme {
+        DarwinSpinner(color = Color.Black)
     }
 }

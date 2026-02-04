@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -224,8 +225,7 @@ fun DarwinAvatarGroup(
 
         // Overflow indicator
         if (overflowCount > 0) {
-            val overflowIndex = visibleCount
-            val xOffset = (size - overlapDp) * overflowIndex
+            val xOffset = (size - overlapDp) * visibleCount
             val fontSize = (size.value * 0.35f).sp
 
             Box(
@@ -246,5 +246,13 @@ fun DarwinAvatarGroup(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DarwinAvatarPreview() {
+    DarwinTheme {
+        DarwinAvatar(name = "John Doe")
     }
 }
