@@ -5,8 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,6 +41,8 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.icons.DarwinIcon
+import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
@@ -82,9 +87,12 @@ fun DarwinSelect(
 
     var expanded by remember { mutableStateOf(false) }
     var highlightedIndex by remember { mutableStateOf(-1) }
+    var triggerWidthPx by remember { mutableStateOf(0) }
+    var triggerHeightPx by remember { mutableStateOf(0) }
 
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
+    val isTriggerHovered by interactionSource.collectIsHoveredAsState()
     val focusRequester = remember { FocusRequester() }
 
     val selectedOption = remember(selectedValue, options) {
@@ -96,7 +104,12 @@ fun DarwinSelect(
         else -> glassBorderOrDefault(glass, colors.inputBorder)
     }
 
-    val backgroundColor = glassOrDefault(glass, colors.inputBackground)
+    // React: bg-black/5 dark:bg-white/5, hover:bg-black/10 dark:hover:bg-white/10
+    val backgroundColor = when {
+        glass -> glassOrDefault(glass, colors.inputBackground)
+        isTriggerHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.04f)
+        else -> colors.inputBackground
+    }
 
     val chevronRotation by animateFloatAsState(
         targetValue = if (expanded) 180f else 0f,
@@ -131,7 +144,11 @@ fun DarwinSelect(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp)
+                    .height(36.dp)
+                    .onGloballyPositioned { coordinates ->
+                        triggerWidthPx = coordinates.size.width
+                        triggerHeightPx = coordinates.size.height
+                    }
                     .clip(shapes.medium)
                     .background(backgroundColor)
                     .border(
@@ -142,6 +159,7 @@ fun DarwinSelect(
                     .then(
                         if (enabled) {
                             Modifier
+                                .hoverable(interactionSource)
                                 .focusRequester(focusRequester)
                                 .focusable(interactionSource = interactionSource)
                                 .clickable(
@@ -213,10 +231,9 @@ fun DarwinSelect(
                 )
 
                 // Chevron icon
-                DarwinText(
-                    text = "\u25BC",
-                    style = typography.labelSmall,
-                    color = colors.textTertiary,
+                DarwinIcon(
+                    imageVector = LucideChevronDown,
+                    tint = colors.textTertiary,
                     modifier = Modifier
                         .padding(start = 8.dp)
                         .rotate(chevronRotation),
@@ -227,9 +244,20 @@ fun DarwinSelect(
             DarwinDropdownPopup(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
+                anchorWidthPx = triggerWidthPx,
+                anchorHeightPx = triggerHeightPx,
+                matchAnchorWidth = false,
                 modifier = Modifier
-                    .background(colors.card, shapes.large)
-                    .border(1.dp, colors.border, shapes.large)
+                    .clip(shapes.large)
+                    .background(
+                        if (colors.isDark) Color(0xFF171717) else Color.White, // opaque — no backdrop-blur in Compose
+                        shapes.large,
+                    )
+                    .border(
+                        1.dp,
+                        if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+                        shapes.large,
+                    )
                     .heightIn(max = 280.dp),
             ) {
                 val scrollState = rememberScrollState()
@@ -237,54 +265,56 @@ fun DarwinSelect(
                     modifier = Modifier
                         .verticalScroll(scrollState)
                         .padding(vertical = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     options.forEachIndexed { index, option ->
                         val isSelected = option.value == selectedValue
                         val isHighlighted = index == highlightedIndex
+                        val itemInteractionSource = remember { MutableInteractionSource() }
+                        val isItemHovered by itemInteractionSource.collectIsHoveredAsState()
+
+                        // React: selected bg-black/10 dark:bg-white/10,
+                        // hover bg-black/5 dark:bg-white/5
+                        // Compose renders alpha slightly heavier than CSS, so values are lowered
                         val itemBackgroundColor = when {
-                            isSelected -> colors.accent.copy(alpha = 0.10f)
-                            isHighlighted -> colors.accent.copy(alpha = 0.06f)
+                            isSelected -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.06f)
+                            isHighlighted || isItemHovered -> if (colors.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.035f)
                             else -> Color.Transparent
                         }
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(36.dp)
+                                .padding(horizontal = 4.dp)
+                                .clip(shapes.medium)
                                 .then(
                                     if (!option.disabled) {
-                                        Modifier.clickable {
-                                            onValueChange(option.value)
-                                            expanded = false
-                                        }
+                                        Modifier
+                                            .hoverable(itemInteractionSource)
+                                            .clickable(
+                                                interactionSource = itemInteractionSource,
+                                                indication = null,
+                                            ) {
+                                                onValueChange(option.value)
+                                                expanded = false
+                                            }
                                     } else Modifier
                                 )
                                 .background(itemBackgroundColor)
-                                .padding(horizontal = 12.dp),
+                                .padding(horizontal = 8.dp, vertical = 6.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             DarwinText(
                                 text = option.label,
                                 style = typography.bodyMedium,
                                 color = when {
                                     option.disabled -> colors.textQuaternary
-                                    isSelected -> colors.accent
-                                    else -> colors.textPrimary
+                                    isSelected -> colors.textPrimary
+                                    else -> if (colors.isDark) Color(0xFFD4D4D8) else Color(0xFF3F3F46) // zinc-300 / zinc-700
                                 },
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f),
                             )
-
-                            if (isSelected) {
-                                DarwinText(
-                                    text = "\u2713",
-                                    style = typography.bodyMedium,
-                                    color = colors.accent,
-                                    modifier = Modifier.padding(start = 8.dp),
-                                )
-                            }
                         }
                     }
                 }

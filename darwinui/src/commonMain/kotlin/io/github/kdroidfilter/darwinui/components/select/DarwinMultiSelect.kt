@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -44,6 +45,8 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.icons.DarwinIcon
+import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
@@ -86,6 +89,8 @@ fun DarwinMultiSelect(
 
     var expanded by remember { mutableStateOf(false) }
     var highlightedIndex by remember { mutableStateOf(-1) }
+    var triggerWidthPx by remember { mutableStateOf(0) }
+    var triggerHeightPx by remember { mutableStateOf(0) }
 
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -145,6 +150,10 @@ fun DarwinMultiSelect(
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 40.dp)
+                    .onGloballyPositioned { coordinates ->
+                        triggerWidthPx = coordinates.size.width
+                        triggerHeightPx = coordinates.size.height
+                    }
                     .clip(shapes.medium)
                     .background(backgroundColor)
                     .border(
@@ -250,10 +259,9 @@ fun DarwinMultiSelect(
                 }
 
                 // Chevron icon
-                DarwinText(
-                    text = "\u25BC",
-                    style = typography.labelSmall,
-                    color = colors.textTertiary,
+                DarwinIcon(
+                    imageVector = LucideChevronDown,
+                    tint = colors.textTertiary,
                     modifier = Modifier
                         .padding(start = 8.dp)
                         .rotate(chevronRotation),
@@ -264,6 +272,9 @@ fun DarwinMultiSelect(
             DarwinDropdownPopup(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
+                anchorWidthPx = triggerWidthPx,
+                anchorHeightPx = triggerHeightPx,
+                matchAnchorWidth = false,
                 modifier = Modifier
                     .background(colors.card, shapes.large)
                     .border(1.dp, colors.border, shapes.large)
