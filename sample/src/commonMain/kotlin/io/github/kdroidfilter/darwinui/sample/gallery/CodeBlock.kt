@@ -26,13 +26,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import dev.snipme.highlights.Highlights
+import dev.snipme.highlights.model.BoldHighlight
+import dev.snipme.highlights.model.ColorHighlight
+import dev.snipme.highlights.model.SyntaxLanguage
+import dev.snipme.highlights.model.SyntaxThemes
 import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.icons.LucideCheck
 import io.github.kdroidfilter.darwinui.icons.LucideCopy
@@ -44,6 +52,33 @@ import kotlinx.coroutines.delay
 fun CodeBlock(code: String) {
     val clipboardManager = LocalClipboardManager.current
     var copied by remember { mutableStateOf(false) }
+    val isDark = DarwinTheme.colors.isDark
+
+    val highlightedCode = remember(code, isDark) {
+        val highlights = Highlights.Builder()
+            .code(code)
+            .language(SyntaxLanguage.KOTLIN)
+            .theme(SyntaxThemes.atom(darkMode = isDark))
+            .build()
+
+        buildAnnotatedString {
+            append(code)
+            for (highlight in highlights.getHighlights()) {
+                when (highlight) {
+                    is ColorHighlight -> addStyle(
+                        style = SpanStyle(color = Color(highlight.rgb).copy(alpha = 1f)),
+                        start = highlight.location.start,
+                        end = highlight.location.end,
+                    )
+                    is BoldHighlight -> addStyle(
+                        style = SpanStyle(fontWeight = FontWeight.Bold),
+                        start = highlight.location.start,
+                        end = highlight.location.end,
+                    )
+                }
+            }
+        }
+    }
 
     LaunchedEffect(copied) {
         if (copied) {
@@ -115,10 +150,10 @@ fun CodeBlock(code: String) {
             }
         }
 
-        // Code content
+        // Code content with syntax highlighting
         SelectionContainer {
             BasicText(
-                text = code,
+                text = highlightedCode,
                 style = TextStyle(
                     fontFamily = FontFamily.Monospace,
                     fontSize = DarwinTheme.typography.bodySmall.fontSize,
