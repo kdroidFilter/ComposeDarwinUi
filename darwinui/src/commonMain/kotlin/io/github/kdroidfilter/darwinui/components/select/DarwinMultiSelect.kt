@@ -5,8 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,10 +20,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -42,11 +42,15 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.icons.DarwinIcon
+import io.github.kdroidfilter.darwinui.icons.LucideCheck
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
+import io.github.kdroidfilter.darwinui.icons.LucideX
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.glassOrDefault
 import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
@@ -55,8 +59,8 @@ import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
  * Darwin UI multiple-selection dropdown.
  *
  * Mirrors the React darwin-ui MultiSelect component with macOS-inspired styling.
- * Displays selected items as tags/chips inside the trigger, or a count summary
- * when the selection exceeds [maxDisplayCount].
+ * The trigger displays a text summary; selected items appear as removable tags
+ * below the trigger (matching the React layout).
  *
  * @param options          Available options to choose from.
  * @param selectedValues   Currently selected option values.
@@ -64,8 +68,7 @@ import io.github.kdroidfilter.darwinui.theme.glassBorderOrDefault
  * @param placeholder      Text displayed when nothing is selected.
  * @param enabled          Whether the component is interactive.
  * @param glass            Whether to apply the glass-morphism effect.
- * @param showTags         Whether to display individual tags or always show a count.
- * @param maxDisplayCount  Maximum number of tags to display before collapsing to a count.
+ * @param showTags         Whether to display tags below the trigger.
  * @param label            Optional label text displayed above the trigger.
  * @param modifier         Modifier applied to the root layout.
  */
@@ -79,7 +82,6 @@ fun DarwinMultiSelect(
     enabled: Boolean = true,
     glass: Boolean = false,
     showTags: Boolean = true,
-    maxDisplayCount: Int = 3,
     label: String? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -94,6 +96,7 @@ fun DarwinMultiSelect(
 
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
+    val isTriggerHovered by interactionSource.collectIsHoveredAsState()
     val focusRequester = remember { FocusRequester() }
 
     val selectedOptions = remember(selectedValues, options) {
@@ -105,7 +108,12 @@ fun DarwinMultiSelect(
         else -> glassBorderOrDefault(glass, colors.inputBorder)
     }
 
-    val backgroundColor = glassOrDefault(glass, colors.inputBackground)
+    // React: bg-black/5 hover:bg-black/10
+    val backgroundColor = when {
+        glass -> glassOrDefault(glass, colors.inputBackground)
+        isTriggerHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.04f)
+        else -> colors.inputBackground
+    }
 
     val chevronRotation by animateFloatAsState(
         targetValue = if (expanded) 180f else 0f,
@@ -133,6 +141,13 @@ fun DarwinMultiSelect(
         onValuesChange(updated)
     }
 
+    // Display text in trigger
+    val displayText = when {
+        selectedValues.isEmpty() -> null
+        selectedValues.size == 1 -> selectedOptions.firstOrNull()?.label ?: "1 selected"
+        else -> "${selectedValues.size} selected"
+    }
+
     Column(modifier = modifier) {
         // Label
         if (label != null) {
@@ -144,12 +159,12 @@ fun DarwinMultiSelect(
             )
         }
 
-        // Trigger
+        // Trigger — fixed height, text only (React: h-9 = 36px)
         Box {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 40.dp)
+                    .height(32.dp)
                     .onGloballyPositioned { coordinates ->
                         triggerWidthPx = coordinates.size.width
                         triggerHeightPx = coordinates.size.height
@@ -164,6 +179,7 @@ fun DarwinMultiSelect(
                     .then(
                         if (enabled) {
                             Modifier
+                                .hoverable(interactionSource)
                                 .focusRequester(focusRequester)
                                 .focusable(interactionSource = interactionSource)
                                 .clickable(
@@ -213,50 +229,19 @@ fun DarwinMultiSelect(
                                 }
                         } else Modifier
                     )
-                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                    .padding(horizontal = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                // Content area
-                Box(modifier = Modifier.weight(1f)) {
-                    if (selectedValues.isEmpty()) {
-                        // Placeholder
-                        DarwinText(
-                            text = placeholder,
-                            style = typography.bodyMedium,
-                            color = colors.textTertiary,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.align(Alignment.CenterStart),
-                        )
-                    } else if (!showTags || selectedValues.size > maxDisplayCount) {
-                        // Count summary
-                        DarwinText(
-                            text = "${selectedValues.size} selected",
-                            style = typography.bodyMedium,
-                            color = colors.textPrimary,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.align(Alignment.CenterStart),
-                        )
-                    } else {
-                        // Tags
-                        FlowRow(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
-                        ) {
-                            selectedOptions.forEach { option ->
-                                SelectTag(
-                                    label = option.label,
-                                    enabled = enabled,
-                                    onRemove = {
-                                        toggleValue(option.value)
-                                    },
-                                )
-                            }
-                        }
-                    }
-                }
+                // Display text or placeholder
+                DarwinText(
+                    text = displayText ?: placeholder,
+                    style = typography.bodyMedium,
+                    color = if (displayText != null) colors.textPrimary else colors.textTertiary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
 
                 // Chevron icon
                 DarwinIcon(
@@ -276,8 +261,16 @@ fun DarwinMultiSelect(
                 anchorHeightPx = triggerHeightPx,
                 matchAnchorWidth = false,
                 modifier = Modifier
-                    .background(colors.card, shapes.large)
-                    .border(1.dp, colors.border, shapes.large)
+                    .clip(shapes.large)
+                    .background(
+                        if (colors.isDark) Color(0xFF171717) else Color.White,
+                        shapes.large,
+                    )
+                    .border(
+                        1.dp,
+                        if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+                        shapes.large,
+                    )
                     .heightIn(max = 280.dp),
             ) {
                 val scrollState = rememberScrollState()
@@ -285,36 +278,54 @@ fun DarwinMultiSelect(
                     modifier = Modifier
                         .verticalScroll(scrollState)
                         .padding(vertical = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     options.forEachIndexed { index, option ->
                         val isSelected = option.value in selectedValues
                         val isHighlighted = index == highlightedIndex
+                        val itemInteractionSource = remember { MutableInteractionSource() }
+                        val isItemHovered by itemInteractionSource.collectIsHoveredAsState()
+
+                        // React: hover:bg-black/10 dark:hover:bg-white/10
                         val itemBackgroundColor = when {
-                            isHighlighted -> colors.accent.copy(alpha = 0.06f)
-                            isSelected -> colors.accent.copy(alpha = 0.10f)
+                            isHighlighted || isItemHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.035f)
                             else -> Color.Transparent
                         }
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(36.dp)
+                                .padding(horizontal = 4.dp)
+                                .clip(shapes.medium)
                                 .then(
                                     if (!option.disabled) {
-                                        Modifier.clickable {
-                                            toggleValue(option.value)
-                                        }
+                                        Modifier
+                                            .hoverable(itemInteractionSource)
+                                            .clickable(
+                                                interactionSource = itemInteractionSource,
+                                                indication = null,
+                                            ) {
+                                                toggleValue(option.value)
+                                            }
                                     } else Modifier
                                 )
                                 .background(itemBackgroundColor)
-                                .padding(horizontal = 12.dp),
+                                .padding(start = 8.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            // Checkbox indicator
-                            CheckboxIndicator(
-                                checked = isSelected,
-                                enabled = !option.disabled,
-                            )
+                            // Check indicator — React: absolute left-2, blue Check icon
+                            Box(
+                                modifier = Modifier.size(16.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                if (isSelected) {
+                                    DarwinIcon(
+                                        imageVector = LucideCheck,
+                                        tint = colors.accent,
+                                        size = 12.dp,
+                                    )
+                                }
+                            }
 
                             Spacer(modifier = Modifier.width(8.dp))
 
@@ -323,7 +334,8 @@ fun DarwinMultiSelect(
                                 style = typography.bodyMedium,
                                 color = when {
                                     option.disabled -> colors.textQuaternary
-                                    else -> colors.textPrimary
+                                    isSelected -> colors.textPrimary
+                                    else -> if (colors.isDark) Color(0xFFD4D4D8) else Color(0xFF3F3F46)
                                 },
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -333,100 +345,73 @@ fun DarwinMultiSelect(
                 }
             }
         }
-    }
-}
 
-/**
- * Small tag/chip displayed inside the multi-select trigger for selected items.
- */
-@Composable
-private fun SelectTag(
-    label: String,
-    enabled: Boolean,
-    onRemove: () -> Unit,
-) {
-    val colors = DarwinTheme.colors
-    val shapes = DarwinTheme.shapes
-    val typography = DarwinTheme.typography
-
-    Row(
-        modifier = Modifier
-            .height(24.dp)
-            .clip(shapes.small)
-            .background(colors.accent.copy(alpha = 0.15f))
-            .padding(start = 8.dp, end = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        DarwinText(
-            text = label,
-            style = typography.labelSmall,
-            color = colors.accent,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.widthIn(max = 100.dp),
-        )
-
-        if (enabled) {
-            DarwinText(
-                text = "\u2715",
-                style = typography.labelSmall,
-                color = colors.accent.copy(alpha = 0.7f),
-                modifier = Modifier
-                    .padding(start = 2.dp)
-                    .size(16.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
+        // Tags below trigger — React: flex flex-wrap gap-1.5 mt-2
+        if (showTags && selectedValues.isNotEmpty()) {
+            FlowRow(
+                modifier = Modifier.padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                selectedOptions.forEach { option ->
+                    Row(
+                        modifier = Modifier
+                            .clip(shapes.medium)
+                            .background(
+                                if (colors.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f),
+                            )
+                            .border(
+                                1.dp,
+                                if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+                                shapes.medium,
+                            )
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        onRemove()
-                    },
-            )
-        }
-    }
-}
+                        DarwinText(
+                            text = option.label,
+                            style = typography.bodySmall.copy(fontSize = 12.sp),
+                            color = if (colors.isDark) Color(0xFFD4D4D8) else Color(0xFF3F3F46),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
 
-/**
- * Simple checkbox indicator drawn with text characters for cross-platform compatibility.
- */
-@Composable
-private fun CheckboxIndicator(
-    checked: Boolean,
-    enabled: Boolean,
-) {
-    val colors = DarwinTheme.colors
-    val shapes = DarwinTheme.shapes
-    val typography = DarwinTheme.typography
-
-    val bgColor = when {
-        checked && enabled -> colors.accent
-        checked && !enabled -> colors.accent.copy(alpha = 0.4f)
-        else -> Color.Transparent
-    }
-
-    val borderCol = when {
-        checked -> Color.Transparent
-        enabled -> colors.inputBorder
-        else -> colors.textQuaternary
-    }
-
-    Box(
-        modifier = Modifier
-            .size(16.dp)
-            .clip(shapes.extraSmall)
-            .background(bgColor)
-            .border(
-                width = if (checked) 0.dp else 1.5.dp,
-                color = borderCol,
-                shape = shapes.extraSmall,
-            ),
-        contentAlignment = Alignment.Center,
-    ) {
-        if (checked) {
-            DarwinText(
-                text = "\u2713",
-                style = typography.labelSmall,
-                color = colors.onAccent,
-            )
+                        if (enabled) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            val removeInteraction = remember { MutableInteractionSource() }
+                            val isRemoveHovered by removeInteraction.collectIsHoveredAsState()
+                            Box(
+                                modifier = Modifier
+                                    .size(16.dp)
+                                    .clip(shapes.small)
+                                    .hoverable(removeInteraction)
+                                    .background(
+                                        if (isRemoveHovered) {
+                                            if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.05f)
+                                        } else Color.Transparent,
+                                    )
+                                    .clickable(
+                                        interactionSource = removeInteraction,
+                                        indication = null,
+                                    ) {
+                                        toggleValue(option.value)
+                                    },
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                DarwinIcon(
+                                    imageVector = LucideX,
+                                    tint = if (isRemoveHovered) {
+                                        if (colors.isDark) Color(0xFFE4E4E7) else Color(0xFF3F3F46) // zinc-200 / zinc-700
+                                    } else {
+                                        if (colors.isDark) Color(0xFF71717A) else Color(0xFFA1A1AA) // zinc-500 / zinc-400
+                                    },
+                                    size = 12.dp,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

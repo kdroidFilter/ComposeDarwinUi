@@ -144,7 +144,7 @@ fun DarwinSelect(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(36.dp)
+                    .height(32.dp)
                     .onGloballyPositioned { coordinates ->
                         triggerWidthPx = coordinates.size.width
                         triggerHeightPx = coordinates.size.height

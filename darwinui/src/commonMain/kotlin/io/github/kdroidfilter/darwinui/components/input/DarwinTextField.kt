@@ -35,14 +35,14 @@ import io.github.kdroidfilter.darwinui.theme.DarwinDuration
  * @property height The fixed height of the input field.
  */
 enum class DarwinInputSize(val height: Dp) {
-    /** Small: 32 dp */
-    Sm(32.dp),
+    /** Small: 26 dp */
+    Sm(26.dp),
 
-    /** Medium (default): 40 dp */
-    Md(40.dp),
+    /** Medium (default): 32 dp */
+    Md(32.dp),
 
-    /** Large: 48 dp */
-    Lg(48.dp),
+    /** Large: 40 dp */
+    Lg(40.dp),
 }
 
 /**
