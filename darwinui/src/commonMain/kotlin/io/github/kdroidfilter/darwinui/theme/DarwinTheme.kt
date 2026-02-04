@@ -35,7 +35,9 @@ fun DarwinTheme(
         LocalDarwinTextStyle provides resolvedTypography.bodyMedium,
         LocalDarwinContentColor provides colors.textPrimary,
     ) {
-        content()
+        PlatformContextMenuOverride {
+            content()
+        }
     }
 }
 

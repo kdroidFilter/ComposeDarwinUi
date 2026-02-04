@@ -78,6 +78,9 @@ import io.github.kdroidfilter.darwinui.components.dialog.DarwinDialogDescription
 import io.github.kdroidfilter.darwinui.components.dialog.DarwinDialogFooter
 import io.github.kdroidfilter.darwinui.components.dialog.DarwinDialogHeader
 import io.github.kdroidfilter.darwinui.components.dialog.DarwinDialogTitle
+import io.github.kdroidfilter.darwinui.components.contextmenu.DarwinContextMenu
+import io.github.kdroidfilter.darwinui.components.contextmenu.DarwinContextMenuItem
+import io.github.kdroidfilter.darwinui.components.contextmenu.DarwinContextMenuSeparator
 import io.github.kdroidfilter.darwinui.components.dropdown.DarwinDropdownMenu
 import io.github.kdroidfilter.darwinui.components.dropdown.DarwinDropdownMenuCheckboxItem
 import io.github.kdroidfilter.darwinui.components.dropdown.DarwinDropdownMenuItem
@@ -164,6 +167,7 @@ private val sidebarEntries = listOf(
     SidebarEntry("tooltip", "Tooltip", "OVERLAYS"),
     SidebarEntry("popover", "Popover", "OVERLAYS"),
     SidebarEntry("dropdown", "Dropdown Menu", "OVERLAYS"),
+    SidebarEntry("contextmenu", "Context Menu", "OVERLAYS"),
     SidebarEntry("tabs", "Tabs", "NAVIGATION"),
     SidebarEntry("accordion", "Accordion", "NAVIGATION"),
     SidebarEntry("sidebar", "Sidebar", "NAVIGATION"),
@@ -286,6 +290,7 @@ fun App() {
                         "tooltip" -> TooltipPage()
                         "popover" -> PopoverPage()
                         "dropdown" -> DropdownMenuPage()
+                        "contextmenu" -> ContextMenuPage()
                         "tabs" -> TabsPage()
                         "accordion" -> AccordionPage()
                         "sidebar" -> SidebarPage()
@@ -1453,6 +1458,47 @@ private fun DropdownMenuPage() {
     GalleryPage("Dropdown Menu", "Displays a menu to the user with a list of actions.") {
         SectionHeader("Examples")
         ExampleCard(title = "Default", sourceCode = GallerySources.DropdownMenuDefaultExample) { DropdownMenuDefaultExample() }
+    }
+}
+
+@GalleryExample("ContextMenu", "Default")
+@Composable
+fun ContextMenuDefaultExample() {
+    DarwinContextMenu(
+        trigger = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(
+                        width = 1.dp,
+                        color = DarwinTheme.colors.border,
+                        shape = DarwinTheme.shapes.large,
+                    )
+                    .clip(DarwinTheme.shapes.large)
+                    .padding(32.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                DarwinText(
+                    text = "Right-click here to open context menu",
+                    style = DarwinTheme.typography.bodyMedium,
+                    color = DarwinTheme.colors.mutedForeground,
+                )
+            }
+        },
+    ) {
+        DarwinContextMenuItem(onSelect = {}) { DarwinText("Cut") }
+        DarwinContextMenuItem(onSelect = {}) { DarwinText("Copy") }
+        DarwinContextMenuItem(onSelect = {}) { DarwinText("Paste") }
+        DarwinContextMenuSeparator()
+        DarwinContextMenuItem(onSelect = {}, destructive = true) { DarwinText("Delete") }
+    }
+}
+
+@Composable
+private fun ContextMenuPage() {
+    GalleryPage("Context Menu", "A menu triggered by right-clicking on an element.") {
+        SectionHeader("Examples")
+        ExampleCard(title = "Default", sourceCode = GallerySources.ContextMenuDefaultExample) { ContextMenuDefaultExample() }
     }
 }
 
