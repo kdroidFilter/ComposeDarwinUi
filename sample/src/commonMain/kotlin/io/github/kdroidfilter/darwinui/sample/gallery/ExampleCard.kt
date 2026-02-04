@@ -39,21 +39,22 @@ fun ExampleCard(
     var activeTab by remember { mutableStateOf(ExampleTab.Preview) }
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(DarwinTheme.shapes.large)
-            .border(
-                width = 1.dp,
-                color = DarwinTheme.colors.border,
-                shape = DarwinTheme.shapes.large,
-            )
-            .background(DarwinTheme.colors.card),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(DarwinTheme.shapes.large)
+                .border(
+                    width = 1.dp,
+                    color = DarwinTheme.colors.border,
+                    shape = DarwinTheme.shapes.large,
+                ).background(DarwinTheme.colors.card),
     ) {
         // Header: title + description + tabs
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             // Title + description
@@ -76,10 +77,11 @@ fun ExampleCard(
             // Tabs: Preview | Code
             Row(
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
-                modifier = Modifier
-                    .clip(DarwinTheme.shapes.small)
-                    .background(DarwinTheme.colors.backgroundSubtle)
-                    .padding(2.dp),
+                modifier =
+                    Modifier
+                        .clip(DarwinTheme.shapes.small)
+                        .background(DarwinTheme.colors.backgroundSubtle)
+                        .padding(2.dp),
             ) {
                 TabButton(
                     text = "Preview",
@@ -96,10 +98,11 @@ fun ExampleCard(
 
         // Separator
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(DarwinTheme.colors.border)
-                .defaultMinSize(minHeight = 1.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(DarwinTheme.colors.border)
+                    .defaultMinSize(minHeight = 1.dp),
         )
 
         // Content area: Preview or Code
@@ -113,20 +116,23 @@ fun ExampleCard(
             when (tab) {
                 ExampleTab.Preview -> {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .defaultMinSize(minHeight = 80.dp)
-                            .padding(16.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .defaultMinSize(minHeight = 80.dp)
+                                .padding(16.dp),
                         contentAlignment = Alignment.CenterStart,
                     ) {
                         content()
                     }
                 }
+
                 ExampleTab.Code -> {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
                     ) {
                         CodeBlock(code = sourceCode)
                     }
@@ -143,14 +149,17 @@ private fun TabButton(
     onClick: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .clip(DarwinTheme.shapes.extraSmall)
-            .then(
-                if (selected) Modifier.background(DarwinTheme.colors.card)
-                else Modifier
-            )
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+        modifier =
+            Modifier
+                .clip(DarwinTheme.shapes.extraSmall)
+                .then(
+                    if (selected) {
+                        Modifier.background(DarwinTheme.colors.card)
+                    } else {
+                        Modifier
+                    },
+                ).clickable(onClick = onClick)
+                .padding(horizontal = 12.dp, vertical = 6.dp),
     ) {
         DarwinText(
             text = text,

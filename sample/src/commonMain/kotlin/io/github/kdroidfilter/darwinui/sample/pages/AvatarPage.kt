@@ -28,14 +28,15 @@ fun AvatarSizesExample() {
 @Composable
 fun AvatarGroupExample() {
     DarwinAvatarGroup(
-        avatars = listOf(
-            AvatarData(name = "Alice Smith"),
-            AvatarData(name = "Bob Jones"),
-            AvatarData(name = "Carol White"),
-            AvatarData(name = "Dan Brown"),
-            AvatarData(name = "Eve Taylor"),
-            AvatarData(name = "Frank Lee"),
-        ),
+        avatars =
+            listOf(
+                AvatarData(name = "Alice Smith"),
+                AvatarData(name = "Bob Jones"),
+                AvatarData(name = "Carol White"),
+                AvatarData(name = "Dan Brown"),
+                AvatarData(name = "Eve Taylor"),
+                AvatarData(name = "Frank Lee"),
+            ),
         maxDisplay = 4,
     )
 }

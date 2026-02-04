@@ -1,80 +1,226 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM).
+# Darwin UI
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-    - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-    - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-      For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-      the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-      Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-      folder is the appropriate location.
+A macOS-inspired UI component library for Compose Multiplatform with full light/dark theme support.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.0-7F52FF.svg?logo=kotlin)](https://kotlinlang.org)
+[![Compose Multiplatform](https://img.shields.io/badge/Compose_Multiplatform-1.10.0-4285F4.svg?logo=jetpackcompose)](https://www.jetbrains.com/compose-multiplatform/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-### Build and Run Android Application
+## Features
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
+- **30+ components** — Buttons, Cards, Dialogs, Tables, Toasts, and more
+- **Light & Dark mode** — Theme-aware styling with automatic system detection
+- **macOS aesthetic** — Clean, native-feeling design inspired by Apple's design language
+- **Compose Multiplatform** — Runs on Android, iOS, Desktop (JVM), and Web (JS/Wasm)
+- **Built-in design system** — Colors, typography (Manrope), shapes, and animations out of the box
+- **No external UI dependencies** — Pure Compose, no Material dependency required
 
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+## Supported Platforms
 
-### Build and Run Desktop (JVM) Application
+| Platform | Status |
+|----------|--------|
+| Android  | ✓      |
+| iOS      | ✓      |
+| Desktop (JVM) | ✓ |
+| Web (JS) | ✓      |
+| Web (Wasm) | ✓    |
 
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
+## Quick Start
 
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
+### 1. Add the dependency
 
-### Build and Run Web Application
+```kotlin
+// build.gradle.kts
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("io.github.kdroidfilter:darwinui:<version>")
+        }
+    }
+}
+```
 
-To build and run the development version of the web app, use the run configuration from the run widget
-in your IDE's toolbar or run it directly from the terminal:
+### 2. Wrap your app with DarwinTheme
 
-- for the Wasm target (faster, modern browsers):
-    - on macOS/Linux
-      ```shell
-      ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
-      ```
-    - on Windows
-      ```shell
-      .\gradlew.bat :composeApp:wasmJsBrowserDevelopmentRun
-      ```
-- for the JS target (slower, supports older browsers):
-    - on macOS/Linux
-      ```shell
-      ./gradlew :composeApp:jsBrowserDevelopmentRun
-      ```
-    - on Windows
-      ```shell
-      .\gradlew.bat :composeApp:jsBrowserDevelopmentRun
-      ```
+```kotlin
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
-### Build and Run iOS Application
+@Composable
+fun App() {
+    DarwinTheme(darkTheme = false) {
+        // Your content here
+        // Access design tokens via DarwinTheme.colors, DarwinTheme.typography, etc.
+    }
+}
+```
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+### 3. Use components
 
----
+```kotlin
+import io.github.kdroidfilter.darwinui.components.button.DarwinButton
+import io.github.kdroidfilter.darwinui.components.button.DarwinButtonVariant
+import io.github.kdroidfilter.darwinui.components.card.*
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+@Composable
+fun MyScreen() {
+    DarwinCard {
+        DarwinCardHeader {
+            DarwinCardTitle("Welcome to Darwin UI")
+            DarwinCardDescription("A macOS-inspired component library")
+        }
+        DarwinCardContent {
+            DarwinButton(
+                onClick = { /* ... */ },
+                variant = DarwinButtonVariant.Primary,
+            ) {
+                DarwinText("Get Started")
+            }
+        }
+    }
+}
+```
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack
-channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+## Components
+
+### Form Controls
+
+| Component | Description |
+|-----------|-------------|
+| **Button** | 11 variants — Default, Primary, Secondary, Success, Warning, Info, Destructive, Outline, Ghost, Link, Accent |
+| **Input** | Text field with label, placeholder, and validation states |
+| **TextArea** | Multi-line text input |
+| **SearchField** | Search input with icon |
+| **Checkbox** | Checkbox with label support |
+| **Switch** | Toggle switch |
+| **Select** | Single-selection dropdown |
+| **MultiSelect** | Multi-selection dropdown |
+| **Slider** | Range slider input |
+| **DateSelect** | Date picker |
+| **Upload** | File upload component |
+
+### Data Display
+
+| Component | Description |
+|-----------|-------------|
+| **Card** | Composable card with header, content, footer, title, and description |
+| **Badge** | Status badges with semantic color variants |
+| **Avatar** | User avatar with image or initials fallback |
+| **Table** | Full table system with headers and rows |
+| **Progress** | Linear progress indicator |
+| **Skeleton** | Loading placeholder animations |
+
+### Feedback
+
+| Component | Description |
+|-----------|-------------|
+| **Alert** | Alert banners with type indicators |
+| **Toast** | Toast notifications with auto-dismiss and positioning |
+
+### Overlays
+
+| Component | Description |
+|-----------|-------------|
+| **Dialog** | Modal dialog with header, content, and footer |
+| **Tooltip** | Hover tooltips |
+| **Popover** | Floating popover content |
+| **DropdownMenu** | Dropdown menu with items and separators |
+| **ContextMenu** | Right-click context menu |
+
+### Navigation
+
+| Component | Description |
+|-----------|-------------|
+| **Tabs** | Tabbed content navigation |
+| **Accordion** | Collapsible content sections |
+| **Sidebar** | Navigation sidebar with groups, icons, and collapsible state |
+
+### Utility
+
+| Component | Description |
+|-----------|-------------|
+| **Text** | Theme-aware text component |
+| **Spinner** | Loading spinner |
+| **Icon** | Icon rendering component (includes Lucide icons) |
+
+## Design System
+
+Darwin UI provides a complete design system accessible through `DarwinTheme`:
+
+```kotlin
+// Colors
+DarwinTheme.colors.background
+DarwinTheme.colors.textPrimary
+DarwinTheme.colors.border
+DarwinTheme.colors.primary
+
+// Typography (Manrope font family)
+DarwinTheme.typography.headingLarge
+DarwinTheme.typography.bodyMedium
+DarwinTheme.typography.bodySmall
+
+// Shapes
+DarwinTheme.shapes.small       // 8dp
+DarwinTheme.shapes.medium      // 10dp
+DarwinTheme.shapes.large       // 12dp
+DarwinTheme.shapes.extraLarge  // 16dp
+
+// Animations
+DarwinTheme.animations
+```
+
+### Dark Mode
+
+Dark mode is supported out of the box. Pass `darkTheme` to `DarwinTheme`, or let it follow the system setting automatically:
+
+```kotlin
+// Follow system setting (default)
+DarwinTheme {
+    // ...
+}
+
+// Force dark mode
+DarwinTheme(darkTheme = true) {
+    // ...
+}
+
+// Manual toggle
+var isDark by remember { mutableStateOf(false) }
+DarwinTheme(darkTheme = isDark) {
+    DarwinButton(onClick = { isDark = !isDark }) {
+        DarwinText(if (isDark) "Light Mode" else "Dark Mode")
+    }
+}
+```
+
+## Running the Sample App
+
+The project includes a gallery app that showcases all components.
+
+```bash
+# Desktop (JVM)
+./gradlew :sample:run
+
+# Web (Wasm)
+./gradlew :sample:wasmJsBrowserDevelopmentRun
+
+# Web (JS)
+./gradlew :sample:jsBrowserDevelopmentRun
+
+# Android
+./gradlew :sample:assembleDebug
+```
+
+## Project Structure
+
+```
+DarwinUI/
+├── darwinui/          # Library module — all components, theme, icons
+├── sample/            # Gallery app showcasing every component
+├── gallery-annotations/  # KSP annotation for gallery examples
+└── gallery-ksp/       # KSP processor for gallery source extraction
+```
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.

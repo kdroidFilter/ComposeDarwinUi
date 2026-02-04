@@ -39,21 +39,22 @@ fun GallerySection(
     var expanded by remember { mutableStateOf(false) }
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(DarwinTheme.shapes.large)
-            .border(
-                width = 1.dp,
-                color = DarwinTheme.colors.border,
-                shape = DarwinTheme.shapes.large,
-            )
-            .background(DarwinTheme.colors.card),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(DarwinTheme.shapes.large)
+                .border(
+                    width = 1.dp,
+                    color = DarwinTheme.colors.border,
+                    shape = DarwinTheme.shapes.large,
+                ).background(DarwinTheme.colors.card),
     ) {
         // Section title
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
         ) {
             DarwinText(
                 text = title,
@@ -65,36 +66,40 @@ fun GallerySection(
 
         // Separator
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(DarwinTheme.colors.border)
-                .defaultMinSize(minHeight = 1.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(DarwinTheme.colors.border)
+                    .defaultMinSize(minHeight = 1.dp),
         )
 
         // Preview area
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .defaultMinSize(minHeight = 80.dp)
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = 80.dp)
+                    .padding(16.dp),
         ) {
             content()
         }
 
         // Separator
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(DarwinTheme.colors.border)
-                .defaultMinSize(minHeight = 1.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(DarwinTheme.colors.border)
+                    .defaultMinSize(minHeight = 1.dp),
         )
 
         // Source Code toggle
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = !expanded }
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = !expanded }
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -114,16 +119,20 @@ fun GallerySection(
         // Expandable code block
         AnimatedVisibility(
             visible = expanded,
-            enter = expandVertically(
-                animationSpec = darwinTween(DarwinDuration.Normal),
-            ) + fadeIn(
-                animationSpec = darwinTween(DarwinDuration.Normal),
-            ),
-            exit = shrinkVertically(
-                animationSpec = darwinTween(DarwinDuration.Normal),
-            ) + fadeOut(
-                animationSpec = darwinTween(DarwinDuration.Normal),
-            ),
+            enter =
+                expandVertically(
+                    animationSpec = darwinTween(DarwinDuration.Normal),
+                ) +
+                    fadeIn(
+                        animationSpec = darwinTween(DarwinDuration.Normal),
+                    ),
+            exit =
+                shrinkVertically(
+                    animationSpec = darwinTween(DarwinDuration.Normal),
+                ) +
+                    fadeOut(
+                        animationSpec = darwinTween(DarwinDuration.Normal),
+                    ),
         ) {
             Box(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
                 CodeBlock(code = sourceCode)

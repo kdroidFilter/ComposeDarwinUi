@@ -54,31 +54,39 @@ fun CodeBlock(code: String) {
     var copied by remember { mutableStateOf(false) }
     val isDark = DarwinTheme.colors.isDark
 
-    val highlightedCode = remember(code, isDark) {
-        val highlights = Highlights.Builder()
-            .code(code)
-            .language(SyntaxLanguage.KOTLIN)
-            .theme(SyntaxThemes.atom(darkMode = isDark))
-            .build()
+    val highlightedCode =
+        remember(code, isDark) {
+            val highlights =
+                Highlights
+                    .Builder()
+                    .code(code)
+                    .language(SyntaxLanguage.KOTLIN)
+                    .theme(SyntaxThemes.atom(darkMode = isDark))
+                    .build()
 
-        buildAnnotatedString {
-            append(code)
-            for (highlight in highlights.getHighlights()) {
-                when (highlight) {
-                    is ColorHighlight -> addStyle(
-                        style = SpanStyle(color = Color(highlight.rgb).copy(alpha = 1f)),
-                        start = highlight.location.start,
-                        end = highlight.location.end,
-                    )
-                    is BoldHighlight -> addStyle(
-                        style = SpanStyle(fontWeight = FontWeight.Bold),
-                        start = highlight.location.start,
-                        end = highlight.location.end,
-                    )
+            buildAnnotatedString {
+                append(code)
+                for (highlight in highlights.getHighlights()) {
+                    when (highlight) {
+                        is ColorHighlight -> {
+                            addStyle(
+                                style = SpanStyle(color = Color(highlight.rgb).copy(alpha = 1f)),
+                                start = highlight.location.start,
+                                end = highlight.location.end,
+                            )
+                        }
+
+                        is BoldHighlight -> {
+                            addStyle(
+                                style = SpanStyle(fontWeight = FontWeight.Bold),
+                                start = highlight.location.start,
+                                end = highlight.location.end,
+                            )
+                        }
+                    }
                 }
             }
         }
-    }
 
     LaunchedEffect(copied) {
         if (copied) {
@@ -88,16 +96,18 @@ fun CodeBlock(code: String) {
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(DarwinTheme.shapes.medium)
-            .background(DarwinTheme.colors.backgroundSubtle),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(DarwinTheme.shapes.medium)
+                .background(DarwinTheme.colors.backgroundSubtle),
     ) {
         // Header with language label and copy button
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -109,13 +119,13 @@ fun CodeBlock(code: String) {
             )
 
             Row(
-                modifier = Modifier
-                    .clip(DarwinTheme.shapes.small)
-                    .clickable {
-                        clipboardManager.setText(AnnotatedString(code))
-                        copied = true
-                    }
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                modifier =
+                    Modifier
+                        .clip(DarwinTheme.shapes.small)
+                        .clickable {
+                            clipboardManager.setText(AnnotatedString(code))
+                            copied = true
+                        }.padding(horizontal = 8.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -128,10 +138,14 @@ fun CodeBlock(code: String) {
                         imageVector = if (isCopied) LucideCheck else LucideCopy,
                         contentDescription = null,
                         modifier = Modifier.size(14.dp),
-                        colorFilter = ColorFilter.tint(
-                            if (isCopied) DarwinTheme.colors.success
-                            else DarwinTheme.colors.textTertiary
-                        ),
+                        colorFilter =
+                            ColorFilter.tint(
+                                if (isCopied) {
+                                    DarwinTheme.colors.success
+                                } else {
+                                    DarwinTheme.colors.textTertiary
+                                },
+                            ),
                     )
                 }
                 AnimatedContent(
@@ -143,8 +157,12 @@ fun CodeBlock(code: String) {
                         text = if (isCopied) "Copied!" else "Copy",
                         style = DarwinTheme.typography.labelSmall,
                         fontWeight = FontWeight.Medium,
-                        color = if (isCopied) DarwinTheme.colors.success
-                        else DarwinTheme.colors.textTertiary,
+                        color =
+                            if (isCopied) {
+                                DarwinTheme.colors.success
+                            } else {
+                                DarwinTheme.colors.textTertiary
+                            },
                     )
                 }
             }
@@ -154,15 +172,17 @@ fun CodeBlock(code: String) {
         SelectionContainer {
             BasicText(
                 text = highlightedCode,
-                style = TextStyle(
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = DarwinTheme.typography.bodySmall.fontSize,
-                    color = DarwinTheme.colors.textSecondary,
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                style =
+                    TextStyle(
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = DarwinTheme.typography.bodySmall.fontSize,
+                        color = DarwinTheme.colors.textSecondary,
+                    ),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
             )
         }
     }

@@ -17,19 +17,18 @@ import io.github.kdroidfilter.darwinui.components.text.DarwinText
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
 @Composable
-fun PreviewContainer(
-    content: @Composable () -> Unit,
-) {
+fun PreviewContainer(content: @Composable () -> Unit) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(DarwinTheme.shapes.extraLarge)
-            .border(
-                width = 1.dp,
-                color = DarwinTheme.colors.border.copy(alpha = 0.60f), // border-border/60
-                shape = DarwinTheme.shapes.extraLarge,
-            )
-            .background(DarwinTheme.colors.muted.copy(alpha = 0.20f)), // bg-muted/20
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(DarwinTheme.shapes.extraLarge)
+                .border(
+                    width = 1.dp,
+                    color = DarwinTheme.colors.border.copy(alpha = 0.60f), // border-border/60
+                    shape = DarwinTheme.shapes.extraLarge,
+                ).background(DarwinTheme.colors.muted.copy(alpha = 0.20f)),
+        // bg-muted/20
     ) {
         DarwinText(
             text = "Preview",
@@ -39,10 +38,11 @@ fun PreviewContainer(
             modifier = Modifier.padding(start = 24.dp, top = 20.dp),
         )
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .defaultMinSize(minHeight = 100.dp)
-                .padding(24.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = 100.dp)
+                    .padding(24.dp),
             contentAlignment = Alignment.Center,
         ) {
             content()
