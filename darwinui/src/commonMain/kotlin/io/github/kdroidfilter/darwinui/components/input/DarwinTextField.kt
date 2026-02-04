@@ -195,13 +195,13 @@ fun DarwinTextField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(size.height)
-                        .clip(shapes.medium)
+                        .clip(shapes.large)
                         .background(idleBackground)
                         .background(colors.inputFocusBackground.copy(alpha = colors.inputFocusBackground.alpha * focusAlpha))
                         .border(
                             width = resolvedBorderWidth,
                             color = borderColor,
-                            shape = shapes.medium,
+                            shape = shapes.large,
                         )
                         .then(
                             if (!enabled) Modifier.graphicsLayer { alpha = 0.5f }
