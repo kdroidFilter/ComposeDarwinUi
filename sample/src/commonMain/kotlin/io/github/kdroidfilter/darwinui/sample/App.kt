@@ -500,20 +500,38 @@ fun InputPasswordExample() {
 @GalleryExample("TextArea", "Default")
 @Composable
 fun TextAreaDefaultExample() {
+    val maxChars = 200
     var text by remember { mutableStateOf("") }
-    DarwinTextArea(value = text, onValueChange = { text = it }, placeholder = "Write a description...", label = "Description", modifier = Modifier.fillMaxWidth(0.5f))
+    Column(modifier = Modifier.fillMaxWidth(0.5f)) {
+        DarwinTextArea(
+            value = text,
+            onValueChange = { if (it.length <= maxChars) text = it },
+            placeholder = "Write your message here...",
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Row(modifier = Modifier.fillMaxWidth().padding(top = 4.dp, end = 2.dp), horizontalArrangement = Arrangement.End) {
+            DarwinText(
+                text = "${text.length}/$maxChars",
+                style = DarwinTheme.typography.caption,
+                color = if (text.length >= maxChars) DarwinTheme.colors.destructive else DarwinTheme.colors.textTertiary,
+            )
+        }
+    }
 }
 
-@GalleryExample("TextArea", "With Content")
+@GalleryExample("TextArea", "Error State")
 @Composable
-fun TextAreaWithContentExample() {
-    var text by remember {
-        mutableStateOf(
-            "Darwin UI is a macOS-inspired design system for Compose Multiplatform. " +
-                    "It provides a comprehensive set of components that follow Apple's Human Interface Guidelines."
-        )
-    }
-    DarwinTextArea(value = text, onValueChange = { text = it }, label = "About", modifier = Modifier.fillMaxWidth(0.5f))
+fun TextAreaErrorExample() {
+    var text by remember { mutableStateOf("") }
+    DarwinTextArea(
+        value = text,
+        onValueChange = { text = it },
+        placeholder = "Error state textarea",
+        isError = true,
+        minLines = 2,
+        maxLines = 2,
+        modifier = Modifier.fillMaxWidth(0.5f),
+    )
 }
 
 @GalleryExample("Checkbox", "States")
@@ -1000,7 +1018,7 @@ private fun TextAreaPage() {
     GalleryPage("Textarea", "A multi-line text input for longer form content.") {
         SectionHeader("Examples")
         ExampleCard(title = "Default", sourceCode = GallerySources.TextAreaDefaultExample) { TextAreaDefaultExample() }
-        ExampleCard(title = "With Content", sourceCode = GallerySources.TextAreaWithContentExample) { TextAreaWithContentExample() }
+        ExampleCard(title = "Error State", sourceCode = GallerySources.TextAreaErrorExample) { TextAreaErrorExample() }
     }
 }
 

@@ -124,7 +124,8 @@ fun DarwinTextField(
     )
 
     val resolvedBorderWidth: Dp = when {
-        isError || isSuccess || isFocused -> 2.dp
+        isFocused -> 2.dp
+        isError || isSuccess -> 1.dp
         else -> 1.dp
     }
 
