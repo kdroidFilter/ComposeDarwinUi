@@ -398,10 +398,14 @@ private fun BadgePreview() {
 
 @Composable
 private fun ProgressPreview() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        DarwinLinearProgress(value = 65f, max = 100f, showValue = true, modifier = Modifier.fillMaxWidth(0.5f))
-        DarwinLinearProgress(value = 40f, max = 100f, variant = DarwinProgressVariant.Success, modifier = Modifier.fillMaxWidth(0.5f))
-        DarwinLinearProgress(indeterminate = true, modifier = Modifier.fillMaxWidth(0.5f))
+    Column(
+        modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        DarwinLinearProgress(value = 65f, max = 100f, showValue = true)
+        DarwinLinearProgress(value = 40f, max = 100f, variant = DarwinProgressVariant.Success)
+        DarwinLinearProgress(value = 80f, max = 100f, variant = DarwinProgressVariant.Gradient)
+        DarwinLinearProgress(indeterminate = true)
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             DarwinCircularProgress(value = 75f, max = 100f, showValue = true)
             DarwinCircularProgress(value = 45f, max = 100f, variant = DarwinProgressVariant.Success, showValue = true)
@@ -850,20 +854,45 @@ fun TableDefaultExample() {
 
 @GalleryExample("Progress", "Linear Default")
 @Composable
-fun ProgressLinearDefaultExample() { DarwinLinearProgress(value = 65f, max = 100f, showValue = true, modifier = Modifier.fillMaxWidth(0.5f)) }
+fun ProgressLinearDefaultExample() {
+    DarwinLinearProgress(
+        value = 65f,
+        max = 100f,
+        showValue = true,
+        modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
+    )
+}
 
-@GalleryExample("Progress", "Linear Variants")
+@GalleryExample("Progress", "Linear Success")
 @Composable
-fun ProgressLinearVariantsExample() {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        DarwinLinearProgress(value = 40f, max = 100f, variant = DarwinProgressVariant.Success, modifier = Modifier.fillMaxWidth(0.5f))
-        DarwinLinearProgress(value = 80f, max = 100f, variant = DarwinProgressVariant.Gradient, modifier = Modifier.fillMaxWidth(0.5f))
-    }
+fun ProgressLinearSuccessExample() {
+    DarwinLinearProgress(
+        value = 40f,
+        max = 100f,
+        variant = DarwinProgressVariant.Success,
+        modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
+    )
+}
+
+@GalleryExample("Progress", "Linear Gradient")
+@Composable
+fun ProgressLinearGradientExample() {
+    DarwinLinearProgress(
+        value = 80f,
+        max = 100f,
+        variant = DarwinProgressVariant.Gradient,
+        modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
+    )
 }
 
 @GalleryExample("Progress", "Linear Indeterminate")
 @Composable
-fun ProgressLinearIndeterminateExample() { DarwinLinearProgress(indeterminate = true, modifier = Modifier.fillMaxWidth(0.5f)) }
+fun ProgressLinearIndeterminateExample() {
+    DarwinLinearProgress(
+        indeterminate = true,
+        modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
+    )
+}
 
 @GalleryExample("Progress", "Circular")
 @Composable
@@ -871,7 +900,6 @@ fun ProgressCircularExample() {
     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         DarwinCircularProgress(value = 75f, max = 100f, showValue = true)
         DarwinCircularProgress(value = 45f, max = 100f, variant = DarwinProgressVariant.Success, showValue = true)
-        DarwinCircularProgress(value = 90f, max = 100f, variant = DarwinProgressVariant.Gradient, showValue = true)
         DarwinCircularProgress(indeterminate = true)
     }
 }
@@ -1337,9 +1365,14 @@ private fun ProgressPage() {
     GalleryPage("Progress", "Displays an indicator showing the completion progress of a task.") {
         PreviewContainer { ProgressPreview() }
 
+        SectionHeader("Usage")
+        CodeBlock("""DarwinLinearProgress(value = 65f, max = 100f, showValue = true)
+DarwinCircularProgress(value = 75f, max = 100f, showValue = true)""")
+
         SectionHeader("Examples")
         ExampleCard(title = "Linear - Default", sourceCode = GallerySources.ProgressLinearDefaultExample) { ProgressLinearDefaultExample() }
-        ExampleCard(title = "Linear - Variants", sourceCode = GallerySources.ProgressLinearVariantsExample) { ProgressLinearVariantsExample() }
+        ExampleCard(title = "Linear - Success", sourceCode = GallerySources.ProgressLinearSuccessExample) { ProgressLinearSuccessExample() }
+        ExampleCard(title = "Linear - Gradient", sourceCode = GallerySources.ProgressLinearGradientExample) { ProgressLinearGradientExample() }
         ExampleCard(title = "Linear - Indeterminate", sourceCode = GallerySources.ProgressLinearIndeterminateExample) { ProgressLinearIndeterminateExample() }
         ExampleCard(title = "Circular", sourceCode = GallerySources.ProgressCircularExample) { ProgressCircularExample() }
     }
