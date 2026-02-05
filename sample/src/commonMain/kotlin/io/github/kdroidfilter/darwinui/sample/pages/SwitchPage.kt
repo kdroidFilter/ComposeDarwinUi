@@ -17,7 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.switchcomponent.DarwinSwitch
+import io.github.kdroidfilter.darwinui.components.Switcher
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -30,9 +30,9 @@ private fun SwitchPreview() {
     var s1 by remember { mutableStateOf(true) }
     var s2 by remember { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        HoverOffsetItem { DarwinSwitch(checked = s1, onCheckedChange = { s1 = it }, label = "Enable notifications") }
-        HoverOffsetItem { DarwinSwitch(checked = s2, onCheckedChange = { s2 = it }, label = "Dark mode") }
-        HoverOffsetItem { DarwinSwitch(checked = false, onCheckedChange = {}, label = "Disabled", enabled = false) }
+        HoverOffsetItem { Switcher(checked = s1, onCheckedChange = { s1 = it }, label = "Enable notifications") }
+        HoverOffsetItem { Switcher(checked = s2, onCheckedChange = { s2 = it }, label = "Dark mode") }
+        HoverOffsetItem { Switcher(checked = false, onCheckedChange = {}, label = "Disabled", enabled = false) }
     }
 }
 
@@ -60,9 +60,9 @@ fun SwitchStatesExample() {
     var switch1 by remember { mutableStateOf(false) }
     var switch2 by remember { mutableStateOf(true) }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        DarwinSwitch(checked = switch1, onCheckedChange = { switch1 = it }, label = "Dark mode")
-        DarwinSwitch(checked = switch2, onCheckedChange = { switch2 = it }, label = "Notifications")
-        DarwinSwitch(checked = false, onCheckedChange = {}, label = "Disabled", enabled = false)
+        Switcher(checked = switch1, onCheckedChange = { switch1 = it }, label = "Dark mode")
+        Switcher(checked = switch2, onCheckedChange = { switch2 = it }, label = "Notifications")
+        Switcher(checked = false, onCheckedChange = {}, label = "Disabled", enabled = false)
     }
 }
 

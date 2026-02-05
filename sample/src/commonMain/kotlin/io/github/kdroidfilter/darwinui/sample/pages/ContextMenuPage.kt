@@ -9,10 +9,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.contextmenu.DarwinContextMenu
-import io.github.kdroidfilter.darwinui.components.contextmenu.DarwinContextMenuItem
-import io.github.kdroidfilter.darwinui.components.contextmenu.DarwinContextMenuSeparator
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.ContextMenu
+import io.github.kdroidfilter.darwinui.components.ContextMenuItem
+import io.github.kdroidfilter.darwinui.components.ContextMenuSeparator
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -23,7 +23,7 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 @GalleryExample("ContextMenu", "Default")
 @Composable
 fun ContextMenuDefaultExample() {
-    DarwinContextMenu(
+    ContextMenu(
         trigger = {
             Box(
                 modifier = Modifier
@@ -37,7 +37,7 @@ fun ContextMenuDefaultExample() {
                     .padding(32.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                DarwinText(
+                Text(
                     text = "Right-click here to open context menu",
                     style = DarwinTheme.typography.bodyMedium,
                     color = DarwinTheme.colors.mutedForeground,
@@ -45,11 +45,11 @@ fun ContextMenuDefaultExample() {
             }
         },
     ) {
-        DarwinContextMenuItem(onSelect = {}) { DarwinText("Cut") }
-        DarwinContextMenuItem(onSelect = {}) { DarwinText("Copy") }
-        DarwinContextMenuItem(onSelect = {}) { DarwinText("Paste") }
-        DarwinContextMenuSeparator()
-        DarwinContextMenuItem(onSelect = {}, destructive = true) { DarwinText("Delete") }
+        ContextMenuItem(onSelect = {}) { Text("Cut") }
+        ContextMenuItem(onSelect = {}) { Text("Copy") }
+        ContextMenuItem(onSelect = {}) { Text("Paste") }
+        ContextMenuSeparator()
+        ContextMenuItem(onSelect = {}, destructive = true) { Text("Delete") }
     }
 }
 

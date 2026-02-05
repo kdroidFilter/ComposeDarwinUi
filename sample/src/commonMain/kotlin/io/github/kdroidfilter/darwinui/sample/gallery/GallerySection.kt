@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinTween
@@ -56,7 +56,7 @@ fun GallerySection(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 10.dp),
         ) {
-            DarwinText(
+            Text(
                 text = title,
                 style = DarwinTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold,
@@ -103,12 +103,12 @@ fun GallerySection(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            DarwinText(
+            Text(
                 text = if (expanded) "\u25BC" else "\u25B6",
                 style = DarwinTheme.typography.labelSmall,
                 color = DarwinTheme.colors.textTertiary,
             )
-            DarwinText(
+            Text(
                 text = "Source Code",
                 style = DarwinTheme.typography.labelMedium,
                 fontWeight = FontWeight.Medium,

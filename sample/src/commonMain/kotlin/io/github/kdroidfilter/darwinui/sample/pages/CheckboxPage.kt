@@ -10,7 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.checkbox.DarwinCheckbox
+import io.github.kdroidfilter.darwinui.components.CheckBox
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -24,9 +24,9 @@ private fun CheckboxPreview() {
     var c2 by remember { mutableStateOf(true) }
     var c3 by remember { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        DarwinCheckbox(checked = c1, onCheckedChange = { c1 = it }, label = "Unchecked option")
-        DarwinCheckbox(checked = c2, onCheckedChange = { c2 = it }, label = "Checked option")
-        DarwinCheckbox(checked = c3, onCheckedChange = { c3 = it }, indeterminate = !c3, label = "Indeterminate")
+        CheckBox(checked = c1, onCheckedChange = { c1 = it }, label = "Unchecked option")
+        CheckBox(checked = c2, onCheckedChange = { c2 = it }, label = "Checked option")
+        CheckBox(checked = c3, onCheckedChange = { c3 = it }, indeterminate = !c3, label = "Indeterminate")
     }
 }
 
@@ -36,10 +36,10 @@ fun CheckboxStatesExample() {
     var checked1 by remember { mutableStateOf(false) }
     var checked2 by remember { mutableStateOf(true) }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        DarwinCheckbox(checked = checked1, onCheckedChange = { checked1 = it }, label = "Accept terms")
-        DarwinCheckbox(checked = checked2, onCheckedChange = { checked2 = it }, label = "Enabled and checked")
-        DarwinCheckbox(checked = false, onCheckedChange = {}, label = "Disabled", enabled = false)
-        DarwinCheckbox(checked = true, onCheckedChange = {}, indeterminate = true, label = "Indeterminate")
+        CheckBox(checked = checked1, onCheckedChange = { checked1 = it }, label = "Accept terms")
+        CheckBox(checked = checked2, onCheckedChange = { checked2 = it }, label = "Enabled and checked")
+        CheckBox(checked = false, onCheckedChange = {}, label = "Disabled", enabled = false)
+        CheckBox(checked = true, onCheckedChange = {}, indeterminate = true, label = "Indeterminate")
     }
 }
 
@@ -51,7 +51,7 @@ fun CheckboxSelectAllExample() {
     val someChecked = items.any { it } && !allChecked
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        DarwinCheckbox(
+        CheckBox(
             checked = allChecked,
             onCheckedChange = { checked -> items = List(3) { checked } },
             indeterminate = someChecked,
@@ -62,7 +62,7 @@ fun CheckboxSelectAllExample() {
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             items.forEachIndexed { i, checked ->
-                DarwinCheckbox(
+                CheckBox(
                     checked = checked,
                     onCheckedChange = { newVal ->
                         items = items.toMutableList().also { it[i] = newVal }

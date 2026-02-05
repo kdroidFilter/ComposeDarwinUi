@@ -11,9 +11,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.dateselect.DarwinDateSelect
-import io.github.kdroidfilter.darwinui.components.dateselect.DateConfig
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.DateSelect
+import io.github.kdroidfilter.darwinui.components.DateConfig
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
@@ -27,12 +27,12 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 fun DateSelectDefaultExample() {
     var selectedConfig by remember { mutableStateOf<DateConfig?>(null) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.widthIn(max = 384.dp).fillMaxWidth()) {
-        DarwinDateSelect(
+        DateSelect(
             label = "Select a date",
             onChange = { selectedConfig = it },
         )
         if (selectedConfig != null) {
-            DarwinText(
+            Text(
                 text = "Selected: ${selectedConfig!!.selectedDate ?: "—"}",
                 style = DarwinTheme.typography.bodySmall,
                 color = DarwinTheme.colors.textSecondary,
@@ -45,7 +45,7 @@ fun DateSelectDefaultExample() {
 internal fun DateSelectPage() {
     GalleryPage("Date Select", "A sophisticated date/time selector with single and recurring event support.") {
         SectionHeader("Usage")
-        CodeBlock("""DarwinDateSelect(
+        CodeBlock("""DateSelect(
     label = "Select a date",
     onChange = { config -> /* handle config */ },
 )""")

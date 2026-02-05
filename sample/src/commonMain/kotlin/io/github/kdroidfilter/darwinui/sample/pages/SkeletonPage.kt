@@ -11,8 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.skeleton.DarwinSkeleton
-import io.github.kdroidfilter.darwinui.components.skeleton.DarwinSkeletonCircle
+import io.github.kdroidfilter.darwinui.components.Skeleton
+import io.github.kdroidfilter.darwinui.components.SkeletonCircle
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
@@ -34,21 +34,21 @@ fun SkeletonCardExample() {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            DarwinSkeletonCircle(size = 48.dp) // h-12 w-12
+            SkeletonCircle(size = 48.dp) // h-12 w-12
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                DarwinSkeleton(modifier = Modifier.fillMaxWidth(0.75f).height(16.dp)) // h-4 w-3/4
-                DarwinSkeleton(modifier = Modifier.fillMaxWidth(0.5f).height(12.dp)) // h-3 w-1/2
+                Skeleton(modifier = Modifier.fillMaxWidth(0.75f).height(16.dp)) // h-4 w-3/4
+                Skeleton(modifier = Modifier.fillMaxWidth(0.5f).height(12.dp)) // h-3 w-1/2
             }
         }
         // Content block: h-24 w-full rounded-lg
-        DarwinSkeleton(modifier = Modifier.fillMaxWidth().height(96.dp)) // h-24
+        Skeleton(modifier = Modifier.fillMaxWidth().height(96.dp)) // h-24
         // Button row
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            DarwinSkeleton(modifier = Modifier.width(80.dp).height(32.dp), shape = DarwinTheme.shapes.small) // h-8 w-20 rounded-md
-            DarwinSkeleton(modifier = Modifier.width(80.dp).height(32.dp), shape = DarwinTheme.shapes.small) // h-8 w-20 rounded-md
+            Skeleton(modifier = Modifier.width(80.dp).height(32.dp), shape = DarwinTheme.shapes.small) // h-8 w-20 rounded-md
+            Skeleton(modifier = Modifier.width(80.dp).height(32.dp), shape = DarwinTheme.shapes.small) // h-8 w-20 rounded-md
         }
     }
 }
@@ -57,8 +57,8 @@ fun SkeletonCardExample() {
 internal fun SkeletonPage() {
     GalleryPage("Skeleton", "Used to show a placeholder while content is loading.") {
         SectionHeader("Usage")
-        CodeBlock("""DarwinSkeleton(modifier = Modifier.fillMaxWidth().height(16.dp))
-DarwinSkeletonCircle(size = 48.dp)""")
+        CodeBlock("""Skeleton(modifier = Modifier.fillMaxWidth().height(16.dp))
+SkeletonCircle(size = 48.dp)""")
 
         SectionHeader("Examples")
         ExampleCard(

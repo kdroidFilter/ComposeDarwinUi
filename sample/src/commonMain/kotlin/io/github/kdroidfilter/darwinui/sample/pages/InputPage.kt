@@ -10,7 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.input.DarwinTextField
+import io.github.kdroidfilter.darwinui.components.TextField
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
@@ -25,9 +25,9 @@ private fun InputPreview() {
         var text by remember { mutableStateOf("") }
         var errorText by remember { mutableStateOf("") }
         var successText by remember { mutableStateOf("Valid input") }
-        DarwinTextField(value = text, onValueChange = { text = it }, placeholder = "Type something...")
-        DarwinTextField(value = errorText, onValueChange = { errorText = it }, placeholder = "Error state", isError = true)
-        DarwinTextField(value = successText, onValueChange = { successText = it }, placeholder = "Success state", isSuccess = true)
+        TextField(value = text, onValueChange = { text = it }, placeholder = "Type something...")
+        TextField(value = errorText, onValueChange = { errorText = it }, placeholder = "Error state", isError = true)
+        TextField(value = successText, onValueChange = { successText = it }, placeholder = "Success state", isSuccess = true)
     }
 }
 
@@ -35,7 +35,7 @@ private fun InputPreview() {
 @Composable
 fun InputDefaultExample() {
     var text by remember { mutableStateOf("") }
-    DarwinTextField(
+    TextField(
         value = text,
         onValueChange = { text = it },
         placeholder = "Enter your name...",
@@ -48,7 +48,7 @@ fun InputDefaultExample() {
 @Composable
 fun InputErrorExample() {
     var text by remember { mutableStateOf("") }
-    DarwinTextField(
+    TextField(
         value = text,
         onValueChange = { text = it },
         placeholder = "Required field",
@@ -63,7 +63,7 @@ fun InputErrorExample() {
 @Composable
 fun InputSuccessExample() {
     var text by remember { mutableStateOf("valid@email.com") }
-    DarwinTextField(
+    TextField(
         value = text,
         onValueChange = { text = it },
         label = "Verified email",
@@ -77,7 +77,7 @@ fun InputSuccessExample() {
 @Composable
 fun InputWithLabelExample() {
     var text by remember { mutableStateOf("") }
-    DarwinTextField(
+    TextField(
         value = text,
         onValueChange = { text = it },
         placeholder = "you@example.com",
@@ -91,7 +91,7 @@ fun InputWithLabelExample() {
 @Composable
 fun InputPasswordExample() {
     var password by remember { mutableStateOf("") }
-    DarwinTextField(
+    TextField(
         value = password,
         onValueChange = { password = it },
         placeholder = "Password",
@@ -108,7 +108,7 @@ internal fun InputPage() {
 
         SectionHeader("Usage")
         CodeBlock("""var text by remember { mutableStateOf("") }
-DarwinTextField(
+TextField(
     value = text,
     onValueChange = { text = it },
     placeholder = "Enter text...",

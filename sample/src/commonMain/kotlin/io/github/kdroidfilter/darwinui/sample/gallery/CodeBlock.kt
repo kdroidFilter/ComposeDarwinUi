@@ -41,7 +41,7 @@ import dev.snipme.highlights.model.BoldHighlight
 import dev.snipme.highlights.model.ColorHighlight
 import dev.snipme.highlights.model.SyntaxLanguage
 import dev.snipme.highlights.model.SyntaxThemes
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.LucideCheck
 import io.github.kdroidfilter.darwinui.icons.LucideCopy
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
@@ -111,7 +111,7 @@ fun CodeBlock(code: String) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            DarwinText(
+            Text(
                 text = "KOTLIN",
                 style = DarwinTheme.typography.labelSmall,
                 color = DarwinTheme.colors.textTertiary,
@@ -153,7 +153,7 @@ fun CodeBlock(code: String) {
                     transitionSpec = { fadeIn() togetherWith fadeOut() },
                     label = "copyText",
                 ) { isCopied ->
-                    DarwinText(
+                    Text(
                         text = if (isCopied) "Copied!" else "Copy",
                         style = DarwinTheme.typography.labelSmall,
                         fontWeight = FontWeight.Medium,

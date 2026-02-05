@@ -7,8 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import io.github.kdroidfilter.darwinui.components.select.DarwinSelect
-import io.github.kdroidfilter.darwinui.components.select.DarwinSelectOption
+import io.github.kdroidfilter.darwinui.components.ComboBox
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -18,18 +17,13 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 @GalleryExample("Select", "Default")
 @Composable
 fun SelectDefaultExample() {
-    val options = listOf(
-        DarwinSelectOption("react", "React"),
-        DarwinSelectOption("vue", "Vue"),
-        DarwinSelectOption("angular", "Angular"),
-        DarwinSelectOption("svelte", "Svelte"),
-    )
-    var selected by remember { mutableStateOf<String?>(null) }
-    DarwinSelect(
-        options = options,
-        selectedValue = selected,
-        onValueChange = { selected = it },
-        label = "Framework",
+    val items = listOf("React", "Vue", "Angular", "Svelte")
+    var selected by remember { mutableStateOf<Int?>(null) }
+    ComboBox(
+        items = items,
+        selected = selected,
+        onSelectionChange = { index, _ -> selected = index },
+        header = "Framework",
         modifier = Modifier.fillMaxWidth(0.5f),
     )
 }
@@ -37,18 +31,13 @@ fun SelectDefaultExample() {
 @GalleryExample("Select", "Pre-selected")
 @Composable
 fun SelectPreselectedExample() {
-    val options = listOf(
-        DarwinSelectOption("react", "React"),
-        DarwinSelectOption("vue", "Vue"),
-        DarwinSelectOption("angular", "Angular"),
-        DarwinSelectOption("svelte", "Svelte"),
-    )
-    var selected by remember { mutableStateOf<String?>("react") }
-    DarwinSelect(
-        options = options,
-        selectedValue = selected,
-        onValueChange = { selected = it },
-        label = "Default Framework",
+    val items = listOf("React", "Vue", "Angular", "Svelte")
+    var selected by remember { mutableStateOf<Int?>(0) }
+    ComboBox(
+        items = items,
+        selected = selected,
+        onSelectionChange = { index, _ -> selected = index },
+        header = "Default Framework",
         modifier = Modifier.fillMaxWidth(0.5f),
     )
 }

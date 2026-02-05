@@ -5,15 +5,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import io.github.kdroidfilter.darwinui.components.button.DarwinButton
-import io.github.kdroidfilter.darwinui.components.button.DarwinButtonVariant
-import io.github.kdroidfilter.darwinui.components.dropdown.DarwinDropdownMenu
-import io.github.kdroidfilter.darwinui.components.dropdown.DarwinDropdownMenuCheckboxItem
-import io.github.kdroidfilter.darwinui.components.dropdown.DarwinDropdownMenuItem
-import io.github.kdroidfilter.darwinui.components.dropdown.DarwinDropdownMenuLabel
-import io.github.kdroidfilter.darwinui.components.dropdown.DarwinDropdownMenuSeparator
-import io.github.kdroidfilter.darwinui.components.dropdown.DarwinDropdownMenuShortcut
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.OutlineButton
+import io.github.kdroidfilter.darwinui.components.DropdownMenu
+import io.github.kdroidfilter.darwinui.components.DropdownMenuCheckboxItem
+import io.github.kdroidfilter.darwinui.components.DropdownMenuItem
+import io.github.kdroidfilter.darwinui.components.DropdownMenuLabel
+import io.github.kdroidfilter.darwinui.components.DropdownMenuSeparator
+import io.github.kdroidfilter.darwinui.components.DropdownMenuShortcut
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -24,22 +23,21 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 @Composable
 fun DropdownMenuDefaultExample() {
     var dropdownExpanded by remember { mutableStateOf(false) }
-    DarwinDropdownMenu(
+    DropdownMenu(
         expanded = dropdownExpanded,
         onDismissRequest = { dropdownExpanded = false },
         trigger = {
-            DarwinButton(
+            OutlineButton(
                 text = "Open Menu",
                 onClick = { dropdownExpanded = !dropdownExpanded },
-                variant = DarwinButtonVariant.Outline,
             )
         },
     ) {
-        DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }) { DarwinText("Profile") }
-        DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }) { DarwinText("Settings") }
-        DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }) { DarwinText("Preferences") }
-        DarwinDropdownMenuSeparator()
-        DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }, destructive = true) { DarwinText("Log out") }
+        DropdownMenuItem(onClick = { dropdownExpanded = false }) { Text("Profile") }
+        DropdownMenuItem(onClick = { dropdownExpanded = false }) { Text("Settings") }
+        DropdownMenuItem(onClick = { dropdownExpanded = false }) { Text("Preferences") }
+        DropdownMenuSeparator()
+        DropdownMenuItem(onClick = { dropdownExpanded = false }, destructive = true) { Text("Log out") }
     }
 }
 
@@ -48,31 +46,30 @@ fun DropdownMenuDefaultExample() {
 fun DropdownMenuLabelsExample() {
     var dropdownExpanded by remember { mutableStateOf(false) }
     var checkboxState by remember { mutableStateOf(false) }
-    DarwinDropdownMenu(
+    DropdownMenu(
         expanded = dropdownExpanded,
         onDismissRequest = { dropdownExpanded = false },
         trigger = {
-            DarwinButton(
+            OutlineButton(
                 text = "Actions",
                 onClick = { dropdownExpanded = !dropdownExpanded },
-                variant = DarwinButtonVariant.Outline,
             )
         },
     ) {
-        DarwinDropdownMenuLabel(text = "Actions")
-        DarwinDropdownMenuItem(
+        DropdownMenuLabel(text = "Actions")
+        DropdownMenuItem(
             onClick = { dropdownExpanded = false },
-            trailingContent = { DarwinDropdownMenuShortcut(text = "Cmd+N") },
-        ) { DarwinText("New File") }
-        DarwinDropdownMenuItem(
+            trailingContent = { DropdownMenuShortcut(text = "Cmd+N") },
+        ) { Text("New File") }
+        DropdownMenuItem(
             onClick = { dropdownExpanded = false },
-            trailingContent = { DarwinDropdownMenuShortcut(text = "Cmd+O") },
-        ) { DarwinText("Open") }
-        DarwinDropdownMenuSeparator()
-        DarwinDropdownMenuLabel(text = "Options")
-        DarwinDropdownMenuCheckboxItem(checked = checkboxState, onCheckedChange = { checkboxState = it }) { DarwinText("Auto-save") }
-        DarwinDropdownMenuSeparator()
-        DarwinDropdownMenuItem(onClick = { dropdownExpanded = false }, enabled = false) { DarwinText("Disabled item") }
+            trailingContent = { DropdownMenuShortcut(text = "Cmd+O") },
+        ) { Text("Open") }
+        DropdownMenuSeparator()
+        DropdownMenuLabel(text = "Options")
+        DropdownMenuCheckboxItem(checked = checkboxState, onCheckedChange = { checkboxState = it }) { Text("Auto-save") }
+        DropdownMenuSeparator()
+        DropdownMenuItem(onClick = { dropdownExpanded = false }, enabled = false) { Text("Disabled item") }
     }
 }
 

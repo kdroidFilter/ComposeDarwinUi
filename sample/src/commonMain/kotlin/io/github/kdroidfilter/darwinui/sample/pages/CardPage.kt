@@ -5,16 +5,16 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.button.DarwinButton
-import io.github.kdroidfilter.darwinui.components.button.DarwinButtonSize
-import io.github.kdroidfilter.darwinui.components.button.DarwinButtonVariant
-import io.github.kdroidfilter.darwinui.components.card.DarwinCard
-import io.github.kdroidfilter.darwinui.components.card.DarwinCardContent
-import io.github.kdroidfilter.darwinui.components.card.DarwinCardDescription
-import io.github.kdroidfilter.darwinui.components.card.DarwinCardFooter
-import io.github.kdroidfilter.darwinui.components.card.DarwinCardHeader
-import io.github.kdroidfilter.darwinui.components.card.DarwinCardTitle
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.ButtonSize
+import io.github.kdroidfilter.darwinui.components.PrimaryButton
+import io.github.kdroidfilter.darwinui.components.SubtleButton
+import io.github.kdroidfilter.darwinui.components.Card
+import io.github.kdroidfilter.darwinui.components.CardContent
+import io.github.kdroidfilter.darwinui.components.CardDescription
+import io.github.kdroidfilter.darwinui.components.CardFooter
+import io.github.kdroidfilter.darwinui.components.CardHeader
+import io.github.kdroidfilter.darwinui.components.CardTitle
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
@@ -28,20 +28,20 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 @Composable
 fun CardDefaultExample() {
 
-    DarwinCard(modifier = Modifier.widthIn(max = 384.dp).fillMaxWidth()) {
-        DarwinCardHeader {
-            DarwinCardTitle { DarwinText("Card Title") }
-            DarwinCardDescription { DarwinText("This is a description of the card content.") }
+    Card(modifier = Modifier.widthIn(max = 384.dp).fillMaxWidth()) {
+        CardHeader {
+            CardTitle { Text("Card Title") }
+            CardDescription { Text("This is a description of the card content.") }
         }
-        DarwinCardContent {
-            DarwinText(
+        CardContent {
+            Text(
                 "Cards can contain any content including text, images, and other components.",
                 color = DarwinTheme.colors.mutedForeground,
             )
         }
-        DarwinCardFooter {
-            DarwinButton(text = "Action", onClick = {}, variant = DarwinButtonVariant.Primary, size = DarwinButtonSize.Small)
-            DarwinButton(text = "Cancel", onClick = {}, variant = DarwinButtonVariant.Ghost, size = DarwinButtonSize.Small)
+        CardFooter {
+            PrimaryButton(text = "Action", onClick = {}, size = ButtonSize.Small)
+            SubtleButton(text = "Cancel", onClick = {}, size = ButtonSize.Small)
         }
     }
 }
@@ -52,13 +52,13 @@ internal fun CardPage() {
         PreviewContainer { CardDefaultExample() }
 
         SectionHeader("Usage")
-        CodeBlock("""DarwinCard {
-    DarwinCardHeader {
-        DarwinCardTitle { DarwinText("Title") }
-        DarwinCardDescription { DarwinText("Description") }
+        CodeBlock("""Card {
+    CardHeader {
+        CardTitle { Text("Title") }
+        CardDescription { Text("Description") }
     }
-    DarwinCardContent { DarwinText("Content") }
-    DarwinCardFooter { DarwinButton(text = "Action", onClick = {}) }
+    CardContent { Text("Content") }
+    CardFooter { PrimaryButton(text = "Action", onClick = {}) }
 }""")
 
         SectionHeader("Examples")

@@ -21,11 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.card.DarwinCard
-import io.github.kdroidfilter.darwinui.components.sidebar.DarwinSidebar
-import io.github.kdroidfilter.darwinui.components.sidebar.DarwinSidebarItem
-import io.github.kdroidfilter.darwinui.components.switchcomponent.DarwinSwitch
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.Card
+import io.github.kdroidfilter.darwinui.components.Sidebar
+import io.github.kdroidfilter.darwinui.components.SidebarItem
+import io.github.kdroidfilter.darwinui.components.Switcher
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.icons.LucideBarChart3
 import io.github.kdroidfilter.darwinui.icons.LucideFolder
@@ -44,25 +44,25 @@ fun SidebarPreviewExample() {
     var isCollapsed by remember { mutableStateOf(false) }
     val sidebarItems = remember {
         listOf(
-            DarwinSidebarItem("Dashboard", onClick = { activeItem = "Dashboard" }, icon = LucideHome),
-            DarwinSidebarItem("Projects", onClick = { activeItem = "Projects" }, icon = LucideFolder),
-            DarwinSidebarItem("Analytics", onClick = { activeItem = "Analytics" }, icon = LucideBarChart3),
-            DarwinSidebarItem("Settings", onClick = { activeItem = "Settings" }, icon = LucideSettings),
+            SidebarItem("Dashboard", onClick = { activeItem = "Dashboard" }, icon = LucideHome),
+            SidebarItem("Projects", onClick = { activeItem = "Projects" }, icon = LucideFolder),
+            SidebarItem("Analytics", onClick = { activeItem = "Analytics" }, icon = LucideBarChart3),
+            SidebarItem("Settings", onClick = { activeItem = "Settings" }, icon = LucideSettings),
         )
     }
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            DarwinSwitch(checked = isCollapsed, onCheckedChange = { isCollapsed = it })
-            DarwinText(
+            Switcher(checked = isCollapsed, onCheckedChange = { isCollapsed = it })
+            Text(
                 text = if (isCollapsed) "Collapsed" else "Expanded",
                 style = DarwinTheme.typography.bodySmall,
                 color = DarwinTheme.colors.textSecondary,
             )
         }
-        DarwinCard(modifier = Modifier.fillMaxWidth().height(320.dp)) {
+        Card(modifier = Modifier.fillMaxWidth().height(320.dp)) {
             Row(modifier = Modifier.fillMaxSize()) {
                 Box(modifier = Modifier.fillMaxHeight().background(DarwinTheme.colors.muted)) {
-                    DarwinSidebar(
+                    Sidebar(
                         items = sidebarItems,
                         activeItem = activeItem,
                         onLogout = { activeItem = "Logged out" },
@@ -74,17 +74,17 @@ fun SidebarPreviewExample() {
                 Box(modifier = Modifier.width(1.dp).fillMaxHeight().background(DarwinTheme.colors.border))
                 Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(16.dp), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        DarwinText(
+                        Text(
                             text = "Current page:",
                             color = DarwinTheme.colors.textSecondary,
                             style = DarwinTheme.typography.bodySmall,
                         )
-                        DarwinText(text = activeItem, fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 4.dp))
+                        Text(text = activeItem, fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 4.dp))
                     }
                 }
             }
         }
-        DarwinText(
+        Text(
             text = "Use the toggle or click \"Collapse\" in the sidebar.",
             style = DarwinTheme.typography.labelSmall,
             color = DarwinTheme.colors.textTertiary.copy(alpha = 0.70f),
@@ -101,16 +101,16 @@ fun SidebarCollapsibleExample() {
     var collapsed by remember { mutableStateOf(false) }
     val items = remember {
         listOf(
-            DarwinSidebarItem("Dashboard", onClick = { active = "Dashboard" }, icon = LucideHome),
-            DarwinSidebarItem("Projects", onClick = { active = "Projects" }, icon = LucideFolder),
-            DarwinSidebarItem("Settings", onClick = { active = "Settings" }, icon = LucideSettings),
+            SidebarItem("Dashboard", onClick = { active = "Dashboard" }, icon = LucideHome),
+            SidebarItem("Projects", onClick = { active = "Projects" }, icon = LucideFolder),
+            SidebarItem("Settings", onClick = { active = "Settings" }, icon = LucideSettings),
         )
     }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        DarwinSwitch(checked = collapsed, onCheckedChange = { collapsed = it }, label = "Collapsed")
-        DarwinCard(modifier = Modifier.fillMaxWidth().height(192.dp)) {
+        Switcher(checked = collapsed, onCheckedChange = { collapsed = it }, label = "Collapsed")
+        Card(modifier = Modifier.fillMaxWidth().height(192.dp)) {
             Row(modifier = Modifier.fillMaxSize()) {
-                DarwinSidebar(
+                Sidebar(
                     items = items,
                     activeItem = active,
                     onLogout = {},
@@ -119,7 +119,7 @@ fun SidebarCollapsibleExample() {
                     collapsible = true,
                 )
                 Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(16.dp), contentAlignment = Alignment.Center) {
-                    DarwinText(text = "Current: $active", color = DarwinTheme.colors.textSecondary)
+                    Text(text = "Current: $active", color = DarwinTheme.colors.textSecondary)
                 }
             }
         }

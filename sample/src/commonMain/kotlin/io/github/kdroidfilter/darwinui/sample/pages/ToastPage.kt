@@ -5,11 +5,13 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.button.DarwinButton
-import io.github.kdroidfilter.darwinui.components.button.DarwinButtonSize
-import io.github.kdroidfilter.darwinui.components.button.DarwinButtonVariant
-import io.github.kdroidfilter.darwinui.components.toast.DarwinToastState
-import io.github.kdroidfilter.darwinui.components.toast.DarwinToastType
+import io.github.kdroidfilter.darwinui.components.ButtonSize
+import io.github.kdroidfilter.darwinui.components.DestructiveButton
+import io.github.kdroidfilter.darwinui.components.InfoButton
+import io.github.kdroidfilter.darwinui.components.SuccessButton
+import io.github.kdroidfilter.darwinui.components.WarningButton
+import io.github.kdroidfilter.darwinui.components.ToastState
+import io.github.kdroidfilter.darwinui.components.ToastType
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -19,45 +21,41 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 @OptIn(ExperimentalLayoutApi::class)
 @GalleryExample("Toast", "Click to Show")
 @Composable
-fun ToastClickToShowExample(toastState: DarwinToastState) {
+fun ToastClickToShowExample(toastState: ToastState) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        DarwinButton(
+        InfoButton(
             text = "Info Toast",
             onClick = {
-                toastState.show("This is an info message", title = "Info", type = DarwinToastType.Info)
+                toastState.show("This is an info message", title = "Info", type = ToastType.Info)
             },
-            variant = DarwinButtonVariant.Info,
-            size = DarwinButtonSize.Small,
+            size = ButtonSize.Small,
         )
-        DarwinButton(
+        SuccessButton(
             text = "Success Toast",
             onClick = {
-                toastState.show("Operation completed!", title = "Success", type = DarwinToastType.Success)
+                toastState.show("Operation completed!", title = "Success", type = ToastType.Success)
             },
-            variant = DarwinButtonVariant.Success,
-            size = DarwinButtonSize.Small,
+            size = ButtonSize.Small,
         )
-        DarwinButton(
+        WarningButton(
             text = "Warning Toast",
             onClick = {
-                toastState.show("Proceed with caution", title = "Warning", type = DarwinToastType.Warning)
+                toastState.show("Proceed with caution", title = "Warning", type = ToastType.Warning)
             },
-            variant = DarwinButtonVariant.Warning,
-            size = DarwinButtonSize.Small,
+            size = ButtonSize.Small,
         )
-        DarwinButton(
+        DestructiveButton(
             text = "Error Toast",
             onClick = {
-                toastState.show("Something went wrong", title = "Error", type = DarwinToastType.Error)
+                toastState.show("Something went wrong", title = "Error", type = ToastType.Error)
             },
-            variant = DarwinButtonVariant.Destructive,
-            size = DarwinButtonSize.Small,
+            size = ButtonSize.Small,
         )
     }
 }
 
 @Composable
-internal fun ToastPage(toastState: DarwinToastState) {
+internal fun ToastPage(toastState: ToastState) {
     GalleryPage("Toast", "A succinct message that is displayed temporarily.") {
         SectionHeader("Examples")
         ExampleCard(

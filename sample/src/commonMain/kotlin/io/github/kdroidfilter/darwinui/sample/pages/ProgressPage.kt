@@ -8,9 +8,10 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.progress.DarwinCircularProgress
-import io.github.kdroidfilter.darwinui.components.progress.DarwinLinearProgress
-import io.github.kdroidfilter.darwinui.components.progress.DarwinProgressVariant
+import io.github.kdroidfilter.darwinui.components.LinearProgress
+import io.github.kdroidfilter.darwinui.components.ProgressVariant
+import io.github.kdroidfilter.darwinui.components.ProgressRing
+import io.github.kdroidfilter.darwinui.components.ProgressRingSize
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
@@ -18,6 +19,7 @@ import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.PreviewContainer
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
+import io.github.kdroidfilter.darwinui.theme.Emerald500
 
 @Composable
 private fun ProgressPreview() {
@@ -25,14 +27,14 @@ private fun ProgressPreview() {
         modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        DarwinLinearProgress(value = 65f, max = 100f, showValue = true)
-        DarwinLinearProgress(value = 40f, max = 100f, variant = DarwinProgressVariant.Success)
-        DarwinLinearProgress(value = 80f, max = 100f, variant = DarwinProgressVariant.Gradient)
-        DarwinLinearProgress(indeterminate = true)
+        LinearProgress(value = 65f, max = 100f, showValue = true)
+        LinearProgress(value = 40f, max = 100f, variant = ProgressVariant.Success)
+        LinearProgress(value = 80f, max = 100f, variant = ProgressVariant.Gradient)
+        LinearProgress(indeterminate = true)
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            DarwinCircularProgress(value = 75f, max = 100f, showValue = true)
-            DarwinCircularProgress(value = 45f, max = 100f, variant = DarwinProgressVariant.Success, showValue = true)
-            DarwinCircularProgress(indeterminate = true)
+            ProgressRing(progress = 0.75f, size = ProgressRingSize.Large)
+            ProgressRing(progress = 0.45f, size = ProgressRingSize.Large, color = Emerald500)
+            ProgressRing(size = ProgressRingSize.Large)
         }
     }
 }
@@ -40,7 +42,7 @@ private fun ProgressPreview() {
 @GalleryExample("Progress", "Linear Default")
 @Composable
 fun ProgressLinearDefaultExample() {
-    DarwinLinearProgress(
+    LinearProgress(
         value = 65f,
         max = 100f,
         showValue = true,
@@ -51,10 +53,10 @@ fun ProgressLinearDefaultExample() {
 @GalleryExample("Progress", "Linear Success")
 @Composable
 fun ProgressLinearSuccessExample() {
-    DarwinLinearProgress(
+    LinearProgress(
         value = 40f,
         max = 100f,
-        variant = DarwinProgressVariant.Success,
+        variant = ProgressVariant.Success,
         modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
     )
 }
@@ -62,10 +64,10 @@ fun ProgressLinearSuccessExample() {
 @GalleryExample("Progress", "Linear Gradient")
 @Composable
 fun ProgressLinearGradientExample() {
-    DarwinLinearProgress(
+    LinearProgress(
         value = 80f,
         max = 100f,
-        variant = DarwinProgressVariant.Gradient,
+        variant = ProgressVariant.Gradient,
         modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
     )
 }
@@ -73,7 +75,7 @@ fun ProgressLinearGradientExample() {
 @GalleryExample("Progress", "Linear Indeterminate")
 @Composable
 fun ProgressLinearIndeterminateExample() {
-    DarwinLinearProgress(
+    LinearProgress(
         indeterminate = true,
         modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
     )
@@ -83,9 +85,9 @@ fun ProgressLinearIndeterminateExample() {
 @Composable
 fun ProgressCircularExample() {
     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-        DarwinCircularProgress(value = 75f, max = 100f, showValue = true)
-        DarwinCircularProgress(value = 45f, max = 100f, variant = DarwinProgressVariant.Success, showValue = true)
-        DarwinCircularProgress(indeterminate = true)
+        ProgressRing(progress = 0.75f, size = ProgressRingSize.Large)
+        ProgressRing(progress = 0.45f, size = ProgressRingSize.Large, color = Emerald500)
+        ProgressRing(size = ProgressRingSize.Large)
     }
 }
 
@@ -95,8 +97,8 @@ internal fun ProgressPage() {
         PreviewContainer { ProgressPreview() }
 
         SectionHeader("Usage")
-        CodeBlock("""DarwinLinearProgress(value = 65f, max = 100f, showValue = true)
-DarwinCircularProgress(value = 75f, max = 100f, showValue = true)""")
+        CodeBlock("""LinearProgress(value = 65f, max = 100f, showValue = true)
+ProgressRing(progress = 0.75f)""")
 
         SectionHeader("Examples")
         ExampleCard(title = "Linear - Default", sourceCode = GallerySources.ProgressLinearDefaultExample) { ProgressLinearDefaultExample() }

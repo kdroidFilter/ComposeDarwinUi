@@ -8,11 +8,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.alert.DarwinAlertBanner
-import io.github.kdroidfilter.darwinui.components.alert.DarwinAlertDialog
-import io.github.kdroidfilter.darwinui.components.alert.DarwinAlertType
-import io.github.kdroidfilter.darwinui.components.button.DarwinButton
-import io.github.kdroidfilter.darwinui.components.button.DarwinButtonVariant
+import io.github.kdroidfilter.darwinui.components.AlertBanner
+import io.github.kdroidfilter.darwinui.components.AlertDialog
+import io.github.kdroidfilter.darwinui.components.AlertType
+import io.github.kdroidfilter.darwinui.components.DestructiveButton
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -23,50 +22,50 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 @Composable
 private fun AlertPreview() {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        DarwinAlertBanner(message = "This is an informational alert.", title = "Information", type = DarwinAlertType.Info)
-        DarwinAlertBanner(message = "Operation completed successfully!", title = "Success", type = DarwinAlertType.Success)
-        DarwinAlertBanner(message = "Please review before proceeding.", title = "Warning", type = DarwinAlertType.Warning)
-        DarwinAlertBanner(message = "An error occurred.", title = "Error", type = DarwinAlertType.Error)
+        AlertBanner(message = "This is an informational alert.", title = "Information", type = AlertType.Info)
+        AlertBanner(message = "Operation completed successfully!", title = "Success", type = AlertType.Success)
+        AlertBanner(message = "Please review before proceeding.", title = "Warning", type = AlertType.Warning)
+        AlertBanner(message = "An error occurred.", title = "Error", type = AlertType.Error)
     }
 }
 
 @GalleryExample("Alert", "Info")
 @Composable
 fun AlertInfoExample() {
-    DarwinAlertBanner(
+    AlertBanner(
         message = "This is an informational alert.",
         title = "Information",
-        type = DarwinAlertType.Info,
+        type = AlertType.Info,
     )
 }
 
 @GalleryExample("Alert", "Success")
 @Composable
 fun AlertSuccessExample() {
-    DarwinAlertBanner(
+    AlertBanner(
         message = "Operation completed successfully!",
         title = "Success",
-        type = DarwinAlertType.Success,
+        type = AlertType.Success,
     )
 }
 
 @GalleryExample("Alert", "Warning")
 @Composable
 fun AlertWarningExample() {
-    DarwinAlertBanner(
+    AlertBanner(
         message = "Please review before proceeding.",
         title = "Warning",
-        type = DarwinAlertType.Warning,
+        type = AlertType.Warning,
     )
 }
 
 @GalleryExample("Alert", "Error")
 @Composable
 fun AlertErrorExample() {
-    DarwinAlertBanner(
+    AlertBanner(
         message = "An error occurred while processing.",
         title = "Error",
-        type = DarwinAlertType.Error,
+        type = AlertType.Error,
         onDismiss = {},
     )
 }
@@ -75,14 +74,14 @@ fun AlertErrorExample() {
 @Composable
 fun AlertDialogExample() {
     var showAlertDialog by remember { mutableStateOf(false) }
-    DarwinButton(text = "Show Alert Dialog", onClick = { showAlertDialog = true }, variant = DarwinButtonVariant.Destructive)
+    DestructiveButton(text = "Show Alert Dialog", onClick = { showAlertDialog = true })
     if (showAlertDialog) {
-        DarwinAlertDialog(
+        AlertDialog(
             open = true,
             onDismissRequest = { showAlertDialog = false },
             title = "Delete item?",
             message = "This action cannot be undone. Are you sure you want to delete this item?",
-            type = DarwinAlertType.Error,
+            type = AlertType.Error,
             confirmText = "Delete",
             cancelText = "Cancel",
             onConfirm = { showAlertDialog = false },

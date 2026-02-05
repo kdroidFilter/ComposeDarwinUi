@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
 @Composable
@@ -30,7 +30,7 @@ fun PreviewContainer(content: @Composable () -> Unit) {
                 ).background(DarwinTheme.colors.muted.copy(alpha = 0.20f)),
         // bg-muted/20
     ) {
-        DarwinText(
+        Text(
             text = "Preview",
             style = DarwinTheme.typography.labelMedium,
             fontWeight = FontWeight.Medium,

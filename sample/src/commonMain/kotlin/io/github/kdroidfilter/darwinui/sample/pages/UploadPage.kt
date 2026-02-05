@@ -7,9 +7,9 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.upload.DarwinUpload
-import io.github.kdroidfilter.darwinui.components.upload.DarwinUploadFile
-import io.github.kdroidfilter.darwinui.components.upload.DarwinUploadVariant
+import io.github.kdroidfilter.darwinui.components.Upload
+import io.github.kdroidfilter.darwinui.components.UploadFile
+import io.github.kdroidfilter.darwinui.components.UploadVariant
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
@@ -22,14 +22,14 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 fun UploadDefaultExample() {
     val files = remember {
         mutableStateListOf(
-            DarwinUploadFile(name = "hero-image.jpg", url = "https://example.com/hero.jpg"),
-            DarwinUploadFile(name = "product-shot.png", url = "https://example.com/product.png"),
-            DarwinUploadFile(name = "banner.jpg", url = "https://example.com/banner.jpg"),
+            UploadFile(name = "hero-image.jpg", url = "https://example.com/hero.jpg"),
+            UploadFile(name = "product-shot.png", url = "https://example.com/product.png"),
+            UploadFile(name = "banner.jpg", url = "https://example.com/banner.jpg"),
         )
     }
-    DarwinUpload(
+    Upload(
         files = files,
-        onPickFiles = { files.add(DarwinUploadFile(name = "new-image.jpg", isUploading = true, progress = 0.4f)) },
+        onPickFiles = { files.add(UploadFile(name = "new-image.jpg", isUploading = true, progress = 0.4f)) },
         onRemoveFile = { index -> files.removeAt(index) },
         onClearAll = { files.clear() },
         onSetCover = { index ->
@@ -54,10 +54,10 @@ fun UploadDefaultExample() {
 @GalleryExample("Upload", "Compact")
 @Composable
 fun UploadCompactExample() {
-    DarwinUpload(
+    Upload(
         files = emptyList(),
         onPickFiles = {},
-        variant = DarwinUploadVariant.Compact,
+        variant = UploadVariant.Compact,
         modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
     )
 }
@@ -65,10 +65,10 @@ fun UploadCompactExample() {
 @GalleryExample("Upload", "Inline")
 @Composable
 fun UploadInlineExample() {
-    DarwinUpload(
+    Upload(
         files = emptyList(),
         onPickFiles = {},
-        variant = DarwinUploadVariant.Inline,
+        variant = UploadVariant.Inline,
         modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
     )
 }
@@ -77,7 +77,7 @@ fun UploadInlineExample() {
 internal fun UploadPage() {
     GalleryPage("Upload", "A file upload component with drag and drop support.") {
         SectionHeader("Usage")
-        CodeBlock("""DarwinUpload(
+        CodeBlock("""Upload(
     files = files,
     onPickFiles = { /* open file picker */ },
     onRemoveFile = { index -> files.removeAt(index) },
@@ -86,7 +86,7 @@ internal fun UploadPage() {
     onSwap = { i, j -> /* swap positions */ },
     maxFiles = 4,
     label = "Upload product images",
-    variant = DarwinUploadVariant.Default,
+    variant = UploadVariant.Default,
 )""")
 
         SectionHeader("Examples")

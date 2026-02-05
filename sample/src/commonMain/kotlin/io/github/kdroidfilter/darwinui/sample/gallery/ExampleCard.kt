@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
 private enum class ExampleTab { Preview, Code }
@@ -59,14 +59,14 @@ fun ExampleCard(
         ) {
             // Title + description
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                DarwinText(
+                Text(
                     text = title,
                     style = DarwinTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                     color = DarwinTheme.colors.textPrimary,
                 )
                 if (description.isNotEmpty()) {
-                    DarwinText(
+                    Text(
                         text = description,
                         style = DarwinTheme.typography.bodySmall,
                         color = DarwinTheme.colors.textTertiary,
@@ -161,7 +161,7 @@ private fun TabButton(
                 ).clickable(onClick = onClick)
                 .padding(horizontal = 12.dp, vertical = 6.dp),
     ) {
-        DarwinText(
+        Text(
             text = text,
             style = DarwinTheme.typography.labelSmall,
             fontWeight = if (selected) FontWeight.Medium else FontWeight.Normal,

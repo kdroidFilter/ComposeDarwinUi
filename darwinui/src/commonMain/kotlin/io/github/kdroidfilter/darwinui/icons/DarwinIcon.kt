@@ -21,7 +21,7 @@ import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
  * @param size Icon size. Defaults to 16 dp (matching Lucide's default in-button size).
  */
 @Composable
-fun DarwinIcon(
+fun Icon(
     imageVector: ImageVector,
     contentDescription: String? = null,
     modifier: Modifier = Modifier,

@@ -1,15 +1,15 @@
 package io.github.kdroidfilter.darwinui.sample.pages
 
 import androidx.compose.runtime.Composable
-import io.github.kdroidfilter.darwinui.components.badge.DarwinBadge
-import io.github.kdroidfilter.darwinui.components.badge.DarwinBadgeVariant
-import io.github.kdroidfilter.darwinui.components.table.DarwinTable
-import io.github.kdroidfilter.darwinui.components.table.DarwinTableBody
-import io.github.kdroidfilter.darwinui.components.table.DarwinTableCell
-import io.github.kdroidfilter.darwinui.components.table.DarwinTableHead
-import io.github.kdroidfilter.darwinui.components.table.DarwinTableHeaderCell
-import io.github.kdroidfilter.darwinui.components.table.DarwinTableRow
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.Badge
+import io.github.kdroidfilter.darwinui.components.BadgeVariant
+import io.github.kdroidfilter.darwinui.components.Table
+import io.github.kdroidfilter.darwinui.components.TableBody
+import io.github.kdroidfilter.darwinui.components.TableCell
+import io.github.kdroidfilter.darwinui.components.TableHead
+import io.github.kdroidfilter.darwinui.components.TableHeaderCell
+import io.github.kdroidfilter.darwinui.components.TableRow
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -19,43 +19,43 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 @GalleryExample("Table", "Default")
 @Composable
 fun TableDefaultExample() {
-    DarwinTable {
-        DarwinTableHead {
-            DarwinTableRow {
-                DarwinTableHeaderCell { DarwinText("Name") }
-                DarwinTableHeaderCell { DarwinText("Email") }
-                DarwinTableHeaderCell { DarwinText("Role") }
-                DarwinTableHeaderCell(weight = 0.5f) { DarwinText("Status") }
+    Table {
+        TableHead {
+            TableRow {
+                TableHeaderCell { Text("Name") }
+                TableHeaderCell { Text("Email") }
+                TableHeaderCell { Text("Role") }
+                TableHeaderCell(weight = 0.5f) { Text("Status") }
             }
         }
-        DarwinTableBody(scrollable = false) {
-            DarwinTableRow {
-                DarwinTableCell { DarwinText("Alice Smith") }
-                DarwinTableCell { DarwinText("alice@example.com") }
-                DarwinTableCell { DarwinText("Admin") }
-                DarwinTableCell(weight = 0.5f) {
-                    DarwinBadge(variant = DarwinBadgeVariant.Success) {
-                        DarwinText("Active")
+        TableBody(scrollable = false) {
+            TableRow {
+                TableCell { Text("Alice Smith") }
+                TableCell { Text("alice@example.com") }
+                TableCell { Text("Admin") }
+                TableCell(weight = 0.5f) {
+                    Badge(variant = BadgeVariant.Success) {
+                        Text("Active")
                     }
                 }
             }
-            DarwinTableRow {
-                DarwinTableCell { DarwinText("Bob Jones") }
-                DarwinTableCell { DarwinText("bob@example.com") }
-                DarwinTableCell { DarwinText("Editor") }
-                DarwinTableCell(weight = 0.5f) {
-                    DarwinBadge(variant = DarwinBadgeVariant.Warning) {
-                        DarwinText("Pending")
+            TableRow {
+                TableCell { Text("Bob Jones") }
+                TableCell { Text("bob@example.com") }
+                TableCell { Text("Editor") }
+                TableCell(weight = 0.5f) {
+                    Badge(variant = BadgeVariant.Warning) {
+                        Text("Pending")
                     }
                 }
             }
-            DarwinTableRow {
-                DarwinTableCell { DarwinText("Carol White") }
-                DarwinTableCell { DarwinText("carol@example.com") }
-                DarwinTableCell { DarwinText("Viewer") }
-                DarwinTableCell(weight = 0.5f) {
-                    DarwinBadge(variant = DarwinBadgeVariant.Archived) {
-                        DarwinText("Inactive")
+            TableRow {
+                TableCell { Text("Carol White") }
+                TableCell { Text("carol@example.com") }
+                TableCell { Text("Viewer") }
+                TableCell(weight = 0.5f) {
+                    Badge(variant = BadgeVariant.Archived) {
+                        Text("Inactive")
                     }
                 }
             }

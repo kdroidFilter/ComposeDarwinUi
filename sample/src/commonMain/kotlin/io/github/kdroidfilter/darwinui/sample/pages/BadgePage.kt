@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.badge.DarwinBadge
-import io.github.kdroidfilter.darwinui.components.badge.DarwinBadgeVariant
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.Badge
+import io.github.kdroidfilter.darwinui.components.BadgeVariant
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -19,15 +19,15 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 @Composable
 private fun BadgePreview() {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        DarwinBadge(variant = DarwinBadgeVariant.Default) { DarwinText("Default") }
-        DarwinBadge(variant = DarwinBadgeVariant.Secondary) { DarwinText("Secondary") }
-        DarwinBadge(variant = DarwinBadgeVariant.Outline) { DarwinText("Outline") }
-        DarwinBadge(variant = DarwinBadgeVariant.Success) { DarwinText("Success") }
-        DarwinBadge(variant = DarwinBadgeVariant.Warning) { DarwinText("Warning") }
-        DarwinBadge(variant = DarwinBadgeVariant.Destructive) { DarwinText("Error") }
-        DarwinBadge(variant = DarwinBadgeVariant.Info) { DarwinText("Info") }
-        DarwinBadge(variant = DarwinBadgeVariant.Published) { DarwinText("Published") }
-        DarwinBadge(variant = DarwinBadgeVariant.Draft) { DarwinText("Draft") }
+        Badge(variant = BadgeVariant.Default) { Text("Default") }
+        Badge(variant = BadgeVariant.Secondary) { Text("Secondary") }
+        Badge(variant = BadgeVariant.Outline) { Text("Outline") }
+        Badge(variant = BadgeVariant.Success) { Text("Success") }
+        Badge(variant = BadgeVariant.Warning) { Text("Warning") }
+        Badge(variant = BadgeVariant.Destructive) { Text("Error") }
+        Badge(variant = BadgeVariant.Info) { Text("Info") }
+        Badge(variant = BadgeVariant.Published) { Text("Published") }
+        Badge(variant = BadgeVariant.Draft) { Text("Draft") }
     }
 }
 
@@ -36,13 +36,13 @@ private fun BadgePreview() {
 @Composable
 fun BadgeVariantsExample() {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        DarwinBadge(variant = DarwinBadgeVariant.Default) { DarwinText("Default") }
-        DarwinBadge(variant = DarwinBadgeVariant.Secondary) { DarwinText("Secondary") }
-        DarwinBadge(variant = DarwinBadgeVariant.Outline) { DarwinText("Outline") }
-        DarwinBadge(variant = DarwinBadgeVariant.Success) { DarwinText("Success") }
-        DarwinBadge(variant = DarwinBadgeVariant.Warning) { DarwinText("Warning") }
-        DarwinBadge(variant = DarwinBadgeVariant.Destructive) { DarwinText("Error") }
-        DarwinBadge(variant = DarwinBadgeVariant.Info) { DarwinText("Info") }
+        Badge(variant = BadgeVariant.Default) { Text("Default") }
+        Badge(variant = BadgeVariant.Secondary) { Text("Secondary") }
+        Badge(variant = BadgeVariant.Outline) { Text("Outline") }
+        Badge(variant = BadgeVariant.Success) { Text("Success") }
+        Badge(variant = BadgeVariant.Warning) { Text("Warning") }
+        Badge(variant = BadgeVariant.Destructive) { Text("Error") }
+        Badge(variant = BadgeVariant.Info) { Text("Info") }
     }
 }
 
@@ -51,11 +51,11 @@ fun BadgeVariantsExample() {
 @Composable
 fun BadgeSemanticVariantsExample() {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        DarwinBadge(variant = DarwinBadgeVariant.Published) { DarwinText("Published") }
-        DarwinBadge(variant = DarwinBadgeVariant.Draft) { DarwinText("Draft") }
-        DarwinBadge(variant = DarwinBadgeVariant.Archived) { DarwinText("Archived") }
-        DarwinBadge(variant = DarwinBadgeVariant.NewBadge) { DarwinText("New") }
-        DarwinBadge(variant = DarwinBadgeVariant.Responded) { DarwinText("Responded") }
+        Badge(variant = BadgeVariant.Published) { Text("Published") }
+        Badge(variant = BadgeVariant.Draft) { Text("Draft") }
+        Badge(variant = BadgeVariant.Archived) { Text("Archived") }
+        Badge(variant = BadgeVariant.NewBadge) { Text("New") }
+        Badge(variant = BadgeVariant.Responded) { Text("Responded") }
     }
 }
 

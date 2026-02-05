@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.avatar.AvatarData
-import io.github.kdroidfilter.darwinui.components.avatar.DarwinAvatar
-import io.github.kdroidfilter.darwinui.components.avatar.DarwinAvatarGroup
+import io.github.kdroidfilter.darwinui.components.AvatarData
+import io.github.kdroidfilter.darwinui.components.Avatar
+import io.github.kdroidfilter.darwinui.components.AvatarGroup
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -17,17 +17,17 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 @Composable
 fun AvatarSizesExample() {
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        DarwinAvatar(name = "Alice Smith")
-        DarwinAvatar(name = "Bob Jones", size = 48.dp)
-        DarwinAvatar(name = "Carol White", size = 56.dp)
-        DarwinAvatar(name = "Dan Brown")
+        Avatar(name = "Alice Smith")
+        Avatar(name = "Bob Jones", size = 48.dp)
+        Avatar(name = "Carol White", size = 56.dp)
+        Avatar(name = "Dan Brown")
     }
 }
 
 @GalleryExample("Avatar", "Avatar Group")
 @Composable
 fun AvatarGroupExample() {
-    DarwinAvatarGroup(
+    AvatarGroup(
         avatars =
             listOf(
                 AvatarData(name = "Alice Smith"),

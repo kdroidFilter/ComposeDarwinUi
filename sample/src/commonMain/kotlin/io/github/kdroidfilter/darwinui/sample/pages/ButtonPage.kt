@@ -13,12 +13,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.button.DarwinButton
-import io.github.kdroidfilter.darwinui.components.button.DarwinButtonSize
-import io.github.kdroidfilter.darwinui.components.button.DarwinButtonVariant
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.AccentButton
+import io.github.kdroidfilter.darwinui.components.Button
+import io.github.kdroidfilter.darwinui.components.ButtonSize
+import io.github.kdroidfilter.darwinui.components.DestructiveButton
+import io.github.kdroidfilter.darwinui.components.HyperlinkButton
+import io.github.kdroidfilter.darwinui.components.InfoButton
+import io.github.kdroidfilter.darwinui.components.OutlineButton
+import io.github.kdroidfilter.darwinui.components.PrimaryButton
+import io.github.kdroidfilter.darwinui.components.SecondaryButton
+import io.github.kdroidfilter.darwinui.components.SubtleButton
+import io.github.kdroidfilter.darwinui.components.SuccessButton
+import io.github.kdroidfilter.darwinui.components.WarningButton
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
-import io.github.kdroidfilter.darwinui.icons.DarwinIcon
+import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideDownload
 import io.github.kdroidfilter.darwinui.icons.LucideHeart
 import io.github.kdroidfilter.darwinui.icons.LucidePlus
@@ -49,69 +58,49 @@ private fun ButtonPreview() {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         // Text Buttons
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            DarwinText("TEXT BUTTONS", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
+            Text("TEXT BUTTONS", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                DarwinButton(text = "Primary", onClick = {}, variant = DarwinButtonVariant.Primary)
-                DarwinButton(text = "Secondary", onClick = {}, variant = DarwinButtonVariant.Secondary)
-                DarwinButton(text = "Outline", onClick = {}, variant = DarwinButtonVariant.Outline)
-                DarwinButton(text = "Ghost", onClick = {}, variant = DarwinButtonVariant.Ghost)
-                DarwinButton(text = "Destructive", onClick = {}, variant = DarwinButtonVariant.Destructive)
-                DarwinButton(
+                PrimaryButton(text = "Primary", onClick = {})
+                SecondaryButton(text = "Secondary", onClick = {})
+                OutlineButton(text = "Outline", onClick = {})
+                SubtleButton(text = "Ghost", onClick = {})
+                DestructiveButton(text = "Destructive", onClick = {})
+                PrimaryButton(
                     text = if (loading) "Loading..." else "Click me",
                     onClick = { loading = true },
-                    variant = DarwinButtonVariant.Primary,
                     loading = loading,
                 )
             }
         }
         // Icon Buttons
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            DarwinText("ICON BUTTONS", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
+            Text("ICON BUTTONS", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                DarwinButton(onClick = {}, variant = DarwinButtonVariant.Primary, size = DarwinButtonSize.Icon) { DarwinIcon(LucidePlus) }
-                DarwinButton(
-                    onClick = {},
-                    variant = DarwinButtonVariant.Secondary,
-                    size = DarwinButtonSize.Icon,
-                ) { DarwinIcon(LucideSettings) }
-                DarwinButton(
-                    onClick = {},
-                    variant = DarwinButtonVariant.Outline,
-                    size = DarwinButtonSize.Icon,
-                ) { DarwinIcon(LucideHeart) }
-                DarwinButton(
-                    onClick = {},
-                    variant = DarwinButtonVariant.Ghost,
-                    size = DarwinButtonSize.Icon,
-                ) { DarwinIcon(LucideShare2) }
-                DarwinButton(
-                    onClick = {},
-                    variant = DarwinButtonVariant.Destructive,
-                    size = DarwinButtonSize.Icon,
-                ) { DarwinIcon(LucideTrash2) }
+                PrimaryButton(onClick = {}, size = ButtonSize.Icon) { Icon(LucidePlus) }
+                SecondaryButton(onClick = {}, size = ButtonSize.Icon) { Icon(LucideSettings) }
+                OutlineButton(onClick = {}, size = ButtonSize.Icon) { Icon(LucideHeart) }
+                SubtleButton(onClick = {}, size = ButtonSize.Icon) { Icon(LucideShare2) }
+                DestructiveButton(onClick = {}, size = ButtonSize.Icon) { Icon(LucideTrash2) }
             }
         }
         // With Icons
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            DarwinText("WITH ICONS", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
+            Text("WITH ICONS", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                DarwinButton(
+                PrimaryButton(
                     text = "Create New",
                     onClick = {},
-                    variant = DarwinButtonVariant.Primary,
-                    leftIcon = { DarwinIcon(LucidePlus, modifier = Modifier.padding(end = 4.dp)) },
+                    leftIcon = { Icon(LucidePlus, modifier = Modifier.padding(end = 4.dp)) },
                 )
-                DarwinButton(
+                SecondaryButton(
                     text = "Download",
                     onClick = {},
-                    variant = DarwinButtonVariant.Secondary,
-                    leftIcon = { DarwinIcon(LucideDownload, modifier = Modifier.padding(end = 4.dp)) },
+                    leftIcon = { Icon(LucideDownload, modifier = Modifier.padding(end = 4.dp)) },
                 )
-                DarwinButton(
+                OutlineButton(
                     text = "Share",
                     onClick = {},
-                    variant = DarwinButtonVariant.Outline,
-                    leftIcon = { DarwinIcon(LucideShare2, modifier = Modifier.padding(end = 4.dp)) },
+                    leftIcon = { Icon(LucideShare2, modifier = Modifier.padding(end = 4.dp)) },
                 )
             }
         }
@@ -126,17 +115,17 @@ fun ButtonVariantsExample() {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        DarwinButton(text = "Default", onClick = {})
-        DarwinButton(text = "Primary", onClick = {}, variant = DarwinButtonVariant.Primary)
-        DarwinButton(text = "Secondary", onClick = {}, variant = DarwinButtonVariant.Secondary)
-        DarwinButton(text = "Accent", onClick = {}, variant = DarwinButtonVariant.Accent)
-        DarwinButton(text = "Success", onClick = {}, variant = DarwinButtonVariant.Success)
-        DarwinButton(text = "Warning", onClick = {}, variant = DarwinButtonVariant.Warning)
-        DarwinButton(text = "Info", onClick = {}, variant = DarwinButtonVariant.Info)
-        DarwinButton(text = "Destructive", onClick = {}, variant = DarwinButtonVariant.Destructive)
-        DarwinButton(text = "Outline", onClick = {}, variant = DarwinButtonVariant.Outline)
-        DarwinButton(text = "Ghost", onClick = {}, variant = DarwinButtonVariant.Ghost)
-        DarwinButton(text = "Link", onClick = {}, variant = DarwinButtonVariant.Link)
+        Button(text = "Default", onClick = {})
+        PrimaryButton(text = "Primary", onClick = {})
+        SecondaryButton(text = "Secondary", onClick = {})
+        AccentButton(text = "Accent", onClick = {})
+        SuccessButton(text = "Success", onClick = {})
+        WarningButton(text = "Warning", onClick = {})
+        InfoButton(text = "Info", onClick = {})
+        DestructiveButton(text = "Destructive", onClick = {})
+        OutlineButton(text = "Outline", onClick = {})
+        SubtleButton(text = "Ghost", onClick = {})
+        HyperlinkButton(text = "Link", onClick = {})
     }
 }
 
@@ -148,9 +137,9 @@ fun ButtonSizesExample() {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        DarwinButton(text = "Small", onClick = {}, size = DarwinButtonSize.Small)
-        DarwinButton(text = "Default", onClick = {}, size = DarwinButtonSize.Default)
-        DarwinButton(text = "Large", onClick = {}, size = DarwinButtonSize.Large)
+        Button(text = "Small", onClick = {}, size = ButtonSize.Small)
+        Button(text = "Default", onClick = {}, size = ButtonSize.Default)
+        Button(text = "Large", onClick = {}, size = ButtonSize.Large)
     }
 }
 
@@ -162,10 +151,10 @@ fun ButtonStatesExample() {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        DarwinButton(text = "Disabled", onClick = {}, enabled = false)
-        DarwinButton(text = "Loading", onClick = {}, loading = true)
-        DarwinButton(text = "Loading + text", onClick = {}, loading = true, loadingText = "Saving...")
-        DarwinButton(text = "Default", onClick = {})
+        Button(text = "Disabled", onClick = {}, enabled = false)
+        Button(text = "Loading", onClick = {}, loading = true)
+        Button(text = "Loading + text", onClick = {}, loading = true, loadingText = "Saving...")
+        Button(text = "Default", onClick = {})
     }
 }
 
@@ -175,9 +164,9 @@ internal fun ButtonPage() {
         PreviewContainer { ButtonPreview() }
 
         SectionHeader("Usage")
-        CodeBlock("""DarwinButton(text = "Primary", onClick = {}, variant = DarwinButtonVariant.Primary)
-DarwinButton(text = "Secondary", onClick = {}, variant = DarwinButtonVariant.Secondary)
-DarwinButton(text = "Destructive", onClick = {}, variant = DarwinButtonVariant.Destructive)""")
+        CodeBlock("""PrimaryButton(text = "Primary", onClick = {})
+SecondaryButton(text = "Secondary", onClick = {})
+DestructiveButton(text = "Destructive", onClick = {})""")
 
         SectionHeader("Examples")
         ExampleCard(

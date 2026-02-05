@@ -12,8 +12,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.input.DarwinTextArea
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.TextArea
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -27,14 +27,14 @@ fun TextAreaDefaultExample() {
     val maxChars = 200
     var text by remember { mutableStateOf("") }
     Column(modifier = Modifier.fillMaxWidth(0.5f)) {
-        DarwinTextArea(
+        TextArea(
             value = text,
             onValueChange = { if (it.length <= maxChars) text = it },
             placeholder = "Write your message here...",
             modifier = Modifier.fillMaxWidth(),
         )
         Row(modifier = Modifier.fillMaxWidth().padding(top = 4.dp, end = 2.dp), horizontalArrangement = Arrangement.End) {
-            DarwinText(
+            Text(
                 text = "${text.length}/$maxChars",
                 style = DarwinTheme.typography.caption,
                 color = if (text.length >= maxChars) DarwinTheme.colors.destructive else DarwinTheme.colors.textTertiary,
@@ -47,7 +47,7 @@ fun TextAreaDefaultExample() {
 @Composable
 fun TextAreaErrorExample() {
     var text by remember { mutableStateOf("") }
-    DarwinTextArea(
+    TextArea(
         value = text,
         onValueChange = { text = it },
         placeholder = "Error state textarea",

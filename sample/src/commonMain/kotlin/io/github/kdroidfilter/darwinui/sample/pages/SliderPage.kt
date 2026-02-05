@@ -13,8 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.slider.DarwinSlider
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.Slider
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -32,18 +32,18 @@ fun SliderVolumeExample() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            DarwinText(
+            Text(
                 text = "Volume",
                 style = DarwinTheme.typography.bodySmall,
                 color = DarwinTheme.colors.textTertiary,
             )
-            DarwinText(
+            Text(
                 text = "${value.toInt()}%",
                 style = DarwinTheme.typography.bodySmall,
                 color = Color(0xFF60A5FA), // blue-400
             )
         }
-        DarwinSlider(value = value, onValueChange = { value = it }, min = 0f, max = 100f)
+        Slider(value = value, onValueChange = { value = it }, min = 0f, max = 100f)
     }
 }
 
@@ -52,12 +52,12 @@ fun SliderVolumeExample() {
 fun SliderWithValueExample() {
     var value by remember { mutableStateOf(50f) }
     Column(modifier = Modifier.fillMaxWidth(0.5f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        DarwinText(
+        Text(
             text = "With value display",
             style = DarwinTheme.typography.bodySmall,
             color = DarwinTheme.colors.textTertiary,
         )
-        DarwinSlider(value = value, onValueChange = { value = it }, min = 0f, max = 100f, showValue = true)
+        Slider(value = value, onValueChange = { value = it }, min = 0f, max = 100f, showValue = true)
     }
 }
 

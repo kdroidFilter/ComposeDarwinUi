@@ -50,16 +50,15 @@ import com.composables.icons.lucide.TextCursorInput
 import com.composables.icons.lucide.ToggleLeft
 import com.composables.icons.lucide.TriangleAlert
 import com.composables.icons.lucide.Upload
-import io.github.kdroidfilter.darwinui.components.button.DarwinButton
-import io.github.kdroidfilter.darwinui.components.button.DarwinButtonSize
-import io.github.kdroidfilter.darwinui.components.button.DarwinButtonVariant
-import io.github.kdroidfilter.darwinui.components.input.DarwinSearchField
-import io.github.kdroidfilter.darwinui.components.sidebar.DarwinSidebar
-import io.github.kdroidfilter.darwinui.components.sidebar.DarwinSidebarItem
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
-import io.github.kdroidfilter.darwinui.components.toast.DarwinToastHost
-import io.github.kdroidfilter.darwinui.components.toast.rememberDarwinToastState
-import io.github.kdroidfilter.darwinui.icons.DarwinIcon
+import io.github.kdroidfilter.darwinui.components.ButtonSize
+import io.github.kdroidfilter.darwinui.components.SubtleButton
+import io.github.kdroidfilter.darwinui.components.SearchField
+import io.github.kdroidfilter.darwinui.components.Sidebar
+import io.github.kdroidfilter.darwinui.components.SidebarItem
+import io.github.kdroidfilter.darwinui.components.Text
+import io.github.kdroidfilter.darwinui.components.ToastHost
+import io.github.kdroidfilter.darwinui.components.rememberToastState
+import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideMoon
 import io.github.kdroidfilter.darwinui.icons.LucideSun
 import io.github.kdroidfilter.darwinui.sample.pages.AccordionPage
@@ -129,7 +128,7 @@ fun App() {
     var isDark by remember { mutableStateOf(false) }
 
     DarwinTheme(darkTheme = isDark) {
-        val toastState = rememberDarwinToastState()
+        val toastState = rememberToastState()
 
         Box(modifier = Modifier.fillMaxSize().background(DarwinTheme.colors.background)) {
             var selectedPage by remember { mutableStateOf("button") }
@@ -137,7 +136,7 @@ fun App() {
             var sidebarCollapsed by remember { mutableStateOf(false) }
 
             Row(modifier = Modifier.fillMaxSize()) {
-                // Gallery navigation sidebar using DarwinSidebar
+                // Gallery navigation sidebar using Sidebar
                 val query = searchQuery.lowercase().trim()
                 val filteredDefs = if (query.isEmpty()) {
                     sidebarEntryDefs
@@ -145,7 +144,7 @@ fun App() {
                     sidebarEntryDefs.filter { it.label.lowercase().contains(query) }
                 }
                 val sidebarItems = filteredDefs.map { def ->
-                    DarwinSidebarItem(
+                    SidebarItem(
                         label = def.label,
                         onClick = { selectedPage = def.id },
                         icon = def.icon,
@@ -155,7 +154,7 @@ fun App() {
                 }
 
                 Box(modifier = Modifier.fillMaxHeight().background(DarwinTheme.colors.backgroundElevated)) {
-                    DarwinSidebar(
+                    Sidebar(
                         items = sidebarItems,
                         activeItem = selectedPage,
                         showBorder = true,
@@ -166,34 +165,33 @@ fun App() {
                                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                         Column {
-                                            DarwinText(
+                                            Text(
                                                 text = "Darwin UI",
                                                 fontSize = 18.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = DarwinTheme.colors.textPrimary,
                                             )
-                                            DarwinText(
+                                            Text(
                                                 text = "Component Docs",
                                                 style = DarwinTheme.typography.bodySmall,
                                                 color = DarwinTheme.colors.textTertiary,
                                             )
                                         }
-                                        DarwinButton(
+                                        SubtleButton(
                                             onClick = { isDark = !isDark },
-                                            variant = DarwinButtonVariant.Ghost,
-                                            size = DarwinButtonSize.Icon,
+                                            size = ButtonSize.Icon,
                                         ) {
-                                            DarwinIcon(if (isDark) LucideSun else LucideMoon)
+                                            Icon(if (isDark) LucideSun else LucideMoon)
                                         }
                                     }
-                                    DarwinSearchField(
+                                    SearchField(
                                         value = searchQuery,
                                         onValueChange = { searchQuery = it },
                                         placeholder = "Search components...",
                                         modifier = Modifier.fillMaxWidth(),
                                     )
                                     if (filteredDefs.isEmpty()) {
-                                        DarwinText(
+                                        Text(
                                             text = "No results found",
                                             style = DarwinTheme.typography.bodySmall,
                                             color = DarwinTheme.colors.textTertiary,
@@ -248,7 +246,7 @@ fun App() {
                 }
             }
 
-            DarwinToastHost(state = toastState)
+            ToastHost(state = toastState)
         }
     }
 }

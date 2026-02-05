@@ -8,15 +8,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.card.DarwinCard
-import io.github.kdroidfilter.darwinui.components.card.DarwinCardContent
-import io.github.kdroidfilter.darwinui.components.tabs.DarwinTabs
-import io.github.kdroidfilter.darwinui.components.tabs.DarwinTabsContent
-import io.github.kdroidfilter.darwinui.components.tabs.DarwinTabsList
-import io.github.kdroidfilter.darwinui.components.tabs.DarwinTabsTrigger
-import io.github.kdroidfilter.darwinui.components.text.DarwinText
+import io.github.kdroidfilter.darwinui.components.Card
+import io.github.kdroidfilter.darwinui.components.CardContent
+import io.github.kdroidfilter.darwinui.components.Tabs
+import io.github.kdroidfilter.darwinui.components.TabsContent
+import io.github.kdroidfilter.darwinui.components.TabsList
+import io.github.kdroidfilter.darwinui.components.TabsTrigger
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
-import io.github.kdroidfilter.darwinui.icons.DarwinIcon
+import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideSearch
 import io.github.kdroidfilter.darwinui.icons.LucideSettings
 import io.github.kdroidfilter.darwinui.icons.LucideStar
@@ -30,36 +30,36 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 @Composable
 fun TabsDefaultExample() {
     var selectedTab by remember { mutableStateOf("account") }
-    DarwinTabs(selectedTab = selectedTab, onTabSelected = { selectedTab = it }) {
-        DarwinTabsList {
-            DarwinTabsTrigger(value = "account") { DarwinText("Account") }
-            DarwinTabsTrigger(value = "settings") { DarwinText("Settings") }
-            DarwinTabsTrigger(value = "notifications") { DarwinText("Notifications") }
+    Tabs(selectedTab = selectedTab, onTabSelected = { selectedTab = it }) {
+        TabsList {
+            TabsTrigger(value = "account") { Text("Account") }
+            TabsTrigger(value = "settings") { Text("Settings") }
+            TabsTrigger(value = "notifications") { Text("Notifications") }
         }
-        DarwinTabsContent(value = "account") {
-            DarwinCard {
-                DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    DarwinText(
+        TabsContent(value = "account") {
+            Card {
+                CardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    Text(
                         "Account settings and profile information.",
                         color = DarwinTheme.colors.textSecondary,
                     )
                 }
             }
         }
-        DarwinTabsContent(value = "settings") {
-            DarwinCard {
-                DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    DarwinText(
+        TabsContent(value = "settings") {
+            Card {
+                CardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    Text(
                         "Application preferences and configuration.",
                         color = DarwinTheme.colors.textSecondary,
                     )
                 }
             }
         }
-        DarwinTabsContent(value = "notifications") {
-            DarwinCard {
-                DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    DarwinText(
+        TabsContent(value = "notifications") {
+            Card {
+                CardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    Text(
                         "Notification preferences and history.",
                         color = DarwinTheme.colors.textSecondary,
                     )
@@ -73,36 +73,36 @@ fun TabsDefaultExample() {
 @Composable
 fun TabsWithIconsExample() {
     var selectedTab by remember { mutableStateOf("search") }
-    DarwinTabs(selectedTab = selectedTab, onTabSelected = { selectedTab = it }) {
-        DarwinTabsList {
-            DarwinTabsTrigger(value = "search", icon = { DarwinIcon(LucideSearch) }) { DarwinText("Search") }
-            DarwinTabsTrigger(value = "favorites", icon = { DarwinIcon(LucideStar) }) { DarwinText("Favorites") }
-            DarwinTabsTrigger(value = "settings", icon = { DarwinIcon(LucideSettings) }) { DarwinText("Settings") }
+    Tabs(selectedTab = selectedTab, onTabSelected = { selectedTab = it }) {
+        TabsList {
+            TabsTrigger(value = "search", icon = { Icon(LucideSearch) }) { Text("Search") }
+            TabsTrigger(value = "favorites", icon = { Icon(LucideStar) }) { Text("Favorites") }
+            TabsTrigger(value = "settings", icon = { Icon(LucideSettings) }) { Text("Settings") }
         }
-        DarwinTabsContent(value = "search") {
-            DarwinCard {
-                DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    DarwinText(
+        TabsContent(value = "search") {
+            Card {
+                CardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    Text(
                         "Search across all your content.",
                         color = DarwinTheme.colors.textSecondary,
                     )
                 }
             }
         }
-        DarwinTabsContent(value = "favorites") {
-            DarwinCard {
-                DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    DarwinText(
+        TabsContent(value = "favorites") {
+            Card {
+                CardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    Text(
                         "Your starred and bookmarked items.",
                         color = DarwinTheme.colors.textSecondary,
                     )
                 }
             }
         }
-        DarwinTabsContent(value = "settings") {
-            DarwinCard {
-                DarwinCardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    DarwinText(
+        TabsContent(value = "settings") {
+            Card {
+                CardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    Text(
                         "Manage your preferences.",
                         color = DarwinTheme.colors.textSecondary,
                     )
