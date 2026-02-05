@@ -60,23 +60,20 @@ fun App() {
 ### 3. Use components
 
 ```kotlin
-import io.github.kdroidfilter.darwinui.components.button.DarwinButton
-import io.github.kdroidfilter.darwinui.components.button.DarwinButtonVariant
-import io.github.kdroidfilter.darwinui.components.card.*
+import io.github.kdroidfilter.darwinui.components.*
 
 @Composable
 fun MyScreen() {
-    DarwinCard {
-        DarwinCardHeader {
-            DarwinCardTitle("Welcome")
-            DarwinCardDescription("A macOS-inspired component library")
+    Card {
+        CardHeader {
+            CardTitle("Welcome")
+            CardDescription("A macOS-inspired component library")
         }
-        DarwinCardContent {
-            DarwinButton(
+        CardContent {
+            PrimaryButton(
                 onClick = { /* ... */ },
-                variant = DarwinButtonVariant.Primary,
             ) {
-                DarwinText("Get Started")
+                Text("Get Started")
             }
         }
     }
