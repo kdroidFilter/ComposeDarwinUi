@@ -4,10 +4,9 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,8 +33,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -43,13 +40,10 @@ import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronsLeft
 import io.github.kdroidfilter.darwinui.icons.LucideLogOut
-import io.github.kdroidfilter.darwinui.theme.Blue500
+import androidx.compose.ui.unit.Dp
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.Zinc100
-import io.github.kdroidfilter.darwinui.theme.Zinc200
-import io.github.kdroidfilter.darwinui.theme.Zinc400
 import io.github.kdroidfilter.darwinui.theme.Zinc500
 import io.github.kdroidfilter.darwinui.theme.Zinc600
 import io.github.kdroidfilter.darwinui.theme.Zinc700
@@ -67,6 +61,56 @@ private fun <T> sidebarSpring() = spring<T>(
     dampingRatio = 1.0f,
     stiffness = DarwinSpringPreset.Smooth.stiffness,
 )
+
+// =============================================================================
+// SidebarIconSize — mirrors macOS "Taille des icônes de la barre latérale"
+// =============================================================================
+
+/**
+ * Icon size preset for the sidebar, matching macOS System Settings option
+ * "Taille des icônes de la barre latérale" (Small / Medium / Large).
+ */
+enum class SidebarIconSize(
+    val iconDp: Dp,
+    val collapsedIconDp: Dp,
+    val itemHeight: Dp,
+    val hPadding: Dp,
+    val collapsedHPadding: Dp,
+    val iconGap: Dp,
+    val itemSpacing: Dp,
+    val groupHeaderMaxHeight: Dp,
+) {
+    Small(
+        iconDp = 16.dp,
+        collapsedIconDp = 18.dp,
+        itemHeight = 26.dp,
+        hPadding = 8.dp,
+        collapsedHPadding = 8.dp,
+        iconGap = 6.dp,
+        itemSpacing = 1.dp,
+        groupHeaderMaxHeight = 24.dp,
+    ),
+    Medium(
+        iconDp = 18.dp,
+        collapsedIconDp = 20.dp,
+        itemHeight = 30.dp,
+        hPadding = 10.dp,
+        collapsedHPadding = 10.dp,
+        iconGap = 8.dp,
+        itemSpacing = 2.dp,
+        groupHeaderMaxHeight = 28.dp,
+    ),
+    Large(
+        iconDp = 26.dp,
+        collapsedIconDp = 26.dp,
+        itemHeight = 42.dp,
+        hPadding = 12.dp,
+        collapsedHPadding = 12.dp,
+        iconGap = 10.dp,
+        itemSpacing = 3.dp,
+        groupHeaderMaxHeight = 32.dp,
+    ),
+}
 
 // =============================================================================
 // Data
@@ -99,6 +143,7 @@ fun Sidebar(
     items: List<SidebarItem>,
     activeItem: String,
     modifier: Modifier = Modifier,
+    iconSize: SidebarIconSize = SidebarIconSize.Medium,
     onLogout: (() -> Unit)? = null,
     collapsed: Boolean = false,
     onCollapsedChange: ((Boolean) -> Unit)? = null,
@@ -114,22 +159,22 @@ fun Sidebar(
     val settingsItem = items.find { it.label == "Settings" }
     val hasGroups = items.any { it.group != null }
 
-    // Animated width: collapsed=56dp, expanded=200dp
+    // Animated width: collapsed=56dp, expanded=272dp (matches macOS sidebar)
     val animatedWidth by animateDpAsState(
-        targetValue = if (collapsed) 56.dp else 200.dp,
+        targetValue = if (collapsed) 56.dp else 272.dp,
         animationSpec = sidebarSpring(),
     )
 
-    // Animated padding: collapsed=8dp(p-2), expanded=12dp(p-3)
+    // Animated padding: collapsed=6dp, expanded=8dp (macOS-like tight padding)
     val animatedPadding by animateDpAsState(
-        targetValue = if (collapsed) 8.dp else 12.dp,
+        targetValue = if (collapsed) 6.dp else 8.dp,
         animationSpec = sidebarSpring(),
     )
-
-    // Bottom section border
-    val bottomBorderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Zinc200
 
     val hasBottomSection = collapsible || settingsItem != null || onLogout != null
+
+    val sidebarContentShape = DarwinTheme.shapes.large
+    val sidebarBorderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.08f)
 
     Box(
         modifier = modifier
@@ -141,7 +186,9 @@ fun Sidebar(
             modifier = Modifier
                 .fillMaxHeight()
                 .width(animatedWidth)
-                .padding(animatedPadding),
+                .padding(animatedPadding)
+                .clip(sidebarContentShape)
+                .border(1.dp, sidebarBorderColor, sidebarContentShape),
         ) {
             // ---- Pinned header (height fraction + alpha, stays in tree) ----
             if (header != null) {
@@ -166,23 +213,26 @@ fun Sidebar(
                 }
             }
 
-            // ---- Scrollable items (flex-1, space-y-1) ----
+            // ---- Scrollable items ----
             Column(
-                modifier = Modifier.weight(1f).verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 6.dp),
+                verticalArrangement = Arrangement.spacedBy(iconSize.itemSpacing),
             ) {
                 if (hasGroups) {
-                    // Grouped rendering: preserve insertion order
                     val groups = topItems.groupBy { it.group }
                     for ((group, groupItems) in groups) {
                         if (group != null) {
-                            GroupHeader(text = group, isCollapsed = collapsed)
+                            GroupHeader(text = group, isCollapsed = collapsed, sidebarIconSize = iconSize)
                         }
                         groupItems.forEach { item ->
                             SidebarItemWithVisibility(
                                 item = item,
                                 activeItem = activeItem,
                                 collapsed = collapsed,
+                                sidebarIconSize = iconSize,
                             )
                         }
                     }
@@ -192,42 +242,35 @@ fun Sidebar(
                             item = item,
                             activeItem = activeItem,
                             collapsed = collapsed,
+                            sidebarIconSize = iconSize,
                         )
                     }
                 }
             }
 
-            // ---- Bottom section: border-t + pt-3, space-y-1 ----
+            // ---- Bottom section ----
             if (hasBottomSection) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(bottomBorderColor),
-                )
-
                 Column(
-                    modifier = Modifier.padding(top = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.padding(top = 8.dp, start = 6.dp, end = 6.dp),
+                    verticalArrangement = Arrangement.spacedBy(iconSize.itemSpacing),
                 ) {
-                    // Collapse toggle
                     if (collapsible) {
                         CollapseToggle(
                             isCollapsed = collapsed,
                             onClick = { onCollapsedChange?.invoke(!collapsed) },
+                            sidebarIconSize = iconSize,
                         )
                     }
 
-                    // Settings item (fade out if no icon)
                     if (settingsItem != null) {
                         SidebarItemWithVisibility(
                             item = settingsItem,
                             activeItem = activeItem,
                             collapsed = collapsed,
+                            sidebarIconSize = iconSize,
                         )
                     }
 
-                    // Logout (always has icon)
                     if (onLogout != null) {
                         SidebarItemRow(
                             label = "Logout",
@@ -235,6 +278,7 @@ fun Sidebar(
                             active = false,
                             icon = LucideLogOut,
                             isCollapsed = collapsed,
+                            sidebarIconSize = iconSize,
                         )
                     }
                 }
@@ -268,6 +312,7 @@ private fun SidebarItemWithVisibility(
     item: SidebarItem,
     activeItem: String,
     collapsed: Boolean,
+    sidebarIconSize: SidebarIconSize = SidebarIconSize.Medium,
 ) {
     if (item.icon != null) {
         SidebarItemRow(
@@ -276,6 +321,7 @@ private fun SidebarItemWithVisibility(
             active = activeItem == item.id,
             icon = item.icon,
             isCollapsed = collapsed,
+            sidebarIconSize = sidebarIconSize,
         )
     } else {
         val alpha by animateFloatAsState(
@@ -283,7 +329,7 @@ private fun SidebarItemWithVisibility(
             animationSpec = sidebarSpring(),
         )
         val itemHeight by animateDpAsState(
-            targetValue = if (collapsed) 0.dp else 40.dp,
+            targetValue = if (collapsed) 0.dp else sidebarIconSize.itemHeight,
             animationSpec = sidebarSpring(),
         )
 
@@ -299,6 +345,7 @@ private fun SidebarItemWithVisibility(
                 active = activeItem == item.id,
                 icon = null,
                 isCollapsed = false,
+                sidebarIconSize = sidebarIconSize,
             )
         }
     }
@@ -313,7 +360,7 @@ private fun SidebarItemWithVisibility(
  * gaps don't snap when the exit animation completes.
  */
 @Composable
-private fun GroupHeader(text: String, isCollapsed: Boolean) {
+private fun GroupHeader(text: String, isCollapsed: Boolean, sidebarIconSize: SidebarIconSize = SidebarIconSize.Medium) {
     val typography = DarwinTheme.typography
     val colors = DarwinTheme.colors
 
@@ -321,11 +368,8 @@ private fun GroupHeader(text: String, isCollapsed: Boolean) {
         targetValue = if (isCollapsed) 0f else 1f,
         animationSpec = sidebarSpring(),
     )
-    // 40dp is a generous upper bound (content is ~28dp with padding).
-    // When expanded, the content is smaller so 40dp doesn't constrain it.
-    // When collapsing, it smoothly shrinks and clips the content to 0.
     val maxHeight by animateDpAsState(
-        targetValue = if (isCollapsed) 0.dp else 40.dp,
+        targetValue = if (isCollapsed) 0.dp else sidebarIconSize.groupHeaderMaxHeight,
         animationSpec = sidebarSpring(),
     )
 
@@ -339,7 +383,7 @@ private fun GroupHeader(text: String, isCollapsed: Boolean) {
             text = text,
             style = typography.labelSmall,
             color = colors.textTertiary,
-            modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 4.dp),
+            modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 10.dp, bottom = 2.dp),
         )
     }
 }
@@ -361,46 +405,34 @@ private fun SidebarItemRow(
     active: Boolean,
     icon: ImageVector?,
     isCollapsed: Boolean,
+    sidebarIconSize: SidebarIconSize = SidebarIconSize.Medium,
 ) {
     val isDark = DarwinTheme.colors.isDark
-    val shapes = DarwinTheme.shapes
     val typography = DarwinTheme.typography
 
     val interactionSource = remember { MutableInteractionSource() }
-    val isHovered by interactionSource.collectIsHoveredAsState()
 
-    val backgroundColor = when {
-        active -> DarwinTheme.colors.accent
-        isHovered -> if (isDark) Color.White.copy(alpha = 0.10f) else Zinc100
-        else -> Color.Transparent
-    }
+    val backgroundColor = if (active) DarwinTheme.colors.accent else Color.Transparent
 
-    val textColor = when {
-        active -> Color.White
-        isHovered -> if (isDark) Zinc100 else Zinc900
-        else -> if (isDark) Zinc400 else Zinc600
-    }
+    val textColor = if (active) Color.White else if (isDark) Color(0xFFD4D4D8) else Zinc600
+    val iconColor = if (active) Color.White else if (isDark) Color(0xFFD4D4D8) else Zinc500
 
-    val iconColor = when {
-        active -> Color.White
-        isHovered -> if (isDark) Zinc200 else Zinc700
-        else -> if (isDark) Zinc400 else Zinc500
-    }
+    val itemShape = DarwinTheme.shapes.small
 
-    // All item animations use the same Smooth spring as the sidebar width
-    // so everything moves in one unified, progressive motion.
-    val iconSize by animateDpAsState(
-        targetValue = if (isCollapsed) 20.dp else 16.dp,
+    // When collapsed, always use Small dimensions so icons fit the fixed 56dp width
+    val collapsedSize = SidebarIconSize.Small
+    val animatedIconSize by animateDpAsState(
+        targetValue = if (isCollapsed) collapsedSize.collapsedIconDp else sidebarIconSize.iconDp,
         animationSpec = sidebarSpring(),
     )
 
     val hPadding by animateDpAsState(
-        targetValue = if (isCollapsed) 10.dp else 12.dp,
+        targetValue = if (isCollapsed) collapsedSize.collapsedHPadding else sidebarIconSize.hPadding,
         animationSpec = sidebarSpring(),
     )
 
     val iconLabelGap by animateDpAsState(
-        targetValue = if (isCollapsed) 0.dp else 12.dp,
+        targetValue = if (isCollapsed) 0.dp else sidebarIconSize.iconGap,
         animationSpec = sidebarSpring(),
     )
 
@@ -409,13 +441,18 @@ private fun SidebarItemRow(
         animationSpec = sidebarSpring(),
     )
 
+    val textStyle = when (sidebarIconSize) {
+        SidebarIconSize.Small -> typography.bodySmall
+        SidebarIconSize.Medium -> typography.bodyMedium
+        SidebarIconSize.Large -> typography.bodyLarge
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(40.dp)
-            .clip(shapes.extraLarge) // rounded-xl = 16dp
-            .background(backgroundColor, shapes.extraLarge)
-            .hoverable(interactionSource = interactionSource)
+            .height(sidebarIconSize.itemHeight)
+            .clip(itemShape)
+            .background(backgroundColor, itemShape)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -429,16 +466,14 @@ private fun SidebarItemRow(
             Icon(
                 imageVector = icon,
                 tint = iconColor,
-                modifier = Modifier.size(iconSize),
+                modifier = Modifier.size(animatedIconSize),
             )
             Spacer(modifier = Modifier.width(iconLabelGap))
         }
 
         Text(
             text = label,
-            style = typography.bodyMedium.merge(
-                TextStyle(fontWeight = FontWeight.Medium)
-            ),
+            style = textStyle,
             color = textColor,
             maxLines = 1,
             overflow = TextOverflow.Clip,
@@ -455,41 +490,34 @@ private fun SidebarItemRow(
 private fun CollapseToggle(
     isCollapsed: Boolean,
     onClick: () -> Unit,
+    sidebarIconSize: SidebarIconSize = SidebarIconSize.Medium,
 ) {
     val isDark = DarwinTheme.colors.isDark
-    val shapes = DarwinTheme.shapes
     val typography = DarwinTheme.typography
 
     val interactionSource = remember { MutableInteractionSource() }
-    val isHovered by interactionSource.collectIsHoveredAsState()
 
-    val textColor = when {
-        isHovered -> if (isDark) Zinc200 else Zinc700
-        else -> if (isDark) Zinc400 else Zinc500
-    }
+    val textColor = if (isDark) Color(0xFFD4D4D8) else Zinc500
 
-    val backgroundColor = when {
-        isHovered -> if (isDark) Color.White.copy(alpha = 0.10f) else Zinc100
-        else -> Color.Transparent
-    }
+    val itemShape = DarwinTheme.shapes.small
 
-    // ChevronsLeft rotates 180° when collapsed
     val iconRotation by animateFloatAsState(
         targetValue = if (isCollapsed) 180f else 0f,
         animationSpec = darwinTween(DarwinDuration.Slow),
     )
 
-    val iconSize by animateDpAsState(
-        targetValue = if (isCollapsed) 20.dp else 16.dp,
+    val collapsedSize = SidebarIconSize.Small
+    val animatedIconSize by animateDpAsState(
+        targetValue = if (isCollapsed) collapsedSize.collapsedIconDp else sidebarIconSize.iconDp,
         animationSpec = sidebarSpring(),
     )
     val hPadding by animateDpAsState(
-        targetValue = if (isCollapsed) 10.dp else 12.dp,
+        targetValue = if (isCollapsed) collapsedSize.collapsedHPadding else sidebarIconSize.hPadding,
         animationSpec = sidebarSpring(),
     )
 
     val iconLabelGap by animateDpAsState(
-        targetValue = if (isCollapsed) 0.dp else 12.dp,
+        targetValue = if (isCollapsed) 0.dp else sidebarIconSize.iconGap,
         animationSpec = sidebarSpring(),
     )
 
@@ -498,13 +526,16 @@ private fun CollapseToggle(
         animationSpec = sidebarSpring(),
     )
 
+    val textStyle = when (sidebarIconSize) {
+        SidebarIconSize.Small -> typography.bodySmall
+        SidebarIconSize.Medium -> typography.bodyMedium
+        SidebarIconSize.Large -> typography.bodyLarge
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(40.dp)
-            .clip(shapes.extraLarge)
-            .background(backgroundColor, shapes.extraLarge)
-            .hoverable(interactionSource = interactionSource)
+            .height(sidebarIconSize.itemHeight)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -516,16 +547,14 @@ private fun CollapseToggle(
         Icon(
             imageVector = LucideChevronsLeft,
             tint = textColor,
-            modifier = Modifier.size(iconSize).graphicsLayer { rotationZ = iconRotation },
+            modifier = Modifier.size(animatedIconSize).graphicsLayer { rotationZ = iconRotation },
         )
 
         Spacer(modifier = Modifier.width(iconLabelGap))
 
         Text(
             text = "Collapse",
-            style = typography.bodyMedium.merge(
-                TextStyle(fontWeight = FontWeight.Medium)
-            ),
+            style = textStyle,
             color = textColor,
             maxLines = 1,
             overflow = TextOverflow.Clip,

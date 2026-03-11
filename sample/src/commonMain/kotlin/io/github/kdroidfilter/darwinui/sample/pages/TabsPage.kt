@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.Card
 import io.github.kdroidfilter.darwinui.components.CardContent
+import io.github.kdroidfilter.darwinui.components.TabSize
 import io.github.kdroidfilter.darwinui.components.Tabs
 import io.github.kdroidfilter.darwinui.components.TabsContent
 import io.github.kdroidfilter.darwinui.components.TabsList
@@ -39,30 +40,89 @@ fun TabsDefaultExample() {
         TabsContent(value = "account") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text(
-                        "Account settings and profile information.",
-                        color = DarwinTheme.colors.textSecondary,
-                    )
+                    Text("Account settings and profile information.", color = DarwinTheme.colors.textSecondary)
                 }
             }
         }
         TabsContent(value = "settings") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text(
-                        "Application preferences and configuration.",
-                        color = DarwinTheme.colors.textSecondary,
-                    )
+                    Text("Application preferences and configuration.", color = DarwinTheme.colors.textSecondary)
                 }
             }
         }
         TabsContent(value = "notifications") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text(
-                        "Notification preferences and history.",
-                        color = DarwinTheme.colors.textSecondary,
-                    )
+                    Text("Notification preferences and history.", color = DarwinTheme.colors.textSecondary)
+                }
+            }
+        }
+    }
+}
+
+@GalleryExample("Tabs", "Small")
+@Composable
+fun TabsSmallExample() {
+    var selectedTab by remember { mutableStateOf("account") }
+    Tabs(selectedTab = selectedTab, onTabSelected = { selectedTab = it }) {
+        TabsList(size = TabSize.Sm) {
+            TabsTrigger(value = "account") { Text("Account") }
+            TabsTrigger(value = "settings") { Text("Settings") }
+            TabsTrigger(value = "notifications") { Text("Notifications") }
+        }
+        TabsContent(value = "account") {
+            Card {
+                CardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    Text("Account settings and profile information.", color = DarwinTheme.colors.textSecondary)
+                }
+            }
+        }
+        TabsContent(value = "settings") {
+            Card {
+                CardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    Text("Application preferences and configuration.", color = DarwinTheme.colors.textSecondary)
+                }
+            }
+        }
+        TabsContent(value = "notifications") {
+            Card {
+                CardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    Text("Notification preferences and history.", color = DarwinTheme.colors.textSecondary)
+                }
+            }
+        }
+    }
+}
+
+@GalleryExample("Tabs", "Large")
+@Composable
+fun TabsLargeExample() {
+    var selectedTab by remember { mutableStateOf("search") }
+    Tabs(selectedTab = selectedTab, onTabSelected = { selectedTab = it }) {
+        TabsList(size = TabSize.Lg) {
+            TabsTrigger(value = "search", icon = { Icon(LucideSearch) }) { Text("Search") }
+            TabsTrigger(value = "favorites", icon = { Icon(LucideStar) }) { Text("Favorites") }
+            TabsTrigger(value = "settings", icon = { Icon(LucideSettings) }) { Text("Settings") }
+        }
+        TabsContent(value = "search") {
+            Card {
+                CardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    Text("Search across all your content.", color = DarwinTheme.colors.textSecondary)
+                }
+            }
+        }
+        TabsContent(value = "favorites") {
+            Card {
+                CardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    Text("Your starred and bookmarked items.", color = DarwinTheme.colors.textSecondary)
+                }
+            }
+        }
+        TabsContent(value = "settings") {
+            Card {
+                CardContent(modifier = Modifier.padding(top = 24.dp)) {
+                    Text("Manage your preferences.", color = DarwinTheme.colors.textSecondary)
                 }
             }
         }
@@ -82,30 +142,21 @@ fun TabsWithIconsExample() {
         TabsContent(value = "search") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text(
-                        "Search across all your content.",
-                        color = DarwinTheme.colors.textSecondary,
-                    )
+                    Text("Search across all your content.", color = DarwinTheme.colors.textSecondary)
                 }
             }
         }
         TabsContent(value = "favorites") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text(
-                        "Your starred and bookmarked items.",
-                        color = DarwinTheme.colors.textSecondary,
-                    )
+                    Text("Your starred and bookmarked items.", color = DarwinTheme.colors.textSecondary)
                 }
             }
         }
         TabsContent(value = "settings") {
             Card {
                 CardContent(modifier = Modifier.padding(top = 24.dp)) {
-                    Text(
-                        "Manage your preferences.",
-                        color = DarwinTheme.colors.textSecondary,
-                    )
+                    Text("Manage your preferences.", color = DarwinTheme.colors.textSecondary)
                 }
             }
         }
@@ -115,8 +166,11 @@ fun TabsWithIconsExample() {
 @Composable
 internal fun TabsPage() {
     GalleryPage("Tabs", "A set of layered sections of content, known as tab panels.") {
-        SectionHeader("Examples")
-        ExampleCard(title = "Default", sourceCode = GallerySources.TabsDefaultExample) { TabsDefaultExample() }
+        SectionHeader("Sizes")
+        ExampleCard(title = "Small", sourceCode = GallerySources.TabsSmallExample) { TabsSmallExample() }
+        ExampleCard(title = "Default (Medium)", sourceCode = GallerySources.TabsDefaultExample) { TabsDefaultExample() }
+        ExampleCard(title = "Large", sourceCode = GallerySources.TabsLargeExample) { TabsLargeExample() }
+        SectionHeader("With Icons")
         ExampleCard(title = "With Icons", sourceCode = GallerySources.TabsWithIconsExample) { TabsWithIconsExample() }
     }
 }

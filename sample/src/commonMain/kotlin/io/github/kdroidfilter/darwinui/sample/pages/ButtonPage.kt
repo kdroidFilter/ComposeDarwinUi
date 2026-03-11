@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.AccentButton
 import io.github.kdroidfilter.darwinui.components.Button
+import io.github.kdroidfilter.darwinui.components.ButtonSize
 import io.github.kdroidfilter.darwinui.components.DestructiveButton
 import io.github.kdroidfilter.darwinui.components.HyperlinkButton
 import io.github.kdroidfilter.darwinui.components.InfoButton
@@ -132,13 +133,17 @@ fun ButtonVariantsExample() {
 @GalleryExample("Button", "Sizes")
 @Composable
 fun ButtonSizesExample() {
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Button(onClick = {}) { Text("Small") }
-        Button(onClick = {}) { Text("Default") }
-        Button(onClick = {}) { Text("Large") }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            PrimaryButton(text = "Small", onClick = {}, size = ButtonSize.Small)
+            PrimaryButton(text = "Default", onClick = {}, size = ButtonSize.Default)
+            PrimaryButton(text = "Large", onClick = {}, size = ButtonSize.Large)
+        }
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            SecondaryButton(text = "Small", onClick = {}, size = ButtonSize.Small)
+            SecondaryButton(text = "Default", onClick = {}, size = ButtonSize.Default)
+            SecondaryButton(text = "Large", onClick = {}, size = ButtonSize.Large)
+        }
     }
 }
 

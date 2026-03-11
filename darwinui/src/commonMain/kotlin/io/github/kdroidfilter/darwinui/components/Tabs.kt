@@ -57,6 +57,24 @@ import io.github.kdroidfilter.darwinui.theme.darwinTween
 import kotlinx.coroutines.launch
 
 // =============================================================================
+// TabSize — Sm / Md / Lg
+// =============================================================================
+
+enum class TabSize(
+    val containerHeight: Dp,
+    val indicatorHeight: Dp,
+    val triggerHPadding: Dp,
+    val triggerVPadding: Dp,
+    val iconSize: Dp,
+) {
+    Sm(containerHeight = 32.dp, indicatorHeight = 24.dp, triggerHPadding = 10.dp, triggerVPadding = 4.dp, iconSize = 14.dp),
+    Md(containerHeight = 40.dp, indicatorHeight = 32.dp, triggerHPadding = 12.dp, triggerVPadding = 6.dp, iconSize = 16.dp),
+    Lg(containerHeight = 48.dp, indicatorHeight = 40.dp, triggerHPadding = 16.dp, triggerVPadding = 8.dp, iconSize = 18.dp),
+}
+
+internal val LocalTabSize = staticCompositionLocalOf { TabSize.Md }
+
+// =============================================================================
 // State
 // =============================================================================
 
@@ -124,6 +142,7 @@ fun Tabs(
 @Composable
 fun TabsList(
     modifier: Modifier = Modifier,
+    size: TabSize = TabSize.Md,
     content: @Composable RowScope.() -> Unit,
 ) {
     val state = LocalTabsState.current
@@ -163,37 +182,38 @@ fun TabsList(
         }
     }
 
-    // Pill container: inline-flex h-10 rounded-xl p-1
-    Box(
-        modifier = modifier
-            .height(40.dp)
-            .background(backgroundColor, shapes.large)
-            .clip(shapes.large)
-            .border(1.dp, borderColor, shapes.large)
-            .padding(4.dp),
-        contentAlignment = Alignment.CenterStart,
-    ) {
-        // Animated background indicator behind the selected trigger
-        // fillMaxHeight makes it fill the inner pill area (32dp)
-        if (indicatorWidth.value > 0f) {
-            Box(
-                modifier = Modifier
-                    .offset {
-                        IntOffset(
-                            x = with(density) { indicatorOffset.value.dp.roundToPx() },
-                            y = 0,
-                        )
-                    }
-                    .size(width = indicatorWidth.value.dp, height = 32.dp)
-                    .background(indicatorColor, shapes.small),
+    // Pill container
+    CompositionLocalProvider(LocalTabSize provides size) {
+        Box(
+            modifier = modifier
+                .height(size.containerHeight)
+                .background(backgroundColor, shapes.large)
+                .clip(shapes.large)
+                .border(1.dp, borderColor, shapes.large)
+                .padding(4.dp),
+            contentAlignment = Alignment.CenterStart,
+        ) {
+            // Animated background indicator behind the selected trigger
+            if (indicatorWidth.value > 0f) {
+                Box(
+                    modifier = Modifier
+                        .offset {
+                            IntOffset(
+                                x = with(density) { indicatorOffset.value.dp.roundToPx() },
+                                y = 0,
+                            )
+                        }
+                        .size(width = indicatorWidth.value.dp, height = size.indicatorHeight)
+                        .background(indicatorColor, shapes.small),
+                )
+            }
+
+            // Tab triggers row
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                content = content,
             )
         }
-
-        // Tab triggers row
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            content = content,
-        )
     }
 }
 
@@ -210,6 +230,7 @@ fun TabsTrigger(
     content: @Composable () -> Unit,
 ) {
     val state = LocalTabsState.current
+    val tabSize = LocalTabSize.current
     val colors = DarwinTheme.colors
     val typography = DarwinTheme.typography
     val density = LocalDensity.current
@@ -225,12 +246,11 @@ fun TabsTrigger(
         else -> if (isDark) Zinc200 else Zinc800
     }
 
-    val textStyle = typography.bodyMedium.merge(
-        TextStyle(
-            color = textColor,
-            fontWeight = FontWeight.Medium,
-        )
-    )
+    val textStyle = when (tabSize) {
+        TabSize.Sm -> typography.bodySmall
+        TabSize.Md -> typography.bodyMedium
+        TabSize.Lg -> typography.bodyLarge
+    }.merge(TextStyle(color = textColor, fontWeight = FontWeight.Medium))
 
     Box(
         modifier = modifier
@@ -249,7 +269,7 @@ fun TabsTrigger(
                 enabled = enabled,
                 onClick = { state.onTabSelected(value) },
             )
-            .padding(horizontal = 12.dp, vertical = 6.dp),
+            .padding(horizontal = tabSize.triggerHPadding, vertical = tabSize.triggerVPadding),
         contentAlignment = Alignment.Center,
     ) {
         CompositionLocalProvider(
@@ -259,9 +279,9 @@ fun TabsTrigger(
             if (icon != null) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
-                    Box(modifier = Modifier.size(16.dp)) { icon() }
+                    Box(modifier = Modifier.size(tabSize.iconSize)) { icon() }
                     content()
                 }
             } else {

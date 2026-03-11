@@ -4,7 +4,6 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
@@ -26,10 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.Zinc600
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
-
-private val Emerald500 = Color(0xFF10B981)
 
 // ===========================================================================
 // SwitchColors — mirrors M3's SwitchColors
@@ -78,7 +74,8 @@ object SwitchDefaults {
         checkedTrackColor: Color = DarwinTheme.colorScheme.accent,
         checkedBorderColor: Color = Color.Transparent,
         uncheckedThumbColor: Color = Color.White,
-        uncheckedTrackColor: Color = Zinc600,
+        // macOS unchecked track: #78788C in dark / #E5E5EA in light
+        uncheckedTrackColor: Color = if (DarwinTheme.colors.isDark) Color(0xFF78788C) else Color(0xFFE5E5EA),
         uncheckedBorderColor: Color = Color.Transparent,
         disabledCheckedThumbColor: Color = checkedThumbColor.copy(alpha = 0.5f),
         disabledCheckedTrackColor: Color = checkedTrackColor.copy(alpha = 0.5f),
@@ -93,7 +90,8 @@ object SwitchDefaults {
 }
 
 // ===========================================================================
-// Switch — M3-compatible
+// Switch — macOS-style (Apple Human Interface Guidelines proportions)
+// Track: 44x26dp  Thumb: 22dp circle  Padding: 2dp
 // ===========================================================================
 
 @Composable
@@ -107,30 +105,14 @@ fun Switch(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val trackWidth = 36.dp
-    val trackHeight = 20.dp
+    val trackHeight = 14.dp
+    val thumbSize = 10.dp
     val thumbPadding = 2.dp
-
     val trackShape = RoundedCornerShape(50)
 
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-    // Compute target thumb size based on state (before animation)
-    val targetThumbSize = when {
-        isPressed && enabled -> 18.dp
-        checked -> 16.dp
-        else -> 12.dp
-    }
-
-    // Thumb grows wider on press (M3-style), larger when checked
-    val thumbSize by animateDpAsState(
-        targetValue = targetThumbSize,
-        animationSpec = darwinSpring(preset = DarwinSpringPreset.Snappy),
-        label = "switchThumbSize",
-    )
-
-    // Thumb slides to the right end when checked, using target size so the offset targets a stable position
+    // Thumb translates between left and right positions
     val thumbOffset by animateDpAsState(
-        targetValue = if (checked) (trackWidth - targetThumbSize - thumbPadding) else 0.dp,
+        targetValue = if (checked) (trackWidth - thumbSize - thumbPadding) else thumbPadding,
         animationSpec = darwinSpring(preset = DarwinSpringPreset.Snappy),
         label = "switchThumbOffset",
     )
@@ -168,17 +150,17 @@ fun Switch(
 
     Box(
         modifier = toggleModifier
-            .alpha(if (enabled) 1f else 0.5f)
+            .alpha(if (enabled) 1f else 0.4f)
             .size(width = trackWidth, height = trackHeight)
             .clip(trackShape)
             .background(trackColor, trackShape),
     ) {
         Box(
             modifier = Modifier
-                .offset(x = thumbOffset + thumbPadding)
+                .offset(x = thumbOffset)
                 .align(Alignment.CenterStart)
-                .size(thumbSize) // animated: small when unchecked, larger when checked, widest on press
-                .shadow(elevation = 1.dp, shape = CircleShape, clip = false)
+                .size(thumbSize)
+                .shadow(elevation = 2.dp, shape = CircleShape, clip = false)
                 .clip(CircleShape)
                 .background(thumbColor, CircleShape),
             contentAlignment = Alignment.Center,

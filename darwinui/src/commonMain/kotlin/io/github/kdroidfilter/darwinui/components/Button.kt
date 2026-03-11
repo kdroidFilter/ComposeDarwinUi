@@ -103,6 +103,20 @@ object ButtonDefaults {
     val MinHeight = 36.dp
     val MinWidth = 58.dp
 
+    fun contentPaddingForSize(size: ButtonSize) = when (size) {
+        ButtonSize.Small -> PaddingValues(horizontal = 10.dp, vertical = 0.dp)
+        ButtonSize.Default -> PaddingValues(horizontal = 16.dp, vertical = 0.dp)
+        ButtonSize.Large -> PaddingValues(horizontal = 20.dp, vertical = 0.dp)
+        ButtonSize.Icon -> PaddingValues(8.dp)
+    }
+
+    fun minHeightForSize(size: ButtonSize) = when (size) {
+        ButtonSize.Small -> 28.dp
+        ButtonSize.Default -> 36.dp
+        ButtonSize.Large -> 44.dp
+        ButtonSize.Icon -> 36.dp
+    }
+
     @Composable
     fun buttonColors(
         containerColor: Color = DarwinTheme.colors.primary,
@@ -180,11 +194,14 @@ private fun ButtonImpl(
     border: BorderStroke?,
     contentPadding: PaddingValues,
     interactionSource: MutableInteractionSource,
+    size: ButtonSize = ButtonSize.Default,
     behavior: ButtonBehavior = ButtonBehavior.Solid,
     content: @Composable RowScope.() -> Unit,
 ) {
     val themeColors = DarwinTheme.colors
     val typography = DarwinTheme.typography
+
+    val minHeight = ButtonDefaults.minHeightForSize(size)
 
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -227,10 +244,16 @@ private fun ButtonImpl(
 
     val linkUnderline = behavior == ButtonBehavior.Link && isHovered && enabled
 
+    val baseTextStyle = when (size) {
+        ButtonSize.Small -> typography.bodySmall
+        ButtonSize.Default -> typography.labelMedium
+        ButtonSize.Large -> typography.bodyMedium
+        ButtonSize.Icon -> typography.labelMedium
+    }
     val textStyle = if (linkUnderline)
-        typography.labelMedium.copy(textDecoration = TextDecoration.Underline)
+        baseTextStyle.copy(textDecoration = TextDecoration.Underline)
     else
-        typography.labelMedium
+        baseTextStyle
 
     val buttonModifier = modifier
         .scale(scale)
@@ -247,7 +270,7 @@ private fun ButtonImpl(
             role = Role.Button,
             onClick = onClick,
         )
-        .defaultMinSize(minHeight = ButtonDefaults.MinHeight)
+        .defaultMinSize(minHeight = minHeight)
         .padding(contentPadding)
 
     CompositionLocalProvider(
@@ -273,11 +296,12 @@ fun Button(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    size: ButtonSize = ButtonSize.Default,
     shape: Shape = DarwinTheme.shapes.medium,
     colors: ButtonColors = ButtonDefaults.buttonColors(),
     elevation: ButtonElevation? = null,
     border: BorderStroke? = null,
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    contentPadding: PaddingValues = ButtonDefaults.contentPaddingForSize(size),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
 ) {
@@ -290,6 +314,7 @@ fun Button(
         border = border,
         contentPadding = contentPadding,
         interactionSource = interactionSource,
+        size = size,
         content = content,
     )
 }
@@ -303,11 +328,12 @@ fun OutlinedButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    size: ButtonSize = ButtonSize.Default,
     shape: Shape = DarwinTheme.shapes.medium,
     colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
     elevation: ButtonElevation? = null,
     border: BorderStroke? = ButtonDefaults.outlinedButtonBorder(enabled),
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    contentPadding: PaddingValues = ButtonDefaults.contentPaddingForSize(size),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
 ) {
@@ -320,6 +346,7 @@ fun OutlinedButton(
         border = border,
         contentPadding = contentPadding,
         interactionSource = interactionSource,
+        size = size,
         behavior = ButtonBehavior.Outline,
         content = content,
     )
@@ -334,11 +361,12 @@ fun TextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    size: ButtonSize = ButtonSize.Default,
     shape: Shape = DarwinTheme.shapes.medium,
     colors: ButtonColors = ButtonDefaults.textButtonColors(),
     elevation: ButtonElevation? = null,
     border: BorderStroke? = null,
-    contentPadding: PaddingValues = ButtonDefaults.TextButtonContentPadding,
+    contentPadding: PaddingValues = ButtonDefaults.contentPaddingForSize(size),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
 ) {
@@ -351,6 +379,7 @@ fun TextButton(
         border = border,
         contentPadding = contentPadding,
         interactionSource = interactionSource,
+        size = size,
         behavior = ButtonBehavior.Ghost,
         content = content,
     )
@@ -425,6 +454,7 @@ fun PrimaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    size: ButtonSize = ButtonSize.Default,
     loading: Boolean = false,
     loadingText: String? = null,
     leftIcon: (@Composable () -> Unit)? = null,
@@ -435,6 +465,7 @@ fun PrimaryButton(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled && !loading,
+        size = size,
         colors = ButtonColors(DarwinTheme.colors.accent, Color.White, DarwinTheme.colors.accent.copy(0.5f), Color.White.copy(0.5f)),
     ) {
         if (loading) {
@@ -454,12 +485,13 @@ fun PrimaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    size: ButtonSize = ButtonSize.Default,
     loading: Boolean = false,
     loadingText: String? = null,
     leftIcon: (@Composable () -> Unit)? = null,
     rightIcon: (@Composable () -> Unit)? = null,
 ) {
-    PrimaryButton(onClick, modifier, enabled, loading, loadingText, leftIcon, rightIcon) { Text(text) }
+    PrimaryButton(onClick, modifier, enabled, size, loading, loadingText, leftIcon, rightIcon) { Text(text) }
 }
 
 @Composable
@@ -467,6 +499,7 @@ fun SecondaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    size: ButtonSize = ButtonSize.Default,
     loading: Boolean = false,
     loadingText: String? = null,
     leftIcon: (@Composable () -> Unit)? = null,
@@ -478,6 +511,7 @@ fun SecondaryButton(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled && !loading,
+        size = size,
         colors = ButtonColors(
             containerColor = if (isDark) Color.White.copy(alpha = 0.05f) else Zinc100,
             contentColor = if (isDark) Zinc300 else Zinc800,
@@ -503,12 +537,13 @@ fun SecondaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    size: ButtonSize = ButtonSize.Default,
     loading: Boolean = false,
     loadingText: String? = null,
     leftIcon: (@Composable () -> Unit)? = null,
     rightIcon: (@Composable () -> Unit)? = null,
 ) {
-    SecondaryButton(onClick, modifier, enabled, loading, loadingText, leftIcon, rightIcon) { Text(text) }
+    SecondaryButton(onClick, modifier, enabled, size, loading, loadingText, leftIcon, rightIcon) { Text(text) }
 }
 
 @Composable

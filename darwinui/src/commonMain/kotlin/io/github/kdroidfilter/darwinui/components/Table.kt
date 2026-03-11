@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -34,6 +36,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -46,24 +49,46 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.darwinTween
 
+// ==================== TableLayout ====================
+
+/**
+ * Controls how a [Table] sizes itself and handles overflow.
+ *
+ * [Fluid] — columns use weight-based proportional widths; the table fills its
+ * container. Use when the data fits comfortably without overflowing.
+ *
+ * [Scroll] — columns use fixed [Dp] widths; both horizontal and vertical
+ * overflow are handled with scrollbars (Excel-style). Use when the table has
+ * many columns or long content.
+ */
+enum class TableLayout { Fluid, Scroll }
+
 // ==================== Table ====================
 
 @Composable
 fun Table(
     modifier: Modifier = Modifier,
+    layout: TableLayout = TableLayout.Fluid,
     content: @Composable () -> Unit,
 ) {
     val shape = DarwinTheme.shapes.large
     val backgroundColor = DarwinTheme.colors.card
     val borderColor = DarwinTheme.colors.borderSubtle
 
-    Column(
-        modifier = modifier
+    val containerModifier = when (layout) {
+        TableLayout.Fluid -> modifier
             .fillMaxWidth()
             .clip(shape)
             .background(backgroundColor, shape)
-            .border(width = 1.dp, color = borderColor, shape = shape),
-    ) {
+            .border(width = 1.dp, color = borderColor, shape = shape)
+        TableLayout.Scroll -> modifier
+            .clip(shape)
+            .background(backgroundColor, shape)
+            .border(width = 1.dp, color = borderColor, shape = shape)
+            .horizontalScroll(rememberScrollState())
+    }
+
+    Column(modifier = containerModifier) {
         content()
     }
 }
@@ -229,6 +254,7 @@ fun TableRow(
 fun RowScope.TableCell(
     modifier: Modifier = Modifier,
     weight: Float = 1f,
+    width: Dp? = null,
     alignment: Alignment.Vertical = Alignment.CenterVertically,
     content: @Composable () -> Unit,
 ) {
@@ -236,12 +262,13 @@ fun RowScope.TableCell(
         TextStyle(color = DarwinTheme.colors.textPrimary)
     )
 
+    val sizeModifier = if (width != null) modifier.width(width) else modifier.weight(weight)
+
     CompositionLocalProvider(
         LocalDarwinTextStyle provides style,
     ) {
         Box(
-            modifier = modifier
-                .weight(weight)
+            modifier = sizeModifier
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             contentAlignment = when (alignment) {
                 Alignment.Top -> Alignment.TopStart
@@ -270,6 +297,7 @@ fun RowScope.TableCell(
 fun RowScope.TableHeaderCell(
     modifier: Modifier = Modifier,
     weight: Float = 1f,
+    width: Dp? = null,
     content: @Composable () -> Unit,
 ) {
     val style = DarwinTheme.typography.labelMedium.merge(
@@ -279,12 +307,13 @@ fun RowScope.TableHeaderCell(
         )
     )
 
+    val sizeModifier = if (width != null) modifier.width(width) else modifier.weight(weight)
+
     CompositionLocalProvider(
         LocalDarwinTextStyle provides style,
     ) {
         Box(
-            modifier = modifier
-                .weight(weight)
+            modifier = sizeModifier
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             contentAlignment = Alignment.CenterStart,
         ) {

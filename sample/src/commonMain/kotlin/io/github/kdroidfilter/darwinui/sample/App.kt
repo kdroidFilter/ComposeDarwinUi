@@ -26,9 +26,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
 import com.composables.icons.lucide.Bell
 import com.composables.icons.lucide.Calendar
@@ -61,6 +63,7 @@ import com.composables.icons.lucide.Upload
 import io.github.kdroidfilter.darwinui.components.SubtleButton
 import io.github.kdroidfilter.darwinui.components.SearchField
 import io.github.kdroidfilter.darwinui.components.Sidebar
+import io.github.kdroidfilter.darwinui.components.SidebarIconSize
 import io.github.kdroidfilter.darwinui.components.SidebarItem
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.components.ToastHost
@@ -167,6 +170,7 @@ private val sidebarEntryDefs = listOf(
 fun App() {
     var isDark by remember { mutableStateOf(false) }
     var accentColor by remember { mutableStateOf(AccentColor.Blue) }
+    var sidebarIconSize by remember { mutableStateOf(SidebarIconSize.Medium) }
 
     DarwinTheme(darkTheme = isDark, accentColor = accentColor) {
         val toastState = rememberToastState()
@@ -194,16 +198,16 @@ fun App() {
                     )
                 }
 
-                Box(modifier = Modifier.fillMaxHeight().background(DarwinTheme.colors.backgroundElevated)) {
-                    Sidebar(
-                        items = sidebarItems,
-                        activeItem = selectedPage,
-                        showBorder = true,
-                        collapsed = sidebarCollapsed,
-                        onCollapsedChange = { sidebarCollapsed = it },
-                        header = {
-                            Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Sidebar(
+                    items = sidebarItems,
+                    activeItem = selectedPage,
+                    showBorder = false,
+                    collapsed = sidebarCollapsed,
+                    onCollapsedChange = { sidebarCollapsed = it },
+                    iconSize = sidebarIconSize,
+                    header = {
+                        Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 10.dp)) {
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                                         Column {
                                             Text(
@@ -234,6 +238,10 @@ fun App() {
                                         selected = accentColor,
                                         onSelect = { accentColor = it },
                                     )
+                                    SidebarIconSizePicker(
+                                        selected = sidebarIconSize,
+                                        onSelect = { sidebarIconSize = it },
+                                    )
                                     if (filteredDefs.isEmpty()) {
                                         Text(
                                             text = "No results found",
@@ -246,7 +254,6 @@ fun App() {
                             }
                         },
                     )
-                }
 
                 // Main content area
                 Column(
@@ -338,6 +345,57 @@ private fun AccentColorPicker(
                     )
                     .clickable { onSelect(color) },
             )
+        }
+    }
+}
+
+@Composable
+private fun SidebarIconSizePicker(
+    selected: SidebarIconSize,
+    onSelect: (SidebarIconSize) -> Unit,
+) {
+    val colors = DarwinTheme.colors
+    val shape = DarwinTheme.shapes.small
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(26.dp)
+            .clip(shape)
+            .background(
+                if (colors.isDark) Color.White.copy(alpha = 0.06f) else Color.Black.copy(alpha = 0.04f),
+                shape,
+            ),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        SidebarIconSize.entries.forEach { size ->
+            val isSelected = size == selected
+            val label = when (size) {
+                SidebarIconSize.Small -> "S"
+                SidebarIconSize.Medium -> "M"
+                SidebarIconSize.Large -> "L"
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .padding(2.dp)
+                    .clip(DarwinTheme.shapes.extraSmall)
+                    .then(
+                        if (isSelected) Modifier.background(colors.accent, DarwinTheme.shapes.extraSmall)
+                        else Modifier
+                    )
+                    .clickable { onSelect(size) },
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = label,
+                    style = DarwinTheme.typography.bodySmall,
+                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                    color = if (isSelected) colors.onAccent else colors.textSecondary,
+                )
+            }
         }
     }
 }

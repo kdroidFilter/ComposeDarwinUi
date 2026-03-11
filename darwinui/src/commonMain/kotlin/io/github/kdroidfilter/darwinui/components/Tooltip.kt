@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,7 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,7 +31,9 @@ import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.Zinc100
 import io.github.kdroidfilter.darwinui.theme.Zinc900
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * A hover-triggered tooltip component for Darwin UI.
@@ -61,18 +64,7 @@ fun Tooltip(
     val typography = DarwinTheme.typography
     val shapes = DarwinTheme.shapes
 
-    var isHovered by remember { mutableStateOf(false) }
     var showTooltip by remember { mutableStateOf(false) }
-
-    // Delay before showing the tooltip
-    LaunchedEffect(isHovered) {
-        if (isHovered) {
-            delay(delayMillis)
-            showTooltip = true
-        } else {
-            showTooltip = false
-        }
-    }
 
     // Fade animation
     val alpha by animateFloatAsState(
@@ -89,12 +81,23 @@ fun Tooltip(
     Box(
         modifier = modifier
             .pointerInput(Unit) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        when (event.type) {
-                            PointerEventType.Enter -> isHovered = true
-                            PointerEventType.Exit -> isHovered = false
+                coroutineScope {
+                    awaitPointerEventScope {
+                        val pass = PointerEventPass.Main
+                        while (true) {
+                            val event = awaitPointerEvent(pass)
+                            val inputType = event.changes.firstOrNull()?.type
+                            if (inputType == PointerType.Mouse) {
+                                when (event.type) {
+                                    PointerEventType.Enter -> launch {
+                                        delay(delayMillis)
+                                        showTooltip = true
+                                    }
+                                    PointerEventType.Exit -> {
+                                        showTooltip = false
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -102,7 +105,7 @@ fun Tooltip(
     ) {
         content()
 
-        if (alpha > 0f) {
+        if (showTooltip || alpha > 0f) {
             Popup(
                 alignment = Alignment.TopCenter,
                 offset = IntOffset(0, -8),
