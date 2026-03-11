@@ -28,6 +28,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -173,7 +178,7 @@ fun Sidebar(
 
     val hasBottomSection = collapsible || settingsItem != null || onLogout != null
 
-    val sidebarContentShape = DarwinTheme.shapes.large
+    val sidebarContentShape = DarwinTheme.shapes.extraLarge
     val sidebarBorderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.08f)
 
     Box(
@@ -187,6 +192,25 @@ fun Sidebar(
                 .fillMaxHeight()
                 .width(animatedWidth)
                 .padding(animatedPadding)
+                .drawBehind {
+                    // Soft outer shadow: concentric stroke rings, no fill
+                    val steps = 5
+                    val maxExpand = 6.dp.toPx()
+                    val baseAlpha = if (isDark) 0.02f else 0.03f
+                    val cornerRad = 16.dp.toPx()
+                    val strokeWidth = maxExpand / steps
+                    for (i in 1..steps) {
+                        val expand = maxExpand * (i.toFloat() / steps)
+                        val alpha = baseAlpha * ((steps - i + 1).toFloat() / steps)
+                        drawRoundRect(
+                            color = Color.Black.copy(alpha = alpha),
+                            topLeft = Offset(-expand, -expand),
+                            size = Size(size.width + expand * 2, size.height + expand * 2),
+                            cornerRadius = CornerRadius(cornerRad + expand),
+                            style = Stroke(width = strokeWidth),
+                        )
+                    }
+                }
                 .clip(sidebarContentShape)
                 .border(1.dp, sidebarBorderColor, sidebarContentShape),
         ) {
