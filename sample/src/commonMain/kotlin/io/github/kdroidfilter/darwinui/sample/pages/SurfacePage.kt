@@ -11,71 +11,77 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.components.Card
+import io.github.kdroidfilter.darwinui.components.CardContent
+import io.github.kdroidfilter.darwinui.components.CardHeader
+import io.github.kdroidfilter.darwinui.components.CardTitle
 import io.github.kdroidfilter.darwinui.components.Surface
 import io.github.kdroidfilter.darwinui.components.Text
-import io.github.kdroidfilter.darwinui.gallery.GalleryExample
-import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
+import io.github.kdroidfilter.darwinui.sample.gallery.ComparisonSection
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
-import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
 @OptIn(ExperimentalLayoutApi::class)
-@GalleryExample("Surface", "Variants")
-@Composable
-fun SurfaceVariantsExample() {
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Surface(
-            modifier = Modifier.size(80.dp),
-            color = DarwinTheme.colorScheme.surface,
-        ) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
-                Text("Surface", style = DarwinTheme.typography.labelSmall)
-            }
-        }
-        Surface(
-            modifier = Modifier.size(80.dp),
-            color = DarwinTheme.colorScheme.surfaceVariant,
-            shape = DarwinTheme.shapes.medium,
-        ) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
-                Text("Variant", style = DarwinTheme.typography.labelSmall)
-            }
-        }
-        Surface(
-            modifier = Modifier.size(80.dp),
-            color = DarwinTheme.colorScheme.primaryContainer,
-            shape = DarwinTheme.shapes.large,
-            shadowElevation = 4.dp,
-        ) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
-                Text("Elevated", style = DarwinTheme.typography.labelSmall)
-            }
-        }
-        Surface(
-            modifier = Modifier.size(80.dp),
-            color = DarwinTheme.colorScheme.surface,
-            shape = DarwinTheme.shapes.extraLarge,
-            border = BorderStroke(1.dp, DarwinTheme.colorScheme.outline),
-        ) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
-                Text("Outlined", style = DarwinTheme.typography.labelSmall)
-            }
-        }
-    }
-}
-
 @Composable
 internal fun SurfacePage() {
-    GalleryPage("Surface", "A foundational container component that maps to different color roles and elevations.") {
-        SectionHeader("Examples")
-        ExampleCard(
-            title = "Variants",
-            description = "Surface with different colors, shapes, and elevations",
-            sourceCode = GallerySources.SurfaceVariantsExample,
-        ) { SurfaceVariantsExample() }
+    GalleryPage("Surface", "Compare Darwin Card with Material 3 Surface container component.") {
+        SectionHeader("Container Variants")
+        ComparisonSection(
+            darwinContent = {
+                Card {
+                    CardHeader {
+                        CardTitle { Text("Darwin Card") }
+                    }
+                    CardContent {
+                        Text("A structured container with header, content, and footer sections.")
+                    }
+                }
+            },
+            materialContent = {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Surface(
+                        modifier = Modifier.size(80.dp),
+                        color = DarwinTheme.colorScheme.surface,
+                    ) {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
+                            Text("Surface", style = DarwinTheme.typography.labelSmall)
+                        }
+                    }
+                    Surface(
+                        modifier = Modifier.size(80.dp),
+                        color = DarwinTheme.colorScheme.surfaceVariant,
+                        shape = DarwinTheme.shapes.medium,
+                    ) {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
+                            Text("Variant", style = DarwinTheme.typography.labelSmall)
+                        }
+                    }
+                    Surface(
+                        modifier = Modifier.size(80.dp),
+                        color = DarwinTheme.colorScheme.primaryContainer,
+                        shape = DarwinTheme.shapes.large,
+                        shadowElevation = 4.dp,
+                    ) {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
+                            Text("Elevated", style = DarwinTheme.typography.labelSmall)
+                        }
+                    }
+                    Surface(
+                        modifier = Modifier.size(80.dp),
+                        color = DarwinTheme.colorScheme.surface,
+                        shape = DarwinTheme.shapes.extraLarge,
+                        border = BorderStroke(1.dp, DarwinTheme.colorScheme.outline),
+                    ) {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(8.dp)) {
+                            Text("Outlined", style = DarwinTheme.typography.labelSmall)
+                        }
+                    }
+                }
+            },
+        )
     }
 }

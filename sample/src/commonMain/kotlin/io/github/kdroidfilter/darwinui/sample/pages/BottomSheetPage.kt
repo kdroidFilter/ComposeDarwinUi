@@ -15,55 +15,55 @@ import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.ModalBottomSheet
 import io.github.kdroidfilter.darwinui.components.PrimaryButton
 import io.github.kdroidfilter.darwinui.components.Text
-import io.github.kdroidfilter.darwinui.gallery.GalleryExample
-import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
+import io.github.kdroidfilter.darwinui.sample.gallery.ComparisonSection
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
-import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
-
-@GalleryExample("Bottom Sheet", "Modal")
-@Composable
-fun BottomSheetModalExample() {
-    var showSheet by remember { mutableStateOf(false) }
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        PrimaryButton(
-            text = "Open Bottom Sheet",
-            onClick = { showSheet = true },
-        )
-    }
-
-    if (showSheet) {
-        ModalBottomSheet(onDismissRequest = { showSheet = false }) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Text("Bottom Sheet Title")
-                Text("This is some content inside the modal bottom sheet. You can put any composable content here.")
-                PrimaryButton(
-                    text = "Dismiss",
-                    onClick = { showSheet = false },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-        }
-    }
-}
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
 @Composable
 internal fun BottomSheetPage() {
-    GalleryPage("Bottom Sheet", "A sheet that slides up from the bottom of the screen to present additional content.") {
-        SectionHeader("Examples")
-        ExampleCard(
-            title = "Modal",
-            description = "ModalBottomSheet triggered by a button tap",
-            sourceCode = GallerySources.BottomSheetModalExample,
-        ) { BottomSheetModalExample() }
+    GalleryPage("Bottom Sheet", "A sheet that slides up from the bottom to present additional content.") {
+        SectionHeader("Modal")
+        ComparisonSection(
+            darwinContent = {
+                Text(
+                    "Darwin uses Dialog or Popover for overlay content — no dedicated bottom sheet.",
+                    style = DarwinTheme.typography.bodySmall,
+                    color = DarwinTheme.colors.textTertiary,
+                )
+            },
+            materialContent = {
+                var showSheet by remember { mutableStateOf(false) }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    PrimaryButton(
+                        text = "Open Bottom Sheet",
+                        onClick = { showSheet = true },
+                    )
+                }
+
+                if (showSheet) {
+                    ModalBottomSheet(onDismissRequest = { showSheet = false }) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp, vertical = 16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            Text("Bottom Sheet Title")
+                            Text("This is some content inside the modal bottom sheet.")
+                            PrimaryButton(
+                                text = "Dismiss",
+                                onClick = { showSheet = false },
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
+                    }
+                }
+            },
+        )
     }
 }

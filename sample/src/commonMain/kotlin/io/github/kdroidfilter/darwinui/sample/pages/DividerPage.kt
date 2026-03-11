@@ -13,57 +13,60 @@ import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.HorizontalDivider
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.components.VerticalDivider
-import io.github.kdroidfilter.darwinui.gallery.GalleryExample
-import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
+import io.github.kdroidfilter.darwinui.sample.gallery.ComparisonSection
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
-import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
-
-@GalleryExample("Divider", "Horizontal")
-@Composable
-fun DividerHorizontalExample() {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Text("Section A")
-        HorizontalDivider()
-        Text("Section B")
-        HorizontalDivider()
-        Text("Section C")
-    }
-}
-
-@GalleryExample("Divider", "Vertical")
-@Composable
-fun DividerVerticalExample() {
-    Box(modifier = Modifier.height(48.dp)) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(horizontal = 8.dp),
-        ) {
-            Text("Left", modifier = Modifier.padding(vertical = 12.dp))
-            VerticalDivider()
-            Text("Center", modifier = Modifier.padding(vertical = 12.dp))
-            VerticalDivider()
-            Text("Right", modifier = Modifier.padding(vertical = 12.dp))
-        }
-    }
-}
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
 @Composable
 internal fun DividerPage() {
     GalleryPage("Divider", "Thin lines that group content in lists and layouts.") {
-        SectionHeader("Examples")
-        ExampleCard(
-            title = "Horizontal",
-            description = "Horizontal dividers separating content sections",
-            sourceCode = GallerySources.DividerHorizontalExample,
-        ) { DividerHorizontalExample() }
-        ExampleCard(
-            title = "Vertical",
-            description = "Vertical dividers separating inline content",
-            sourceCode = GallerySources.DividerVerticalExample,
-        ) { DividerVerticalExample() }
+        SectionHeader("Horizontal")
+        ComparisonSection(
+            darwinContent = {
+                Text(
+                    "Darwin uses border or background modifiers for separators.",
+                    style = DarwinTheme.typography.bodySmall,
+                    color = DarwinTheme.colors.textTertiary,
+                )
+            },
+            materialContent = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text("Section A")
+                    HorizontalDivider()
+                    Text("Section B")
+                    HorizontalDivider()
+                    Text("Section C")
+                }
+            },
+        )
+
+        SectionHeader("Vertical")
+        ComparisonSection(
+            darwinContent = {
+                Text(
+                    "No dedicated Darwin divider component.",
+                    style = DarwinTheme.typography.bodySmall,
+                    color = DarwinTheme.colors.textTertiary,
+                )
+            },
+            materialContent = {
+                Box(modifier = Modifier.height(48.dp)) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                    ) {
+                        Text("Left", modifier = Modifier.padding(vertical = 12.dp))
+                        VerticalDivider()
+                        Text("Center", modifier = Modifier.padding(vertical = 12.dp))
+                        VerticalDivider()
+                        Text("Right", modifier = Modifier.padding(vertical = 12.dp))
+                    }
+                }
+            },
+        )
     }
 }
