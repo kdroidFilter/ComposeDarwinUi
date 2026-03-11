@@ -49,6 +49,11 @@ internal fun FabPage() {
                     LargeFloatingActionButton(onClick = {}) { Icon(Lucide.Plus) }
                 }
             },
+            sourceCode = """
+                SmallFloatingActionButton(onClick = {}) { Icon(Lucide.Plus) }
+                FloatingActionButton(onClick = {}) { Icon(Lucide.Plus) }
+                LargeFloatingActionButton(onClick = {}) { Icon(Lucide.Plus) }
+            """.trimIndent(),
         )
 
         SectionHeader("Extended")
@@ -67,6 +72,13 @@ internal fun FabPage() {
                     text = { M3Text("New note") },
                 )
             },
+            sourceCode = """
+                ExtendedFloatingActionButton(
+                    onClick = {},
+                    icon = { Icon(Lucide.Pencil) },
+                    text = { Text("New note") },
+                )
+            """.trimIndent(),
         )
     }
 }

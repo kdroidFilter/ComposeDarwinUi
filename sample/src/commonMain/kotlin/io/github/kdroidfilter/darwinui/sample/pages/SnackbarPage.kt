@@ -61,6 +61,12 @@ internal fun SnackbarPage() {
                     }
                 }
             },
+            sourceCode = """
+                Snackbar { Text("This is a snackbar message") }
+                Snackbar(
+                    action = { TextButton(onClick = {}) { Text("Undo") } },
+                ) { Text("Item deleted") }
+            """.trimIndent(),
         )
 
         SectionHeader("With Host")
@@ -109,6 +115,15 @@ internal fun SnackbarPage() {
                     )
                 }
             },
+            sourceCode = """
+                val hostState = remember { SnackbarHostState() }
+                val scope = rememberCoroutineScope()
+                PrimaryButton(
+                    text = "Show snackbar",
+                    onClick = { scope.launch { hostState.showSnackbar("Hello!") } },
+                )
+                SnackbarHost(hostState = hostState)
+            """.trimIndent(),
         )
     }
 }

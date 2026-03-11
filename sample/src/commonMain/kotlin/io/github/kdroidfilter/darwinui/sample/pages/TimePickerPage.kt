@@ -26,6 +26,10 @@ internal fun TimePickerPage() {
                 val state = rememberTimePickerState(initialHour = 10, initialMinute = 30)
                 TimePicker(state = state)
             },
+            sourceCode = """
+                val state = rememberTimePickerState(initialHour = 10, initialMinute = 30)
+                TimePicker(state = state)
+            """.trimIndent(),
         )
 
         SectionHeader("Input")
@@ -38,6 +42,10 @@ internal fun TimePickerPage() {
                 val state = rememberTimePickerState(initialHour = 10, initialMinute = 30)
                 TimeInput(state = state)
             },
+            sourceCode = """
+                val state = rememberTimePickerState(initialHour = 10, initialMinute = 30)
+                TimeInput(state = state)
+            """.trimIndent(),
         )
     }
 }

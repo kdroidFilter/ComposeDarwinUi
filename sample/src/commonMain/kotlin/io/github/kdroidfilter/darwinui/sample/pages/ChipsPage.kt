@@ -89,6 +89,25 @@ internal fun ChipsPage() {
                     SuggestionChip(onClick = {}, label = { M3Text("Suggestion") })
                 }
             },
+            sourceCode = """
+                AssistChip(onClick = {}, label = { Text("Assist") })
+                AssistChip(
+                    onClick = {},
+                    label = { Text("With icon") },
+                    leadingIcon = { Icon(Lucide.Star) },
+                )
+                FilterChip(
+                    selected = filterSelected,
+                    onClick = { filterSelected = !filterSelected },
+                    label = { Text("Filter") },
+                )
+                InputChip(
+                    selected = inputSelected,
+                    onClick = { inputSelected = !inputSelected },
+                    label = { Text("Input") },
+                )
+                SuggestionChip(onClick = {}, label = { Text("Suggestion") })
+            """.trimIndent(),
         )
 
         SectionHeader("Filter Group")
@@ -127,6 +146,17 @@ internal fun ChipsPage() {
                     }
                 }
             },
+            sourceCode = """
+                val options = listOf("All", "Active", "Paused", "Archived")
+                var selected by remember { mutableStateOf("All") }
+                options.forEach { option ->
+                    FilterChip(
+                        selected = selected == option,
+                        onClick = { selected = option },
+                        label = { Text(option) },
+                    )
+                }
+            """.trimIndent(),
         )
     }
 }

@@ -46,6 +46,17 @@ internal fun BottomAppBarPage() {
                     },
                 )
             },
+            sourceCode = """
+                BottomAppBar(
+                    actions = {
+                        IconButton(onClick = {}) { Icon(Lucide.Menu) }
+                        IconButton(onClick = {}) { Icon(Lucide.Search) }
+                    },
+                    floatingActionButton = {
+                        FloatingActionButton(onClick = {}) { Icon(Lucide.Plus) }
+                    },
+                )
+            """.trimIndent(),
         )
 
         SectionHeader("Actions Only")
@@ -68,6 +79,14 @@ internal fun BottomAppBarPage() {
                     },
                 )
             },
+            sourceCode = """
+                BottomAppBar(
+                    actions = {
+                        IconButton(onClick = {}) { Icon(Lucide.Menu) }
+                        IconButton(onClick = {}) { Icon(Lucide.Search) }
+                    },
+                )
+            """.trimIndent(),
         )
     }
 }

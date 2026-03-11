@@ -61,6 +61,15 @@ internal fun M3ButtonsPage() {
                     FilledTonalButton(onClick = {}) { M3Text("Filled Tonal") }
                 }
             },
+            sourceCode = """
+                PrimaryButton(text = "Primary", onClick = {})
+                SecondaryButton(text = "Secondary", onClick = {})
+                DestructiveButton(text = "Destructive", onClick = {})
+                AccentButton(text = "Accent", onClick = {})
+                OutlineButton(text = "Outline", onClick = {})
+                SubtleButton(text = "Ghost", onClick = {})
+                HyperlinkButton(text = "Link", onClick = {})
+            """.trimIndent(),
         )
 
         SectionHeader("Disabled")
@@ -89,6 +98,11 @@ internal fun M3ButtonsPage() {
                     FilledTonalButton(onClick = {}, enabled = false) { M3Text("Filled Tonal") }
                 }
             },
+            sourceCode = """
+                PrimaryButton(text = "Primary", onClick = {}, enabled = false)
+                SecondaryButton(text = "Secondary", onClick = {}, enabled = false)
+                OutlineButton(text = "Outline", onClick = {}, enabled = false)
+            """.trimIndent(),
         )
 
         SectionHeader("Loading")
@@ -109,6 +123,15 @@ internal fun M3ButtonsPage() {
                     color = io.github.kdroidfilter.darwinui.theme.DarwinTheme.colors.textTertiary,
                 )
             },
+            sourceCode = """
+                PrimaryButton(text = "Loading", onClick = {}, loading = true)
+                PrimaryButton(
+                    text = "Saving...",
+                    onClick = {},
+                    loading = true,
+                    loadingText = "Saving...",
+                )
+            """.trimIndent(),
         )
     }
 }

@@ -99,6 +99,17 @@ internal fun SurfacePage() {
                     }
                 }
             },
+            sourceCode = """
+                Card {
+                    CardHeader { CardTitle { Text("Title") } }
+                    CardContent { Text("Content") }
+                }
+                Surface(
+                    color = DarwinTheme.colorScheme.primaryContainer,
+                    shape = DarwinTheme.shapes.large,
+                    shadowElevation = 4.dp,
+                ) { Text("Elevated") }
+            """.trimIndent(),
         )
     }
 }

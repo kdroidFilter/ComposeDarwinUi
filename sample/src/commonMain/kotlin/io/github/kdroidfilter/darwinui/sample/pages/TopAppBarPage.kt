@@ -54,6 +54,17 @@ internal fun TopAppBarPage() {
                     )
                 }
             },
+            sourceCode = """
+                TopAppBar(
+                    title = { Text("Page Title") },
+                    navigationIcon = {
+                        IconButton(onClick = {}) { Icon(Lucide.ArrowLeft) }
+                    },
+                    actions = {
+                        IconButton(onClick = {}) { Icon(Lucide.EllipsisVertical) }
+                    },
+                )
+            """.trimIndent(),
         )
 
         SectionHeader("Center Aligned")
@@ -84,6 +95,17 @@ internal fun TopAppBarPage() {
                     )
                 }
             },
+            sourceCode = """
+                CenterAlignedTopAppBar(
+                    title = { Text("Centered Title") },
+                    navigationIcon = {
+                        IconButton(onClick = {}) { Icon(Lucide.ArrowLeft) }
+                    },
+                    actions = {
+                        IconButton(onClick = {}) { Icon(Lucide.EllipsisVertical) }
+                    },
+                )
+            """.trimIndent(),
         )
     }
 }

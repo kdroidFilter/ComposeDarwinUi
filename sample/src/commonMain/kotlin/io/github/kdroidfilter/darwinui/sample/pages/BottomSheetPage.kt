@@ -86,6 +86,16 @@ internal fun BottomSheetPage() {
                     }
                 }
             },
+            sourceCode = """
+                var showSheet by remember { mutableStateOf(false) }
+                PrimaryButton(text = "Open Sheet", onClick = { showSheet = true })
+                if (showSheet) {
+                    ModalBottomSheet(onDismissRequest = { showSheet = false }) {
+                        Text("Sheet content")
+                        PrimaryButton(text = "Dismiss", onClick = { showSheet = false })
+                    }
+                }
+            """.trimIndent(),
         )
     }
 }

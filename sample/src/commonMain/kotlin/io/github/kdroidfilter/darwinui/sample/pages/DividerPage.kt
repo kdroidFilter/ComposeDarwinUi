@@ -49,6 +49,11 @@ internal fun DividerPage() {
                     M3Text("Section C")
                 }
             },
+            sourceCode = """
+                Text("Section A")
+                HorizontalDivider()
+                Text("Section B")
+            """.trimIndent(),
         )
 
         SectionHeader("Vertical")
@@ -81,6 +86,13 @@ internal fun DividerPage() {
                     }
                 }
             },
+            sourceCode = """
+                Row {
+                    Text("Left")
+                    VerticalDivider()
+                    Text("Right")
+                }
+            """.trimIndent(),
         )
     }
 }

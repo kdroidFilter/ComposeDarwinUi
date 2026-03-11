@@ -59,6 +59,18 @@ internal fun SegmentedButtonPage() {
                     }
                 }
             },
+            sourceCode = """
+                var selected by remember { mutableStateOf(0) }
+                SingleChoiceSegmentedButtonRow {
+                    options.forEachIndexed { index, label ->
+                        SegmentedButton(
+                            selected = selected == index,
+                            onClick = { selected = index },
+                            shape = SegmentedButtonDefaults.itemShape(index, options.size),
+                        ) { Text(label) }
+                    }
+                }
+            """.trimIndent(),
         )
 
         SectionHeader("Multi Choice")
@@ -91,6 +103,18 @@ internal fun SegmentedButtonPage() {
                     }
                 }
             },
+            sourceCode = """
+                val checked = remember { mutableStateListOf(false, false, false) }
+                MultiChoiceSegmentedButtonRow {
+                    options.forEachIndexed { index, label ->
+                        MultiChoiceSegmentedButton(
+                            checked = checked[index],
+                            onCheckedChange = { checked[index] = it },
+                            shape = SegmentedButtonDefaults.itemShape(index, options.size),
+                        ) { Text(label) }
+                    }
+                }
+            """.trimIndent(),
         )
     }
 }

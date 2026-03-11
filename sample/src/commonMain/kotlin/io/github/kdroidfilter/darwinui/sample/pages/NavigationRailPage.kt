@@ -79,6 +79,23 @@ internal fun NavigationRailPage() {
                     }
                 }
             },
+            sourceCode = """
+                var selected by remember { mutableStateOf(0) }
+                NavigationRail {
+                    NavigationRailItem(
+                        selected = selected == 0,
+                        onClick = { selected = 0 },
+                        icon = { Icon(Lucide.Menu) },
+                        label = { Text("Home") },
+                    )
+                    NavigationRailItem(
+                        selected = selected == 1,
+                        onClick = { selected = 1 },
+                        icon = { Icon(Lucide.Search) },
+                        label = { Text("Search") },
+                    )
+                }
+            """.trimIndent(),
         )
     }
 }

@@ -38,6 +38,11 @@ internal fun IconButtonPage() {
                     OutlinedIconButton(onClick = {}) { Icon(Lucide.Star) }
                 }
             },
+            sourceCode = """
+                PrimaryButton(onClick = {}) { Icon(Lucide.Settings) }
+                SecondaryButton(onClick = {}) { Icon(Lucide.Heart) }
+                OutlineButton(onClick = {}) { Icon(Lucide.Star) }
+            """.trimIndent(),
         )
 
         SectionHeader("Disabled")
@@ -56,6 +61,11 @@ internal fun IconButtonPage() {
                     OutlinedIconButton(onClick = {}, enabled = false) { Icon(Lucide.Star) }
                 }
             },
+            sourceCode = """
+                PrimaryButton(onClick = {}, enabled = false) { Icon(Lucide.Settings) }
+                SecondaryButton(onClick = {}, enabled = false) { Icon(Lucide.Heart) }
+                OutlineButton(onClick = {}, enabled = false) { Icon(Lucide.Star) }
+            """.trimIndent(),
         )
     }
 }

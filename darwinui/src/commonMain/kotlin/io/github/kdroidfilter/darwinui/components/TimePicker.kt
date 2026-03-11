@@ -28,10 +28,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -122,25 +124,26 @@ object TimePickerDefaults {
 // Internal constants
 // =============================================================================
 
-private val ItemHeight = 48.dp
+private val ItemHeight = 40.dp
 private const val VisibleItems = 5
 private const val ScrollListSize = 1000
 
-// Indices for the two "edge" positions relative to center
-private val AlphaByDistance = mapOf(0 to 1f, 1 to 0.65f, 2 to 0.30f)
+// Maximum rotationX angle for items at the edge of the wheel (in degrees)
+private const val MaxRotationX = 60f
 
 // =============================================================================
-// WheelColumn — reusable scroll-wheel column
+// WheelColumn — reusable scroll-wheel column with iOS barrel distortion
 // =============================================================================
 
 /**
- * A single infinite-scroll wheel column.
+ * A single infinite-scroll wheel column with an iOS-style barrel/cylinder effect.
  *
  * @param count          Number of distinct values (e.g. 24 for hours).
  * @param selectedIndex  Currently selected value index (0-based).
  * @param onIndexSelected Callback invoked after scroll snaps to a new index.
  * @param label          Maps a value index to its display string.
  * @param colors         Theme colors for the selection highlight.
+ * @param distortion     Barrel distortion strength: 0f = flat list, 1f = full iOS cylinder effect.
  */
 @Composable
 private fun WheelColumn(
@@ -150,10 +153,13 @@ private fun WheelColumn(
     label: (Int) -> String,
     colors: TimePickerColors,
     modifier: Modifier = Modifier,
+    distortion: Float = 1f,
 ) {
-    // The list is large to simulate infinite scrolling; center it on the initial value.
     val initialFirstVisible = (ScrollListSize / 2) - (ScrollListSize / 2 % count) + selectedIndex - (VisibleItems / 2)
     val listState = rememberLazyListState(initialFirstVisibleItemIndex = initialFirstVisible.coerceAtLeast(0))
+    val density = LocalDensity.current
+    val itemHeightPx = with(density) { ItemHeight.toPx() }
+    val halfVisiblePx = itemHeightPx * VisibleItems / 2f
 
     // Snap to nearest item when scrolling stops
     LaunchedEffect(listState) {
@@ -162,14 +168,14 @@ private fun WheelColumn(
             .filter { !it }
             .collect {
                 val centerIndex = listState.firstVisibleItemIndex + VisibleItems / 2
-                val targetIndex = centerIndex
-                val snappedValue = targetIndex % count
-                listState.animateScrollToItem(targetIndex - VisibleItems / 2)
+                val snappedValue = centerIndex % count
+                listState.animateScrollToItem(centerIndex - VisibleItems / 2)
                 onIndexSelected(snappedValue)
             }
     }
 
     val highlightShape = RoundedCornerShape(10.dp)
+    val clampedDistortion = distortion.coerceIn(0f, 1f)
 
     Box(
         modifier = modifier
@@ -194,23 +200,45 @@ private fun WheelColumn(
         ) {
             items(ScrollListSize) { globalIndex ->
                 val value = globalIndex % count
-                val centerGlobal = listState.firstVisibleItemIndex + VisibleItems / 2
-                val distance = kotlin.math.abs(globalIndex - centerGlobal)
-                val alpha = AlphaByDistance[distance.coerceAtMost(2)] ?: 0.30f
+
+                // Pixel offset of this item's center from the viewport center
+                val scrollOffset = listState.firstVisibleItemScrollOffset.toFloat()
+                val itemTopPx = (globalIndex - listState.firstVisibleItemIndex) * itemHeightPx - scrollOffset
+                val itemCenterPx = itemTopPx + itemHeightPx / 2f
+                // Normalized distance: -1 at top edge, 0 at center, +1 at bottom edge
+                val normalizedOffset = ((itemCenterPx - halfVisiblePx) / halfVisiblePx).coerceIn(-1f, 1f)
+                val absOffset = kotlin.math.abs(normalizedOffset)
+
+                // Barrel transforms, scaled by distortion
+                val rotationX = normalizedOffset * MaxRotationX * clampedDistortion
+                val scale = 1f - absOffset * 0.35f * clampedDistortion
+                val alpha = (1f - absOffset * 0.7f * clampedDistortion).coerceIn(0.1f, 1f)
+                // Compress items toward center to simulate cylinder curvature
+                val translationY = normalizedOffset * absOffset * itemHeightPx * 0.2f * clampedDistortion
+
+                val isCenter = absOffset < 0.3f
 
                 Box(
                     modifier = Modifier
                         .height(ItemHeight)
                         .fillMaxWidth()
-                        .alpha(alpha),
+                        .graphicsLayer {
+                            this.rotationX = -rotationX
+                            this.scaleX = scale
+                            this.scaleY = scale
+                            this.alpha = alpha
+                            this.translationY = translationY
+                            this.cameraDistance = 12f * density.density
+                            this.transformOrigin = TransformOrigin.Center
+                        },
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = label(value),
                         style = TextStyle(
-                            fontSize = 20.sp,
-                            fontWeight = if (distance == 0) FontWeight.SemiBold else FontWeight.Normal,
-                            color = if (distance == 0) colors.timeSelectorContentColor else DarwinTheme.colorScheme.onSurface,
+                            fontSize = 22.sp,
+                            fontWeight = if (isCenter) FontWeight.SemiBold else FontWeight.Normal,
+                            color = if (isCenter) colors.timeSelectorContentColor else DarwinTheme.colorScheme.onSurface,
                             textAlign = TextAlign.Center,
                         ),
                     )
@@ -225,14 +253,13 @@ private fun WheelColumn(
 // =============================================================================
 
 /**
- * iOS-style scroll-wheel time picker.
+ * iOS-style scroll-wheel time picker with barrel distortion effect.
  *
- * When [state.is24hour] is true, the hour column shows 0–23.
- * When false, it shows 1–12 with an additional AM/PM column.
- *
- * [layoutType] is accepted for API parity with M3 but the wheel layout
- * is always rendered in a horizontal row of columns; Vertical vs Horizontal
- * affects the outer container arrangement.
+ * @param state       Time picker state holding the current hour and minute.
+ * @param modifier    Modifier for the outer container.
+ * @param colors      Theme colors for the picker.
+ * @param layoutType  Layout type (accepted for M3 API parity).
+ * @param distortion  Barrel distortion strength: 0f = flat list, 1f = full iOS cylinder effect.
  */
 @Composable
 fun TimePicker(
@@ -240,6 +267,7 @@ fun TimePicker(
     modifier: Modifier = Modifier,
     colors: TimePickerColors = TimePickerDefaults.colors(),
     layoutType: TimePickerLayoutType = TimePickerLayoutType.Vertical,
+    distortion: Float = 1f,
 ) {
     val containerShape = RoundedCornerShape(16.dp)
 
@@ -287,6 +315,7 @@ fun TimePicker(
                 label = hourLabel,
                 colors = colors,
                 modifier = Modifier.width(72.dp),
+                distortion = distortion,
             )
 
             // Separator
@@ -308,6 +337,7 @@ fun TimePicker(
                 label = { it.toString().padStart(2, '0') },
                 colors = colors,
                 modifier = Modifier.width(72.dp),
+                distortion = distortion,
             )
 
             // AM/PM column for 12h mode

@@ -91,6 +91,23 @@ internal fun NavigationBarPage() {
                     }
                 }
             },
+            sourceCode = """
+                var selected by remember { mutableStateOf(0) }
+                NavigationBar {
+                    NavigationBarItem(
+                        selected = selected == 0,
+                        onClick = { selected = 0 },
+                        icon = { Icon(Lucide.House) },
+                        label = { Text("Home") },
+                    )
+                    NavigationBarItem(
+                        selected = selected == 1,
+                        onClick = { selected = 1 },
+                        icon = { Icon(Lucide.Search) },
+                        label = { Text("Search") },
+                    )
+                }
+            """.trimIndent(),
         )
     }
 }

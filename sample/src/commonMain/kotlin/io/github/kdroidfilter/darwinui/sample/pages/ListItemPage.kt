@@ -39,6 +39,11 @@ internal fun ListItemPage() {
                     ListItem(headlineContent = { M3Text("Third item") })
                 }
             },
+            sourceCode = """
+                ListItem(headlineContent = { Text("First item") })
+                HorizontalDivider()
+                ListItem(headlineContent = { Text("Second item") })
+            """.trimIndent(),
         )
 
         SectionHeader("Two Line with Icons")
@@ -77,6 +82,14 @@ internal fun ListItemPage() {
                     )
                 }
             },
+            sourceCode = """
+                ListItem(
+                    headlineContent = { Text("Inbox") },
+                    supportingContent = { Text("3 unread messages") },
+                    leadingContent = { Icon(Lucide.Mail) },
+                    trailingContent = { Icon(Lucide.ChevronRight) },
+                )
+            """.trimIndent(),
         )
     }
 }

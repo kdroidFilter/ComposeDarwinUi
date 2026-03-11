@@ -70,6 +70,19 @@ internal fun RadioButtonPage() {
                     }
                 }
             },
+            sourceCode = """
+                val options = listOf("Option A", "Option B", "Option C")
+                var selected by remember { mutableStateOf("Option A") }
+                options.forEach { option ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = selected == option,
+                            onClick = { selected = option },
+                        )
+                        Text(option)
+                    }
+                }
+            """.trimIndent(),
         )
 
         SectionHeader("Disabled")
@@ -110,6 +123,10 @@ internal fun RadioButtonPage() {
                     }
                 }
             },
+            sourceCode = """
+                RadioButton(selected = true, onClick = {}, enabled = false)
+                RadioButton(selected = false, onClick = {}, enabled = false)
+            """.trimIndent(),
         )
     }
 }
