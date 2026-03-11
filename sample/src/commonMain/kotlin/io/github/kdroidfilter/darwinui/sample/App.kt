@@ -88,6 +88,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.ContextMenuPage
 import io.github.kdroidfilter.darwinui.sample.pages.DateSelectPage
 import io.github.kdroidfilter.darwinui.sample.pages.DialogPage
 import io.github.kdroidfilter.darwinui.sample.pages.DividerPage
+import io.github.kdroidfilter.darwinui.sample.pages.GroupedListPage
 import io.github.kdroidfilter.darwinui.sample.pages.DropdownMenuPage
 import io.github.kdroidfilter.darwinui.sample.pages.FabPage
 import io.github.kdroidfilter.darwinui.sample.pages.IconButtonPage
@@ -132,6 +133,7 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("slider", "Slider", "FORM CONTROLS", Lucide.SlidersHorizontal),
     SidebarEntryDef("dateselect", "Date Select", "FORM CONTROLS", Lucide.Calendar),
     SidebarEntryDef("upload", "Upload", "FORM CONTROLS", Lucide.Upload),
+    SidebarEntryDef("groupedlist", "Grouped List", "DATA DISPLAY", Lucide.ListChecks),
     SidebarEntryDef("badge", "Badge", "DATA DISPLAY", Lucide.Tag),
     SidebarEntryDef("avatar", "Avatar", "DATA DISPLAY", Lucide.CircleUser),
     SidebarEntryDef("card", "Card", "DATA DISPLAY", Lucide.CreditCard),
@@ -276,6 +278,7 @@ fun App() {
                         "slider" -> SliderPage()
                         "upload" -> UploadPage()
                         "dateselect" -> DateSelectPage()
+                        "groupedlist" -> GroupedListPage()
                         "badge" -> BadgePage()
                         "avatar" -> AvatarPage()
                         "card" -> CardPage()
