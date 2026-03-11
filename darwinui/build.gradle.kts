@@ -94,7 +94,7 @@ kotlin {
             implementation(libs.compose.ui)
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.components.resources)
-            implementation(libs.kotlinx.datetime)
+            api(libs.kotlinx.datetime)
         }
     }
 }

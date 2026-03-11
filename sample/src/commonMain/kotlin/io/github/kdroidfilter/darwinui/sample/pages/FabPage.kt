@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.runtime.Composable
@@ -12,33 +11,32 @@ import androidx.compose.ui.unit.dp
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Pencil
 import com.composables.icons.lucide.Plus
-import io.github.kdroidfilter.darwinui.components.PrimaryButton
+import io.github.kdroidfilter.darwinui.components.ExtendedFloatingActionButton as DarwinExtendedFAB
+import io.github.kdroidfilter.darwinui.components.FloatingActionButton as DarwinFAB
+import io.github.kdroidfilter.darwinui.components.LargeFloatingActionButton as DarwinLargeFAB
+import io.github.kdroidfilter.darwinui.components.SmallFloatingActionButton as DarwinSmallFAB
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.sample.gallery.ComparisonSection
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
-import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import androidx.compose.material3.FloatingActionButton as M3FAB
 import androidx.compose.material3.Text as M3Text
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun FabPage() {
-    GalleryPage("Floating Action Button", "Darwin PrimaryButton vs Material 3 FloatingActionButton variants.") {
+    GalleryPage("Floating Action Button", "Darwin FAB vs Material 3 FloatingActionButton variants.") {
         SectionHeader("Sizes")
         ComparisonSection(
             darwinContent = {
-                Text(
-                    "Darwin uses PrimaryButton for primary actions — no dedicated FAB.",
-                    style = DarwinTheme.typography.bodySmall,
-                    color = DarwinTheme.colors.textTertiary,
-                )
                 FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    PrimaryButton(onClick = {}) { Icon(Lucide.Plus) }
-                    PrimaryButton(text = "New note", onClick = {}, leftIcon = { Icon(Lucide.Pencil) })
+                    DarwinSmallFAB(onClick = {}) { Icon(Lucide.Plus) }
+                    DarwinFAB(onClick = {}) { Icon(Lucide.Plus) }
+                    DarwinLargeFAB(onClick = {}) { Icon(Lucide.Plus) }
                 }
             },
             materialContent = {
@@ -47,7 +45,7 @@ internal fun FabPage() {
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     SmallFloatingActionButton(onClick = {}) { Icon(Lucide.Plus) }
-                    FloatingActionButton(onClick = {}) { Icon(Lucide.Plus) }
+                    M3FAB(onClick = {}) { Icon(Lucide.Plus) }
                     LargeFloatingActionButton(onClick = {}) { Icon(Lucide.Plus) }
                 }
             },
@@ -56,10 +54,10 @@ internal fun FabPage() {
         SectionHeader("Extended")
         ComparisonSection(
             darwinContent = {
-                PrimaryButton(
-                    text = "New note",
+                DarwinExtendedFAB(
                     onClick = {},
-                    leftIcon = { Icon(Lucide.Pencil) },
+                    icon = { Icon(Lucide.Pencil) },
+                    text = { Text("New note") },
                 )
             },
             materialContent = {

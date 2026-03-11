@@ -62,6 +62,10 @@ import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideMoon
 import io.github.kdroidfilter.darwinui.icons.LucideSun
 import io.github.kdroidfilter.darwinui.sample.pages.AccordionPage
+import io.github.kdroidfilter.darwinui.sample.pages.BottomAppBarPage
+import io.github.kdroidfilter.darwinui.sample.pages.NavigationRailPage
+import io.github.kdroidfilter.darwinui.sample.pages.SegmentedButtonPage
+import io.github.kdroidfilter.darwinui.sample.pages.TimePickerPage
 import io.github.kdroidfilter.darwinui.sample.pages.AlertPage
 import io.github.kdroidfilter.darwinui.sample.pages.AvatarPage
 import io.github.kdroidfilter.darwinui.sample.pages.BadgePage
@@ -145,6 +149,10 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("bottomsheet", "Bottom Sheet", "MATERIAL 3", Lucide.PanelLeft),
     SidebarEntryDef("radiobutton", "Radio Button", "MATERIAL 3", Lucide.ListChecks),
     SidebarEntryDef("surface", "Surface", "MATERIAL 3", Lucide.Layers),
+    SidebarEntryDef("navigationrail", "Navigation Rail", "MATERIAL 3", Lucide.PanelLeft),
+    SidebarEntryDef("bottomappbar", "Bottom App Bar", "MATERIAL 3", Lucide.PanelTopOpen),
+    SidebarEntryDef("segmentedbutton", "Segmented Button", "MATERIAL 3", Lucide.Columns3),
+    SidebarEntryDef("timepicker", "Time Picker", "MATERIAL 3", Lucide.Calendar),
 )
 
 @Composable
@@ -276,6 +284,10 @@ fun App() {
                         "bottomsheet" -> BottomSheetPage()
                         "radiobutton" -> RadioButtonPage()
                         "surface" -> SurfacePage()
+                        "navigationrail" -> NavigationRailPage()
+                        "bottomappbar" -> BottomAppBarPage()
+                        "segmentedbutton" -> SegmentedButtonPage()
+                        "timepicker" -> TimePickerPage()
                     }
                     Spacer(modifier = Modifier.height(48.dp))
                 }

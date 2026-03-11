@@ -67,6 +67,14 @@ object IconButtonDefaults {
     ) = IconButtonColors(containerColor, contentColor, disabledContainerColor, disabledContentColor)
 
     @Composable
+    fun filledTonalIconButtonColors(
+        containerColor: Color = DarwinTheme.colorScheme.secondaryContainer,
+        contentColor: Color = DarwinTheme.colorScheme.onSecondaryContainer,
+        disabledContainerColor: Color = containerColor.copy(alpha = 0.12f),
+        disabledContentColor: Color = contentColor.copy(alpha = 0.38f),
+    ) = IconButtonColors(containerColor, contentColor, disabledContainerColor, disabledContentColor)
+
+    @Composable
     fun outlinedIconButtonColors(
         containerColor: Color = Color.Transparent,
         contentColor: Color = DarwinTheme.colorScheme.onSurfaceVariant,
@@ -138,6 +146,49 @@ fun FilledIconButton(
     val containerColor = if (enabled) colors.containerColor else colors.disabledContainerColor
     val contentColor = if (enabled) colors.contentColor else colors.disabledContentColor
     val hoverOverlay = if (isHovered && enabled) Color.White.copy(alpha = 0.08f) else Color.Transparent
+
+    CompositionLocalProvider(LocalDarwinContentColor provides contentColor) {
+        Box(
+            modifier = modifier
+                .size(40.dp)
+                .alpha(if (enabled) 1f else 0.38f)
+                .clip(shape)
+                .background(containerColor, shape)
+                .background(hoverOverlay, shape)
+                .hoverable(interactionSource, enabled)
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    enabled = enabled,
+                    onClickLabel = null,
+                    role = Role.Button,
+                    onClick = onClick,
+                ),
+            contentAlignment = Alignment.Center,
+        ) { content() }
+    }
+}
+
+// ===========================================================================
+// FilledTonalIconButton — mirrors M3's FilledTonalIconButton
+// ===========================================================================
+
+@Composable
+fun FilledTonalIconButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = DarwinTheme.shapes.extraLarge,
+    colors: IconButtonColors = IconButtonDefaults.filledTonalIconButtonColors(),
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    content: @Composable () -> Unit,
+) {
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    val containerColor = if (enabled) colors.containerColor else colors.disabledContainerColor
+    val contentColor = if (enabled) colors.contentColor else colors.disabledContentColor
+    val hoverOverlay = if (isHovered && enabled) {
+        if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.06f)
+    } else Color.Transparent
 
     CompositionLocalProvider(LocalDarwinContentColor provides contentColor) {
         Box(

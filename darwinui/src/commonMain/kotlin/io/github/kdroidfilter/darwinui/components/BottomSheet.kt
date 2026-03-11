@@ -8,17 +8,18 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,11 +34,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
@@ -50,6 +52,7 @@ object BottomSheetDefaults {
     val scrimColor: Color @Composable get() = Color.Black.copy(alpha = 0.32f)
     val TonalElevation: Dp = 2.dp
     val shape: Shape get() = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
+    val SheetMaxWidth: Dp = 640.dp
 
     @Composable
     fun DragHandle(modifier: Modifier = Modifier) {
@@ -71,6 +74,7 @@ object BottomSheetDefaults {
 fun ModalBottomSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
+    sheetMaxWidth: Dp = BottomSheetDefaults.SheetMaxWidth,
     shape: Shape = BottomSheetDefaults.shape,
     containerColor: Color = BottomSheetDefaults.containerColor,
     contentColor: Color = BottomSheetDefaults.contentColor,
@@ -112,14 +116,24 @@ fun ModalBottomSheet(
     // Scrim alpha directly tracks sheet offset for instant feedback
     val scrimAlpha = (1f - offsetY.value).coerceIn(0f, 1f)
 
-    Popup(
-        alignment = Alignment.BottomCenter,
-        onDismissRequest = { animateDismiss() },
-        properties = PopupProperties(focusable = true),
-    ) {
-        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-            val maxHeightPx = with(density) { maxHeight.toPx() }
+    // Use LocalWindowInfo for reliable screen size, independent of layout constraints
+    val windowInfo = LocalWindowInfo.current
+    val screenHeightPx = windowInfo.containerSize.height.toFloat()
+    val sheetMaxHeightDp = with(density) { (screenHeightPx * 0.7f).toDp() }
 
+    val draggableState = rememberDraggableState { delta ->
+        scope.launch {
+            val newOffset = (offsetY.value + delta / sheetHeightPx.coerceAtLeast(1f))
+                .coerceAtLeast(0f)
+            offsetY.snapTo(newOffset)
+        }
+    }
+
+    Dialog(
+        onDismissRequest = { animateDismiss() },
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             // Scrim
             Box(
                 modifier = Modifier
@@ -132,39 +146,28 @@ fun ModalBottomSheet(
                     ),
             )
 
-            // Draggable state for the sheet
-            val draggableState = rememberDraggableState { delta ->
-                scope.launch {
-                    val newOffset = (offsetY.value + delta / sheetHeightPx.coerceAtLeast(1f))
-                        .coerceAtLeast(0f) // Don't allow dragging above fully expanded
-                    offsetY.snapTo(newOffset)
-                }
-            }
-
-            // Sheet content — wraps content, capped at 70% screen height like M3
-            Column(
+            // Sheet container — capped at 70% window height, wraps smaller content
+            Box(
                 modifier = modifier
+                    .align(Alignment.BottomCenter)
+                    .widthIn(max = sheetMaxWidth)
                     .fillMaxWidth()
-                    .wrapContentHeight()
-                    .heightIn(max = maxHeight * 0.7f)
+                    .heightIn(max = sheetMaxHeightDp)
                     .onSizeChanged { size ->
                         sheetHeightPx = size.height.toFloat()
                     }
                     .offset {
                         IntOffset(0, (offsetY.value * sheetHeightPx).roundToInt())
                     }
-                    .align(Alignment.BottomCenter)
                     .clip(shape)
                     .background(containerColor, shape)
                     .draggable(
                         state = draggableState,
                         orientation = Orientation.Vertical,
                         onDragStopped = { velocity ->
-                            // Dismiss if dragged past 40% or flung downward fast
                             if (offsetY.value > 0.4f || velocity > velocityThreshold) {
                                 animateDismiss()
                             } else {
-                                // Snap back to fully expanded
                                 scope.launch {
                                     offsetY.animateTo(
                                         0f,
@@ -177,11 +180,17 @@ fun ModalBottomSheet(
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
-                        onClick = {}, // Prevent scrim click-through
+                        onClick = {},
                     ),
             ) {
-                dragHandle()
-                content()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                ) {
+                    dragHandle()
+                    content()
+                }
             }
         }
     }
