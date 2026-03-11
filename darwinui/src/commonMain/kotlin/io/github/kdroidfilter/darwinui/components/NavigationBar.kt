@@ -2,9 +2,7 @@ package io.github.kdroidfilter.darwinui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -12,12 +10,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -25,7 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
@@ -39,14 +36,13 @@ import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 
 // ===========================================================================
-// NavigationBarItemColors — mirrors M3's NavigationBarItemColors
+// NavigationBarItemColors
 // ===========================================================================
 
 @Immutable
 class NavigationBarItemColors(
     val selectedIconColor: Color,
     val selectedTextColor: Color,
-    val indicatorColor: Color,
     val unselectedIconColor: Color,
     val unselectedTextColor: Color,
     val disabledIconColor: Color,
@@ -54,50 +50,59 @@ class NavigationBarItemColors(
 )
 
 // ===========================================================================
-// NavigationBarItemDefaults — mirrors M3's NavigationBarItemDefaults
+// NavigationBarItemDefaults
 // ===========================================================================
 
 object NavigationBarItemDefaults {
     @Composable
     fun colors(
-        selectedIconColor: Color = DarwinTheme.colorScheme.onSecondaryContainer,
-        selectedTextColor: Color = DarwinTheme.colorScheme.onSurface,
-        indicatorColor: Color = DarwinTheme.colorScheme.secondaryContainer,
-        unselectedIconColor: Color = DarwinTheme.colorScheme.onSurfaceVariant,
-        unselectedTextColor: Color = DarwinTheme.colorScheme.onSurfaceVariant,
-        disabledIconColor: Color = DarwinTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
-        disabledTextColor: Color = DarwinTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
+        selectedIconColor: Color = DarwinTheme.colors.accent,
+        selectedTextColor: Color = DarwinTheme.colors.accent,
+        unselectedIconColor: Color = DarwinTheme.colors.textTertiary,
+        unselectedTextColor: Color = DarwinTheme.colors.textTertiary,
+        disabledIconColor: Color = DarwinTheme.colors.textTertiary.copy(alpha = 0.38f),
+        disabledTextColor: Color = DarwinTheme.colors.textTertiary.copy(alpha = 0.38f),
     ) = NavigationBarItemColors(
-        selectedIconColor, selectedTextColor, indicatorColor,
+        selectedIconColor, selectedTextColor,
         unselectedIconColor, unselectedTextColor,
         disabledIconColor, disabledTextColor,
     )
 }
 
 object NavigationBarDefaults {
-    val containerColor: Color @Composable get() = DarwinTheme.colorScheme.surfaceContainer
-    val contentColor: Color @Composable get() = DarwinTheme.colorScheme.onSurfaceVariant
-    val TonalElevation: Dp = 3.dp
+    val containerColor: Color @Composable get() = DarwinTheme.colors.card
+    val TonalElevation: Dp = 0.dp
 }
 
 // ===========================================================================
-// NavigationBar — mirrors M3's NavigationBar
+// NavigationBar — iOS/macOS-style tab bar
 // ===========================================================================
 
 @Composable
 fun NavigationBar(
     modifier: Modifier = Modifier,
     containerColor: Color = NavigationBarDefaults.containerColor,
-    contentColor: Color = NavigationBarDefaults.contentColor,
+    contentColor: Color = NavigationBarDefaults.containerColor,
     tonalElevation: Dp = NavigationBarDefaults.TonalElevation,
     content: @Composable RowScope.() -> Unit,
 ) {
+    val colors = DarwinTheme.colors
+    val separatorColor = if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.08f)
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(62.dp)
             .background(containerColor)
-            .border(1.dp, DarwinTheme.colorScheme.outlineVariant),
+            .drawBehind {
+                // Top separator line
+                drawLine(
+                    color = separatorColor,
+                    start = Offset(0f, 0f),
+                    end = Offset(size.width, 0f),
+                    strokeWidth = 1.dp.toPx(),
+                )
+            },
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
         content = content,
@@ -105,7 +110,7 @@ fun NavigationBar(
 }
 
 // ===========================================================================
-// NavigationBarItem — mirrors M3's NavigationBarItem
+// NavigationBarItem — iOS-style: accent icon+label, no pill
 // ===========================================================================
 
 @Composable
@@ -139,14 +144,12 @@ fun RowScope.NavigationBarItem(
         label = "navBarTextColor",
     )
 
-    // Single float progress 0→1 drives both width and alpha — matches M3 approach
-    val indicatorProgress by animateFloatAsState(
-        targetValue = if (selected) 1f else 0f,
-        animationSpec = spring(stiffness = 400f, dampingRatio = 1f), // critically damped, no bounce
-        label = "navBarIndicator",
+    // Subtle scale on selected
+    val scale by animateFloatAsState(
+        targetValue = if (selected) 1.08f else 1f,
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+        label = "navBarScale",
     )
-
-    val indicatorShape = DarwinTheme.shapes.extraLarge
 
     Column(
         modifier = modifier
@@ -158,32 +161,22 @@ fun RowScope.NavigationBarItem(
                 role = Role.Tab,
                 onClick = onClick,
             )
-            .padding(vertical = 12.dp),
+            .padding(vertical = 8.dp)
+            .graphicsLayer { scaleX = scale; scaleY = scale },
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(3.dp),
     ) {
         Box(
-            modifier = Modifier
-                .defaultMinSize(minWidth = 64.dp, minHeight = 32.dp),
+            modifier = Modifier.size(24.dp),
             contentAlignment = Alignment.Center,
         ) {
-            // Animated pill indicator: grows from 0 to 64dp, fades in simultaneously
-            Box(
-                modifier = Modifier
-                    .width(64.dp * indicatorProgress)
-                    .height(32.dp)
-                    .graphicsLayer { alpha = indicatorProgress }
-                    .clip(indicatorShape)
-                    .background(colors.indicatorColor, indicatorShape),
-            )
-            Box(modifier = Modifier.size(24.dp)) {
-                CompositionLocalProvider(LocalDarwinContentColor provides iconColor) { icon() }
-            }
+            CompositionLocalProvider(LocalDarwinContentColor provides iconColor) { icon() }
         }
+
         if (label != null && (alwaysShowLabel || selected)) {
             CompositionLocalProvider(
                 LocalDarwinContentColor provides textColor,
-                LocalDarwinTextStyle provides DarwinTheme.typography.labelMedium.copy(color = textColor),
+                LocalDarwinTextStyle provides DarwinTheme.typography.labelSmall.copy(color = textColor),
             ) { label() }
         }
     }
