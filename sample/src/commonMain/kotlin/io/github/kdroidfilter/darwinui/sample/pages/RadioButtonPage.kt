@@ -14,6 +14,7 @@ import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.PreviewContainer
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
+import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 
 @Composable
 private fun RadioButtonPreview() {
@@ -46,7 +47,7 @@ internal fun RadioButtonPage() {
         ExampleCard(
             title = "Basic Usage",
             description = "Selected, unselected, and disabled states",
-            sourceCode = "" 
+            sourceCode = GallerySources.RadioButtonBasicExample,
         ) { RadioButtonBasicExample() }
     }
 }

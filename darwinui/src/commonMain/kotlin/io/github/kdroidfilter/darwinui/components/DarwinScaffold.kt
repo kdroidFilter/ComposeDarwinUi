@@ -128,10 +128,10 @@ fun DarwinScaffold(
 
             // Title bar overlaid at top with frosted glass blur
             val titleBarGlassModifier = Modifier.liquid(titleBarGlassState) {
-                frost = 24.dp
+                frost = 16.dp
                 shape = RectangleShape
                 tint = glassTint
-                saturation = 1.3f
+                saturation = 1.05f
             }
 
             // Provide root liquid state for button-level glass inside title bar

@@ -59,7 +59,6 @@ import com.composables.icons.lucide.TextAlignStart
 import com.composables.icons.lucide.TextCursorInput
 import com.composables.icons.lucide.ToggleLeft
 import com.composables.icons.lucide.TriangleAlert
-import com.composables.icons.lucide.Upload
 import io.github.kdroidfilter.darwinui.components.DarwinScaffold
 import io.github.kdroidfilter.darwinui.components.IconButton
 import io.github.kdroidfilter.darwinui.components.NavigationButtons
@@ -116,7 +115,6 @@ import io.github.kdroidfilter.darwinui.sample.pages.TextAreaPage
 import io.github.kdroidfilter.darwinui.sample.pages.TitleBarPage
 import io.github.kdroidfilter.darwinui.sample.pages.ToastPage
 import io.github.kdroidfilter.darwinui.sample.pages.TooltipPage
-import io.github.kdroidfilter.darwinui.sample.pages.UploadPage
 import io.github.kdroidfilter.darwinui.theme.AccentColor
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
@@ -135,7 +133,6 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("multiselect", "Multi Select", "FORM CONTROLS", Lucide.ListChecks),
     SidebarEntryDef("searchinput", "Search Input", "FORM CONTROLS", Lucide.Search),
     SidebarEntryDef("slider", "Slider", "FORM CONTROLS", Lucide.SlidersHorizontal),
-    SidebarEntryDef("upload", "Upload", "FORM CONTROLS", Lucide.Upload),
     SidebarEntryDef("colorwell", "Color Well", "FORM CONTROLS", Lucide.Scan),
     SidebarEntryDef("groupbox", "Group Box", "DATA DISPLAY", Lucide.SquareDashed),
     SidebarEntryDef("groupedlist", "Grouped List", "DATA DISPLAY", Lucide.ListChecks),
@@ -352,7 +349,6 @@ fun App() {
                         "select" -> SelectPage()
                         "multiselect" -> MultiSelectPage()
                         "slider" -> SliderPage()
-                        "upload" -> UploadPage()
                         "groupbox" -> GroupBoxPage()
                         "groupedlist" -> GroupedListPage()
                         "badge" -> BadgePage()
