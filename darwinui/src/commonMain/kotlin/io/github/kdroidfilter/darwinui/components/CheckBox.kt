@@ -9,10 +9,11 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -27,10 +28,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.TextStyle
@@ -160,26 +158,27 @@ fun Checkbox(
         )
     } else modifier
 
+    val checkboxShape = RoundedCornerShape(4.dp)
     Box(
         contentAlignment = Alignment.Center,
         modifier = toggleModifier
             .alpha(if (enabled) 1f else 0.5f)
             .size(16.dp)
-            .clip(CircleShape)
-            .background(boxBackground, CircleShape)
-            .border(width = 1.dp, color = borderColor, shape = CircleShape),
+            .clip(checkboxShape)
+            .background(boxBackground, checkboxShape)
+            .border(width = 1.dp, color = borderColor, shape = checkboxShape),
     ) {
         if (animationProgress > 0f) {
             Canvas(
                 modifier = Modifier
-                    .size(11.dp)
+                    .fillMaxSize()
                     .graphicsLayer {
                         scaleX = animationProgress
                         scaleY = animationProgress
                         alpha = animationProgress
                     },
             ) {
-                drawCheckmark(colors.checkedCheckmarkColor, animationProgress)
+                drawCheckmark(colors.checkedCheckmarkColor)
             }
         }
     }
@@ -240,19 +239,20 @@ fun TriStateCheckbox(
         )
     } else modifier
 
+    val checkboxShape = RoundedCornerShape(4.dp)
     Box(
         contentAlignment = Alignment.Center,
         modifier = clickModifier
             .alpha(if (enabled) 1f else 0.5f)
             .size(16.dp)
-            .clip(CircleShape)
-            .background(boxBackground, CircleShape)
-            .border(width = 1.dp, color = borderColor, shape = CircleShape),
+            .clip(checkboxShape)
+            .background(boxBackground, checkboxShape)
+            .border(width = 1.dp, color = borderColor, shape = checkboxShape),
     ) {
         if (animationProgress > 0f) {
             Canvas(
                 modifier = Modifier
-                    .size(11.dp)
+                    .fillMaxSize()
                     .graphicsLayer {
                         scaleX = animationProgress
                         scaleY = animationProgress
@@ -260,7 +260,7 @@ fun TriStateCheckbox(
                     },
             ) {
                 if (isIndeterminate) drawIndeterminateDash(colors.checkedCheckmarkColor)
-                else drawCheckmark(colors.checkedCheckmarkColor, animationProgress)
+                else drawCheckmark(colors.checkedCheckmarkColor)
             }
         }
     }
@@ -314,23 +314,58 @@ fun CheckBox(
 // Canvas draw helpers
 // ===========================================================================
 
-private fun DrawScope.drawCheckmark(color: Color, progress: Float) {
-    val w = size.width
-    val h = size.height
-    val startX = w * 0.219f; val startY = h * 0.531f
-    val midX = w * 0.406f; val midY = h * 0.719f
-    val endX = w * 0.781f; val endY = h * 0.281f
-    val strokeWidth = w * (1.8f / 16f)
+private fun DrawScope.drawCheckmark(color: Color) {
+    val sx = size.width / 16f
+    val sy = size.height / 16f
     val path = Path().apply {
-        moveTo(startX, startY)
-        val firstSegmentEnd = (progress * 2f).coerceAtMost(1f)
-        lineTo(startX + (midX - startX) * firstSegmentEnd, startY + (midY - startY) * firstSegmentEnd)
-        if (progress > 0.5f) {
-            val p2 = ((progress - 0.5f) * 2f).coerceAtMost(1f)
-            lineTo(midX + (endX - midX) * p2, midY + (endY - midY) * p2)
-        }
+        moveTo(7.02105f * sx, 12.465f * sy)
+        cubicTo(
+            7.39065f * sx, 12.465f * sy,
+            7.67035f * sx, 12.3248f * sy,
+            7.86015f * sx, 12.0345f * sy,
+        )
+        lineTo(12.4552f * sx, 4.99664f * sy)
+        cubicTo(
+            12.5951f * sx, 4.77639f * sy,
+            12.655f * sx, 4.58618f * sy,
+            12.655f * sx, 4.39596f * sy,
+        )
+        cubicTo(
+            12.655f * sx, 3.8954f * sy,
+            12.2754f * sx, 3.535f * sy,
+            11.756f * sx, 3.535f * sy,
+        )
+        cubicTo(
+            11.4063f * sx, 3.535f * sy,
+            11.1966f * sx, 3.66515f * sy,
+            10.9768f * sx, 3.99552f * sy,
+        )
+        lineTo(6.99108f * sx, 10.3126f * sy)
+        lineTo(4.95327f * sx, 7.75973f * sy)
+        cubicTo(
+            4.75349f * sx, 7.51946f * sy,
+            4.54371f * sx, 7.40934f * sy,
+            4.24403f * sx, 7.40934f * sy,
+        )
+        cubicTo(
+            3.72459f * sx, 7.40934f * sy,
+            3.345f * sx, 7.77975f * sy,
+            3.345f * sx, 8.29032f * sy,
+        )
+        cubicTo(
+            3.345f * sx, 8.51057f * sy,
+            3.41492f * sx, 8.7108f * sy,
+            3.60472f * sx, 8.93104f * sy,
+        )
+        lineTo(6.18195f * sx, 12.0746f * sy)
+        cubicTo(
+            6.40172f * sx, 12.3449f * sy,
+            6.66144f * sx, 12.465f * sy,
+            7.01106f * sx, 12.465f * sy,
+        )
+        close()
     }
-    drawPath(path, color, style = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round))
+    drawPath(path, color)
 }
 
 private fun DrawScope.drawIndeterminateDash(color: Color) {

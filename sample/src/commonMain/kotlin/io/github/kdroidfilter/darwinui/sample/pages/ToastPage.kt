@@ -5,10 +5,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.DestructiveButton
-import io.github.kdroidfilter.darwinui.components.InfoButton
-import io.github.kdroidfilter.darwinui.components.SuccessButton
-import io.github.kdroidfilter.darwinui.components.WarningButton
+import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.ToastState
 import io.github.kdroidfilter.darwinui.components.ToastType
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
@@ -22,25 +19,25 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 @Composable
 fun ToastClickToShowExample(toastState: ToastState) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        InfoButton(
+        PushButton(
             text = "Info Toast",
             onClick = {
                 toastState.show("This is an info message", title = "Info", type = ToastType.Info)
             },
         )
-        SuccessButton(
+        PushButton(
             text = "Success Toast",
             onClick = {
                 toastState.show("Operation completed!", title = "Success", type = ToastType.Success)
             },
         )
-        WarningButton(
+        PushButton(
             text = "Warning Toast",
             onClick = {
                 toastState.show("Proceed with caution", title = "Warning", type = ToastType.Warning)
             },
         )
-        DestructiveButton(
+        PushButton(
             text = "Error Toast",
             onClick = {
                 toastState.show("Something went wrong", title = "Error", type = ToastType.Error)

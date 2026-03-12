@@ -81,6 +81,14 @@ enum class SidebarIconSize(
     val groupHeaderMaxHeight: Dp,
 ) {
     Small(
+        iconDp = 14.dp,
+        itemHeight = 22.dp,
+        hPadding = 6.dp,
+        iconGap = 5.dp,
+        itemSpacing = 0.dp,
+        groupHeaderMaxHeight = 22.dp,
+    ),
+    Medium(
         iconDp = 16.dp,
         itemHeight = 26.dp,
         hPadding = 8.dp,
@@ -88,21 +96,13 @@ enum class SidebarIconSize(
         itemSpacing = 1.dp,
         groupHeaderMaxHeight = 24.dp,
     ),
-    Medium(
-        iconDp = 18.dp,
-        itemHeight = 30.dp,
+    Large(
+        iconDp = 22.dp,
+        itemHeight = 34.dp,
         hPadding = 10.dp,
         iconGap = 8.dp,
         itemSpacing = 2.dp,
-        groupHeaderMaxHeight = 28.dp,
-    ),
-    Large(
-        iconDp = 26.dp,
-        itemHeight = 42.dp,
-        hPadding = 12.dp,
-        iconGap = 10.dp,
-        itemSpacing = 3.dp,
-        groupHeaderMaxHeight = 32.dp,
+        groupHeaderMaxHeight = 30.dp,
     ),
 }
 
@@ -171,15 +171,15 @@ fun Sidebar(
     val hasGroups = remember(items) { items.any { it.group != null } }
     val groupedItems = remember(items) { if (hasGroups) items.groupBy { it.group } else null }
 
-    // Animated width: collapsed=56dp, expanded=272dp (matches macOS sidebar)
+    // Animated width: collapsed=56dp, expanded=240dp (matches macOS Finder sidebar)
     val animatedWidth by animateDpAsState(
-        targetValue = if (collapsed) 56.dp else 272.dp,
+        targetValue = if (collapsed) 56.dp else 240.dp,
         animationSpec = sidebarSpring(),
     )
 
-    // Animated padding: collapsed=6dp, expanded=8dp (macOS-like tight padding)
+    // Animated padding: collapsed=4dp, expanded=6dp (macOS-like tight padding)
     val animatedPadding by animateDpAsState(
-        targetValue = if (collapsed) 6.dp else 8.dp,
+        targetValue = if (collapsed) 4.dp else 6.dp,
         animationSpec = sidebarSpring(),
     )
 
@@ -253,7 +253,7 @@ fun Sidebar(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 6.dp, vertical = 4.dp),
+                    .padding(horizontal = 4.dp, vertical = 2.dp),
                 verticalArrangement = Arrangement.spacedBy(iconSize.itemSpacing),
             ) {
                 if (hasGroups && groupedItems != null) {
@@ -289,7 +289,7 @@ fun Sidebar(
             // ---- Bottom section ----
             if (hasBottomSection) {
                 Column(
-                    modifier = Modifier.padding(top = 8.dp, start = 6.dp, end = 6.dp),
+                    modifier = Modifier.padding(top = 6.dp, start = 4.dp, end = 4.dp),
                     verticalArrangement = Arrangement.spacedBy(iconSize.itemSpacing),
                 ) {
                     if (collapsible) {
@@ -426,7 +426,7 @@ private fun GroupHeader(text: String, isCollapsed: Boolean, sidebarIconSize: Sid
             text = text,
             style = typography.labelSmall,
             color = colors.textTertiary,
-            modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 10.dp, bottom = 2.dp),
+            modifier = Modifier.padding(start = sidebarIconSize.hPadding, end = 8.dp, top = 12.dp, bottom = 2.dp),
         )
     }
 }
@@ -457,12 +457,13 @@ private fun SidebarItemRow(
 
     val interactionSource = remember { MutableInteractionSource() }
 
+    // macOS Finder style: subtle translucent background + accent text/icon when active
     val backgroundColor by animateColorAsState(
-        targetValue = if (active) colors.accent else Color.Transparent,
+        targetValue = if (active) colors.textPrimary.copy(alpha = 0.11f) else Color.Transparent,
         animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
     )
     val contentColor by animateColorAsState(
-        targetValue = if (active) colors.onAccent else colors.textSecondary,
+        targetValue = if (active) colors.accent else colors.textPrimary,
         animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
     )
 
@@ -477,9 +478,9 @@ private fun SidebarItemRow(
     )
 
     // When collapsed: center the icon within 56dp total sidebar width.
-    // Total horizontal insets = animatedPadding(6dp) + scrollColumn padding(6dp) + hPadding.
-    // To center: each side = (56dp - iconDp) / 2, so hPadding = (56dp - iconDp) / 2 - 12dp.
-    val collapsedHPadding = ((56.dp - sidebarIconSize.iconDp) / 2 - 12.dp).coerceAtLeast(0.dp)
+    // Total horizontal insets = animatedPadding(4dp) + scrollColumn padding(4dp) + hPadding.
+    // To center: each side = (56dp - iconDp) / 2, so hPadding = (56dp - iconDp) / 2 - 8dp.
+    val collapsedHPadding = ((56.dp - sidebarIconSize.iconDp) / 2 - 8.dp).coerceAtLeast(0.dp)
     val hPadding = lerp(sidebarIconSize.hPadding, collapsedHPadding, collapseFraction)
     val iconLabelGap = lerp(sidebarIconSize.iconGap, 0.dp, collapseFraction)
     val labelAlpha = 1f - collapseFraction

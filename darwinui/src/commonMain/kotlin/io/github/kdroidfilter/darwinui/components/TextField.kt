@@ -414,7 +414,7 @@ fun TextField(
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = DarwinTheme.shapes.large,
+    shape: Shape = DarwinTheme.shapes.small,
     colors: TextFieldColors = TextFieldDefaults.colors(),
     // Darwin extensions
     size: InputSize = InputSize.Md,
@@ -455,7 +455,7 @@ fun OutlinedTextField(
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = DarwinTheme.shapes.large,
+    shape: Shape = DarwinTheme.shapes.small,
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors(),
     // Darwin extensions
     size: InputSize = InputSize.Md,

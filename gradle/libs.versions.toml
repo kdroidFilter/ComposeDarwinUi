@@ -1,5 +1,6 @@
 [versions]
 agp = "8.11.2"
+liquid = "1.1.1"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
@@ -22,6 +23,7 @@ kotlinx-datetime = "0.6.1"
 ksp = "2.3.1"
 
 [libraries]
+liquid = { module = "io.github.fletchmckee.liquid:liquid", version.ref = "liquid" }
 highlights = { module = "dev.snipme:highlights", version.ref = "highlights" }
 icons-lucide-cmp = { module = "com.composables:icons-lucide-cmp", version.ref = "iconsLucideCmp" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

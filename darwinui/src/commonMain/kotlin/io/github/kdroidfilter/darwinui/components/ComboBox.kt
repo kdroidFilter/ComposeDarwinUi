@@ -13,11 +13,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,6 +50,7 @@ import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.darwinGlass
 
 /**
  * A combo box / select component with index-based selection.
@@ -84,14 +90,9 @@ fun ComboBox(
 
     val selectedLabel = selected?.let { items.getOrNull(it) }
 
-    val borderColor = when {
-        isFocused || expanded -> colors.inputFocusBorder
-        else -> colors.inputBorder
-    }
-
     val backgroundColor = when {
-        isTriggerHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.04f)
-        else -> colors.inputBackground
+        isTriggerHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.08f)
+        else -> if (colors.isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.05f)
     }
 
     val chevronRotation by animateFloatAsState(
@@ -118,17 +119,19 @@ fun ComboBox(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(32.dp)
+                    .height(24.dp)
                     .onGloballyPositioned { coordinates ->
                         triggerWidthPx = coordinates.size.width
                         triggerHeightPx = coordinates.size.height
                     }
-                    .clip(shapes.medium)
+                    .clip(shapes.small)
                     .background(backgroundColor)
-                    .border(
-                        width = if (isFocused || expanded) 2.dp else 1.dp,
-                        color = borderColor,
-                        shape = shapes.medium,
+                    .then(
+                        if (isFocused || expanded) Modifier.border(
+                            width = 2.dp,
+                            color = colors.inputFocusBorder,
+                            shape = shapes.small,
+                        ) else Modifier
                     )
                     .then(
                         if (enabled) {
@@ -182,8 +185,7 @@ fun ComboBox(
                                     }
                                 }
                         } else Modifier
-                    )
-                    .padding(horizontal = 12.dp),
+                    ),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
@@ -193,16 +195,23 @@ fun ComboBox(
                     color = if (selectedLabel != null) colors.textPrimary else colors.textTertiary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).padding(start = 12.dp),
                 )
 
-                Icon(
-                    imageVector = LucideChevronDown,
-                    tint = colors.textTertiary,
+                Box(
                     modifier = Modifier
-                        .padding(start = 8.dp)
-                        .rotate(chevronRotation),
-                )
+                        .fillMaxHeight()
+                        .width(28.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = LucideChevronDown,
+                        tint = colors.textPrimary,
+                        modifier = Modifier
+                            .size(12.dp)
+                            .rotate(chevronRotation),
+                    )
+                }
             }
 
             DropdownPopup(
@@ -212,10 +221,9 @@ fun ComboBox(
                 anchorHeightPx = triggerHeightPx,
                 matchAnchorWidth = false,
                 modifier = Modifier
-                    .clip(shapes.large)
-                    .background(
-                        if (colors.isDark) Color(0xFF171717) else Color.White,
-                        shapes.large,
+                    .darwinGlass(
+                        shape = shapes.large,
+                        fallbackColor = if (colors.isDark) Color(0xFF171717) else Color.White,
                     )
                     .border(
                         1.dp,
@@ -228,8 +236,8 @@ fun ComboBox(
                 Column(
                     modifier = Modifier
                         .verticalScroll(scrollState)
-                        .padding(vertical = 4.dp),
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                        .padding(vertical = 5.dp),
+                    verticalArrangement = Arrangement.spacedBy(0.dp),
                 ) {
                     items.forEachIndexed { index, label ->
                         val isSelected = index == selected
@@ -238,18 +246,17 @@ fun ComboBox(
                         val isItemHovered by itemInteractionSource.collectIsHoveredAsState()
 
                         val itemBackgroundColor = when {
-                            isSelected -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.06f)
+                            isSelected -> colors.accent
                             isHighlighted || isItemHovered ->
-                                if (colors.isDark) Color.White.copy(alpha = 0.05f)
-                                else Color.Black.copy(alpha = 0.035f)
+                                if (colors.isDark) Color.White.copy(alpha = 0.08f)
+                                else Color.Black.copy(alpha = 0.05f)
                             else -> Color.Transparent
                         }
 
-                        Row(
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 4.dp)
-                                .clip(shapes.medium)
+                                .height(24.dp)
                                 .hoverable(itemInteractionSource)
                                 .clickable(
                                     interactionSource = itemInteractionSource,
@@ -257,20 +264,29 @@ fun ComboBox(
                                 ) {
                                     onSelectionChange(index, label)
                                     expanded = false
-                                }
-                                .background(itemBackgroundColor)
-                                .padding(horizontal = 8.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+                                },
                         ) {
+                            if (itemBackgroundColor != Color.Transparent) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(horizontal = 5.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(itemBackgroundColor),
+                                )
+                            }
                             Text(
                                 text = label,
                                 style = typography.bodyMedium,
                                 color = when {
-                                    isSelected -> colors.textPrimary
-                                    else -> if (colors.isDark) Color(0xFFD4D4D8) else Color(0xFF3F3F46)
+                                    isSelected -> colors.onAccent
+                                    else -> colors.textPrimary
                                 },
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(horizontal = 13.dp),
                             )
                         }
                     }

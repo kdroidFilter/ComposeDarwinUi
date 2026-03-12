@@ -3,7 +3,6 @@ package io.github.kdroidfilter.darwinui.components
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -150,13 +149,8 @@ fun TabsList(
     val density = LocalDensity.current
     val isDark = DarwinTheme.colors.isDark
 
-    // Background & border colours
-    val backgroundColor = if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f)
-
-    val borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
-
-    // Indicator colour: bg-black/10 dark:bg-white/10
-    val indicatorColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
+    // Indicator colour: subtle overlay on the selected tab
+    val indicatorColor = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.06f)
 
     // ---- Animated indicator ----
     val targetOffset = state.tabOffsets[state.selectedTab] ?: 0.dp
@@ -187,10 +181,7 @@ fun TabsList(
         Box(
             modifier = modifier
                 .height(size.containerHeight)
-                .background(backgroundColor, shapes.large)
-                .clip(shapes.large)
-                .border(1.dp, borderColor, shapes.large)
-                .padding(4.dp),
+                .clip(shapes.large),
             contentAlignment = Alignment.CenterStart,
         ) {
             // Animated background indicator behind the selected trigger
@@ -203,8 +194,8 @@ fun TabsList(
                                 y = 0,
                             )
                         }
-                        .size(width = indicatorWidth.value.dp, height = size.indicatorHeight)
-                        .background(indicatorColor, shapes.small),
+                        .size(width = indicatorWidth.value.dp, height = size.containerHeight)
+                        .background(indicatorColor, shapes.large),
                 )
             }
 

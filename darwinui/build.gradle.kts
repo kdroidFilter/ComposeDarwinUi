@@ -95,6 +95,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.components.resources)
             api(libs.kotlinx.datetime)
+            implementation(libs.liquid)
         }
     }
 }

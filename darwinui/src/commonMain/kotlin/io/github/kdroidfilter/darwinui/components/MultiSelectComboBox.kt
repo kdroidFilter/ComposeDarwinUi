@@ -1,6 +1,5 @@
 package io.github.kdroidfilter.darwinui.components
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -16,6 +15,8 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -50,9 +51,10 @@ import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideCheck
-import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
+import io.github.kdroidfilter.darwinui.icons.LucideChevronsUpDown
 import io.github.kdroidfilter.darwinui.icons.LucideX
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.darwinGlass
 
 /**
  * A multi-select combo box with index-based selection.
@@ -93,19 +95,12 @@ fun MultiSelectComboBox(
     val isTriggerHovered by interactionSource.collectIsHoveredAsState()
     val focusRequester = remember { FocusRequester() }
 
-    val borderColor = when {
-        isFocused || expanded -> colors.inputFocusBorder
-        else -> colors.inputBorder
-    }
+    val borderColor = colors.inputFocusBorder
 
     val backgroundColor = when {
-        isTriggerHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.04f)
-        else -> colors.inputBackground
+        isTriggerHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.08f)
+        else -> if (colors.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f)
     }
-
-    val chevronRotation by animateFloatAsState(
-        targetValue = if (expanded) 180f else 0f,
-    )
 
     LaunchedEffect(expanded) {
         if (expanded) {
@@ -142,17 +137,16 @@ fun MultiSelectComboBox(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(32.dp)
+                    .height(24.dp)
                     .onGloballyPositioned { coordinates ->
                         triggerWidthPx = coordinates.size.width
                         triggerHeightPx = coordinates.size.height
                     }
-                    .clip(shapes.medium)
+                    .clip(shapes.small)
                     .background(backgroundColor)
-                    .border(
-                        width = if (isFocused || expanded) 2.dp else 1.dp,
-                        color = borderColor,
-                        shape = shapes.medium,
+                    .then(
+                        if (isFocused || expanded) Modifier.border(2.dp, borderColor, shapes.small)
+                        else Modifier
                     )
                     .then(
                         if (enabled) {
@@ -199,8 +193,7 @@ fun MultiSelectComboBox(
                                     }
                                 }
                         } else Modifier
-                    )
-                    .padding(horizontal = 12.dp),
+                    ),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
@@ -210,16 +203,19 @@ fun MultiSelectComboBox(
                     color = if (displayText != null) colors.textPrimary else colors.textTertiary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).padding(start = 12.dp),
                 )
 
-                Icon(
-                    imageVector = LucideChevronDown,
-                    tint = colors.textTertiary,
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .rotate(chevronRotation),
-                )
+                Box(
+                    modifier = Modifier.padding(end = 8.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = LucideChevronsUpDown,
+                        tint = if (colors.isDark) Color.White.copy(alpha = 0.85f) else Color.Black.copy(alpha = 0.85f),
+                        modifier = Modifier.size(12.dp),
+                    )
+                }
             }
 
             DropdownPopup(
@@ -229,10 +225,9 @@ fun MultiSelectComboBox(
                 anchorHeightPx = triggerHeightPx,
                 matchAnchorWidth = false,
                 modifier = Modifier
-                    .clip(shapes.large)
-                    .background(
-                        if (colors.isDark) Color(0xFF171717) else Color.White,
-                        shapes.large,
+                    .darwinGlass(
+                        shape = shapes.large,
+                        fallbackColor = if (colors.isDark) Color(0xFF171717) else Color.White,
                     )
                     .border(
                         1.dp,
@@ -245,8 +240,8 @@ fun MultiSelectComboBox(
                 Column(
                     modifier = Modifier
                         .verticalScroll(scrollState)
-                        .padding(vertical = 4.dp),
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                        .padding(vertical = 5.dp),
+                    verticalArrangement = Arrangement.spacedBy(0.dp),
                 ) {
                     items.forEachIndexed { index, label ->
                         val isSelected = index in selectedIndices
@@ -256,51 +251,51 @@ fun MultiSelectComboBox(
 
                         val itemBackgroundColor = when {
                             isHighlighted || isItemHovered ->
-                                if (colors.isDark) Color.White.copy(alpha = 0.10f)
-                                else Color.Black.copy(alpha = 0.035f)
+                                if (colors.isDark) Color.White.copy(alpha = 0.08f)
+                                else Color.Black.copy(alpha = 0.05f)
                             else -> Color.Transparent
                         }
 
-                        Row(
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 4.dp)
-                                .clip(shapes.medium)
+                                .height(24.dp)
                                 .hoverable(itemInteractionSource)
                                 .clickable(
                                     interactionSource = itemInteractionSource,
                                     indication = null,
                                 ) {
                                     toggleIndex(index)
-                                }
-                                .background(itemBackgroundColor)
-                                .padding(start = 8.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+                                },
                         ) {
-                            Box(
-                                modifier = Modifier.size(16.dp),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                if (isSelected) {
-                                    Icon(
-                                        imageVector = LucideCheck,
-                                        tint = colors.accent,
-                                        modifier = Modifier.size(12.dp),
-                                    )
-                                }
+                            if (itemBackgroundColor != Color.Transparent) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(horizontal = 5.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(itemBackgroundColor),
+                                )
                             }
-
-                            Spacer(modifier = Modifier.width(8.dp))
-
+                            if (isSelected) {
+                                Icon(
+                                    imageVector = LucideCheck,
+                                    tint = colors.accent,
+                                    modifier = Modifier
+                                        .align(Alignment.CenterStart)
+                                        .padding(start = 8.dp)
+                                        .size(12.dp),
+                                )
+                            }
                             Text(
                                 text = label,
                                 style = typography.bodyMedium,
-                                color = when {
-                                    isSelected -> colors.textPrimary
-                                    else -> if (colors.isDark) Color(0xFFD4D4D8) else Color(0xFF3F3F46)
-                                },
+                                color = colors.textPrimary,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier
+                                    .align(Alignment.CenterStart)
+                                    .padding(start = 26.dp, end = 13.dp),
                             )
                         }
                     }

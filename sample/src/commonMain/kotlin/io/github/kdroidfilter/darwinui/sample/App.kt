@@ -53,6 +53,7 @@ import com.composables.icons.lucide.Scan
 import com.composables.icons.lucide.Search
 import com.composables.icons.lucide.SlidersHorizontal
 import com.composables.icons.lucide.SquareCheck
+import com.composables.icons.lucide.SquareDashed
 import com.composables.icons.lucide.Table
 import com.composables.icons.lucide.Tag
 import com.composables.icons.lucide.TextAlignStart
@@ -60,7 +61,8 @@ import com.composables.icons.lucide.TextCursorInput
 import com.composables.icons.lucide.ToggleLeft
 import com.composables.icons.lucide.TriangleAlert
 import com.composables.icons.lucide.Upload
-import io.github.kdroidfilter.darwinui.components.SubtleButton
+import io.github.kdroidfilter.darwinui.components.IconButton
+import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.SearchField
 import io.github.kdroidfilter.darwinui.components.Sidebar
 import io.github.kdroidfilter.darwinui.components.SidebarIconSize
@@ -76,6 +78,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.BottomAppBarPage
 import io.github.kdroidfilter.darwinui.sample.pages.NavigationRailPage
 import io.github.kdroidfilter.darwinui.sample.pages.SegmentedControlPage
 import io.github.kdroidfilter.darwinui.sample.pages.TimePickerPage
+import io.github.kdroidfilter.darwinui.sample.pages.IconButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.AlertPage
 import io.github.kdroidfilter.darwinui.sample.pages.AvatarPage
 import io.github.kdroidfilter.darwinui.sample.pages.BadgePage
@@ -88,10 +91,9 @@ import io.github.kdroidfilter.darwinui.sample.pages.ContextMenuPage
 import io.github.kdroidfilter.darwinui.sample.pages.DateSelectPage
 import io.github.kdroidfilter.darwinui.sample.pages.DialogPage
 import io.github.kdroidfilter.darwinui.sample.pages.DividerPage
+import io.github.kdroidfilter.darwinui.sample.pages.GroupBoxPage
 import io.github.kdroidfilter.darwinui.sample.pages.GroupedListPage
 import io.github.kdroidfilter.darwinui.sample.pages.DropdownMenuPage
-import io.github.kdroidfilter.darwinui.sample.pages.FabPage
-import io.github.kdroidfilter.darwinui.sample.pages.IconButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.InputPage
 import io.github.kdroidfilter.darwinui.sample.pages.ListItemPage
 import io.github.kdroidfilter.darwinui.sample.pages.M3ButtonsPage
@@ -114,6 +116,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.TextAreaPage
 import io.github.kdroidfilter.darwinui.sample.pages.ToastPage
 import io.github.kdroidfilter.darwinui.sample.pages.TopAppBarPage
 import io.github.kdroidfilter.darwinui.sample.pages.TooltipPage
+import io.github.kdroidfilter.darwinui.sample.pages.ColorWellPage
 import io.github.kdroidfilter.darwinui.sample.pages.UploadPage
 import io.github.kdroidfilter.darwinui.theme.AccentColor
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
@@ -123,6 +126,7 @@ private data class SidebarEntryDef(val id: String, val label: String, val group:
 
 private val sidebarEntryDefs = listOf(
     SidebarEntryDef("button", "Button", "FORM CONTROLS", Lucide.MousePointerClick),
+    SidebarEntryDef("iconbutton", "Icon Button", "FORM CONTROLS", Lucide.CircleUser),
     SidebarEntryDef("input", "Input", "FORM CONTROLS", Lucide.TextCursorInput),
     SidebarEntryDef("textarea", "Textarea", "FORM CONTROLS", Lucide.TextAlignStart),
     SidebarEntryDef("checkbox", "Checkbox", "FORM CONTROLS", Lucide.SquareCheck),
@@ -133,6 +137,8 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("slider", "Slider", "FORM CONTROLS", Lucide.SlidersHorizontal),
     SidebarEntryDef("dateselect", "Date Select", "FORM CONTROLS", Lucide.Calendar),
     SidebarEntryDef("upload", "Upload", "FORM CONTROLS", Lucide.Upload),
+    SidebarEntryDef("colorwell", "Color Well", "FORM CONTROLS", Lucide.Scan),
+    SidebarEntryDef("groupbox", "Group Box", "DATA DISPLAY", Lucide.SquareDashed),
     SidebarEntryDef("groupedlist", "Grouped List", "DATA DISPLAY", Lucide.ListChecks),
     SidebarEntryDef("badge", "Badge", "DATA DISPLAY", Lucide.Tag),
     SidebarEntryDef("avatar", "Avatar", "DATA DISPLAY", Lucide.CircleUser),
@@ -151,8 +157,6 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("accordion", "Accordion", "NAVIGATION", Lucide.ChevronsUpDown),
     SidebarEntryDef("sidebar", "Sidebar", "NAVIGATION", Lucide.PanelLeft),
     SidebarEntryDef("m3buttons", "M3 Buttons", "MATERIAL 3", Lucide.MousePointerClick),
-    SidebarEntryDef("iconbutton", "Icon Button", "MATERIAL 3", Lucide.SquareCheck),
-    SidebarEntryDef("fab", "FAB", "MATERIAL 3", Lucide.Layers),
     SidebarEntryDef("topappbar", "Top App Bar", "MATERIAL 3", Lucide.PanelTopOpen),
     SidebarEntryDef("navigationbar", "Navigation Bar", "MATERIAL 3", Lucide.Menu),
     SidebarEntryDef("chips", "Chips", "MATERIAL 3", Lucide.Tag),
@@ -225,10 +229,8 @@ fun App() {
                                                 color = DarwinTheme.colors.textTertiary,
                                             )
                                         }
-                                        SubtleButton(
-                                            onClick = { isDark = !isDark },
-                                        ) {
-                                            Icon(if (isDark) LucideSun else LucideMoon)
+                                        IconButton(onClick = { isDark = !isDark }) {
+                                            Icon(if (isDark) LucideSun else LucideMoon, modifier = Modifier.size(14.dp))
                                         }
                                     }
                                     SearchField(
@@ -269,6 +271,7 @@ fun App() {
                 ) {
                     when (selectedPage) {
                         "button" -> ButtonPage()
+                        "iconbutton" -> IconButtonPage()
                         "input" -> InputPage()
                         "searchinput" -> SearchInputPage()
                         "textarea" -> TextAreaPage()
@@ -279,6 +282,7 @@ fun App() {
                         "slider" -> SliderPage()
                         "upload" -> UploadPage()
                         "dateselect" -> DateSelectPage()
+                        "groupbox" -> GroupBoxPage()
                         "groupedlist" -> GroupedListPage()
                         "badge" -> BadgePage()
                         "avatar" -> AvatarPage()
@@ -297,8 +301,6 @@ fun App() {
                         "accordion" -> AccordionPage()
                         "sidebar" -> SidebarPage()
                         "m3buttons" -> M3ButtonsPage()
-                        "iconbutton" -> IconButtonPage()
-                        "fab" -> FabPage()
                         "topappbar" -> TopAppBarPage()
                         "navigationbar" -> NavigationBarPage()
                         "chips" -> ChipsPage()
@@ -312,6 +314,7 @@ fun App() {
                         "bottomappbar" -> BottomAppBarPage()
                         "segmentedcontrol" -> SegmentedControlPage()
                         "timepicker" -> TimePickerPage()
+                        "colorwell" -> ColorWellPage()
                     }
                     Spacer(modifier = Modifier.height(48.dp))
                 }

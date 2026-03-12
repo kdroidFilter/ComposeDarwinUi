@@ -9,7 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -38,7 +38,6 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -47,24 +46,19 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.LucideCheck
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
 import io.github.kdroidfilter.darwinui.theme.Red500
-import io.github.kdroidfilter.darwinui.theme.Zinc100
-import io.github.kdroidfilter.darwinui.theme.Zinc300
-import io.github.kdroidfilter.darwinui.theme.Zinc400
-import io.github.kdroidfilter.darwinui.theme.Zinc500
-import io.github.kdroidfilter.darwinui.theme.Zinc700
-import io.github.kdroidfilter.darwinui.theme.Zinc900
+import io.github.kdroidfilter.darwinui.theme.darwinGlass
 
 // CompositionLocal to allow items to auto-close the menu
 internal val LocalContextMenuClose = staticCompositionLocalOf<() -> Unit> { {} }
@@ -76,21 +70,14 @@ fun ContextMenu(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = DarwinTheme.colors
-    val shapes = DarwinTheme.shapes
 
     var isOpen by remember { mutableStateOf(false) }
     var clickOffset by remember { mutableStateOf(IntOffset.Zero) }
 
-    // bg-white/95 dark:bg-zinc-900/95
-    val bgColor = if (colors.isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
-
-    // border-black/10 dark:border-white/10
-    val borderColor = if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
-
-    val shape = shapes.large // rounded-xl = 12dp
+    val fallbackBg = if (colors.isDark) Color(0xFF262626) else Color(0xFFF5F5F5)
+    val menuShape = RoundedCornerShape(13.dp)
 
     Box(modifier = modifier) {
-        // Trigger with right-click detection
         Box(
             modifier = Modifier.pointerInput(Unit) {
                 awaitPointerEventScope {
@@ -123,7 +110,7 @@ fun ContextMenu(
                     enter = fadeIn(animationSpec = tween(150)) +
                             scaleIn(
                                 initialScale = 0.95f,
-                                transformOrigin = TransformOrigin(0f, 0f), // top-left
+                                transformOrigin = TransformOrigin(0f, 0f),
                                 animationSpec = tween(150),
                             ),
                     exit = fadeOut(animationSpec = tween(100)) +
@@ -139,12 +126,15 @@ fun ContextMenu(
                         Column(
                             modifier = Modifier
                                 .width(IntrinsicSize.Max)
-                                .widthIn(min = 180.dp) // min-w-45 = 180dp
-                                .shadow(elevation = 8.dp, shape = shape)
-                                .clip(shape)
-                                .background(bgColor, shape)
-                                .border(1.dp, borderColor, shape)
-                                .padding(vertical = 4.dp), // p-1 vertical only (separator extends full width)
+                                .widthIn(min = 200.dp)
+                                .shadow(
+                                    elevation = 25.dp,
+                                    shape = menuShape,
+                                    ambientColor = Color.Black.copy(alpha = 0.16f),
+                                    spotColor = Color.Black.copy(alpha = 0.16f),
+                                )
+                                .darwinGlass(shape = menuShape, fallbackColor = fallbackBg)
+                                .padding(vertical = 5.dp),
                             content = content,
                         )
                     }
@@ -164,44 +154,51 @@ fun ContextMenuItem(
     enabled: Boolean = true,
     destructive: Boolean = false,
     modifier: Modifier = Modifier,
+    leadingContent: (@Composable () -> Unit)? = null,
     trailingContent: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     val colors = DarwinTheme.colors
-    val typography = DarwinTheme.typography
     val closeMenu = LocalContextMenuClose.current
+    val accentColor = colors.accent
 
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHighlighted = isHovered || isPressed
 
-    // hover:bg-black/10 dark:hover:bg-white/10
-    // destructive: hover:bg-red-500/10
     val itemBg = when {
         !enabled -> Color.Transparent
-        destructive && isHighlighted -> Red500.copy(alpha = 0.10f)
-        isHighlighted -> if (colors.isDark) Color.White.copy(alpha = 0.10f)
-        else Color.Black.copy(alpha = 0.10f)
+        destructive && isHighlighted -> Red500
+        isHighlighted -> accentColor
         else -> Color.Transparent
     }
 
-    // text-zinc-700 dark:text-zinc-300
-    // hover:text-zinc-900 dark:hover:text-zinc-100
-    // destructive: text-red-500 (always)
     val textColor = when {
+        isHighlighted -> Color.White
         destructive -> Red500
-        isHighlighted -> if (colors.isDark) Zinc100 else Zinc900
-        else -> if (colors.isDark) Zinc300 else Zinc700
+        else -> if (colors.isDark) Color.White.copy(alpha = 0.85f)
+        else Color(0xFF1A1A1A)
     }
 
-    val contentStyle = typography.bodyMedium.merge(TextStyle(color = textColor)) // text-sm
+    val disabledTextColor = if (colors.isDark) Color.White.copy(alpha = 0.35f)
+    else Color(0xFFBFBFBF)
+
+    val effectiveTextColor = if (enabled) textColor else disabledTextColor
+
+    val itemShape = RoundedCornerShape(12.dp)
+    val contentStyle = TextStyle(
+        fontSize = 13.sp,
+        color = effectiveTextColor,
+        letterSpacing = 0.sp,
+    )
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 4.dp) // container p-1 horizontal
-            .clip(DarwinTheme.shapes.small) // rounded-lg = 8dp
+            .padding(horizontal = 5.dp)
+            .height(24.dp)
+            .clip(itemShape)
             .then(
                 if (enabled) {
                     Modifier
@@ -219,19 +216,34 @@ fun ContextMenuItem(
                 }
             )
             .background(itemBg)
-            .padding(horizontal = 8.dp, vertical = 6.dp) // px-2 py-1.5
-            .alpha(if (enabled) 1f else 0.5f),
+            .padding(
+                start = if (leadingContent != null) 8.dp else 12.dp,
+                end = 12.dp,
+            ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(modifier = Modifier.weight(1f)) {
-            CompositionLocalProvider(LocalDarwinTextStyle provides contentStyle) {
+        CompositionLocalProvider(
+            LocalDarwinTextStyle provides contentStyle,
+            LocalDarwinContentColor provides effectiveTextColor,
+        ) {
+            if (leadingContent != null) {
+                Box(
+                    modifier = Modifier.size(12.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    leadingContent()
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+
+            Box(modifier = Modifier.weight(1f)) {
                 content()
             }
-        }
 
-        if (trailingContent != null) {
-            Spacer(modifier = Modifier.width(8.dp))
-            trailingContent()
+            if (trailingContent != null) {
+                Spacer(modifier = Modifier.width(8.dp))
+                trailingContent()
+            }
         }
     }
 }
@@ -249,8 +261,8 @@ fun ContextMenuCheckboxItem(
     content: @Composable () -> Unit,
 ) {
     val colors = DarwinTheme.colors
-    val typography = DarwinTheme.typography
     val closeMenu = LocalContextMenuClose.current
+    val accentColor = colors.accent
 
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -259,23 +271,34 @@ fun ContextMenuCheckboxItem(
 
     val itemBg = when {
         !enabled -> Color.Transparent
-        isHighlighted -> if (colors.isDark) Color.White.copy(alpha = 0.10f)
-        else Color.Black.copy(alpha = 0.10f)
+        isHighlighted -> accentColor
         else -> Color.Transparent
     }
 
     val textColor = when {
-        isHighlighted -> if (colors.isDark) Zinc100 else Zinc900
-        else -> if (colors.isDark) Zinc300 else Zinc700
+        isHighlighted -> Color.White
+        else -> if (colors.isDark) Color.White.copy(alpha = 0.85f)
+        else Color(0xFF1A1A1A)
     }
 
-    val contentStyle = typography.bodyMedium.merge(TextStyle(color = textColor))
+    val disabledTextColor = if (colors.isDark) Color.White.copy(alpha = 0.35f)
+    else Color(0xFFBFBFBF)
+
+    val effectiveTextColor = if (enabled) textColor else disabledTextColor
+
+    val itemShape = RoundedCornerShape(12.dp)
+    val contentStyle = TextStyle(
+        fontSize = 13.sp,
+        color = effectiveTextColor,
+        letterSpacing = 0.sp,
+    )
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 4.dp)
-            .clip(DarwinTheme.shapes.small) // rounded-lg = 8dp
+            .padding(horizontal = 5.dp)
+            .height(24.dp)
+            .clip(itemShape)
             .then(
                 if (enabled) {
                     Modifier
@@ -290,29 +313,29 @@ fun ContextMenuCheckboxItem(
                 }
             )
             .background(itemBg)
-            .padding(horizontal = 8.dp, vertical = 6.dp) // px-2 py-1.5
-            .alpha(if (enabled) 1f else 0.5f),
+            .padding(horizontal = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Check indicator: mr-2 h-4 w-4
         Box(
-            modifier = Modifier.size(16.dp), // h-4 w-4
+            modifier = Modifier.size(16.dp),
             contentAlignment = Alignment.Center,
         ) {
             if (checked) {
-                // h-3 w-3 check icon
                 androidx.compose.foundation.Image(
                     imageVector = LucideCheck,
                     contentDescription = null,
-                    modifier = Modifier.size(12.dp), // h-3 w-3
-                    colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(textColor),
+                    modifier = Modifier.size(12.dp),
+                    colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(effectiveTextColor),
                 )
             }
         }
-        Spacer(modifier = Modifier.width(8.dp)) // mr-2
+        Spacer(modifier = Modifier.width(8.dp))
 
         Box(modifier = Modifier.weight(1f)) {
-            CompositionLocalProvider(LocalDarwinTextStyle provides contentStyle) {
+            CompositionLocalProvider(
+                LocalDarwinTextStyle provides contentStyle,
+                LocalDarwinContentColor provides effectiveTextColor,
+            ) {
                 content()
             }
         }
@@ -329,23 +352,24 @@ fun ContextMenuLabel(
     modifier: Modifier = Modifier,
 ) {
     val colors = DarwinTheme.colors
-    val typography = DarwinTheme.typography
 
-    // text-zinc-500 dark:text-zinc-400
-    val labelColor = if (colors.isDark) Zinc400 else Zinc500
+    val labelColor = if (colors.isDark) Color.White.copy(alpha = 0.45f)
+    else Color(0xFF727272)
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 6.dp), // px-2 + 4dp container = 12dp, py-1.5 = 6dp
+            .padding(horizontal = 5.dp)
+            .height(24.dp)
+            .padding(horizontal = 12.dp),
+        contentAlignment = Alignment.CenterStart,
     ) {
         BasicText(
             text = text,
-            style = typography.labelSmall.merge(
-                TextStyle(
-                    color = labelColor,
-                    fontWeight = FontWeight.SemiBold, // font-semibold
-                )
+            style = TextStyle(
+                fontSize = 13.sp,
+                color = labelColor,
+                letterSpacing = 0.sp,
             ),
         )
     }
@@ -359,15 +383,15 @@ fun ContextMenuLabel(
 fun ContextMenuSeparator(modifier: Modifier = Modifier) {
     val colors = DarwinTheme.colors
 
-    // bg-black/10 dark:bg-white/10
-    val separatorColor = if (colors.isDark) Color.White.copy(alpha = 0.10f)
-    else Color.Black.copy(alpha = 0.10f)
+    val separatorColor = if (colors.isDark) Color.White.copy(alpha = 0.08f)
+    else Color(0xFFE6E6E6)
 
     Spacer(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp) // my-1 = 4dp
-            .height(1.dp) // h-px
+            .padding(horizontal = 11.dp)
+            .padding(vertical = 5.dp)
+            .height(1.dp)
             .background(separatorColor),
     )
 }
@@ -381,19 +405,14 @@ fun ContextMenuShortcut(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    val colors = DarwinTheme.colors
-    val typography = DarwinTheme.typography
-
-    // text-zinc-500 dark:text-zinc-400
-    val shortcutColor = if (colors.isDark) Zinc400 else Zinc500
+    // Inherits the text style (including color) from the parent ContextMenuItem
+    // via LocalDarwinTextStyle, so shortcut color matches the item text color
+    val parentStyle = LocalDarwinTextStyle.current
 
     BasicText(
         text = text,
-        style = typography.labelSmall.merge(
-            TextStyle(
-                color = shortcutColor,
-                letterSpacing = 0.1.em, // tracking-widest
-            )
+        style = parentStyle.merge(
+            TextStyle(letterSpacing = 0.sp)
         ),
         modifier = modifier,
     )

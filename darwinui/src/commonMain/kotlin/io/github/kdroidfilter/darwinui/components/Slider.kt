@@ -4,7 +4,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.hoverable
@@ -17,7 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
@@ -39,8 +38,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.theme.Blue500
+import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import kotlin.math.round
 import kotlin.math.roundToInt
 
@@ -82,10 +82,10 @@ class SliderColors(
 object SliderDefaults {
     @Composable
     fun colors(
-        thumbColor: Color = DarwinTheme.colorScheme.accent,
+        thumbColor: Color = Color.White,
         activeTrackColor: Color = DarwinTheme.colorScheme.accent,
         activeTickColor: Color = DarwinTheme.colorScheme.accent.copy(alpha = 0.5f),
-        inactiveTrackColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(0.10f) else Color.Black.copy(0.10f),
+        inactiveTrackColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(0.10f) else Color.Black.copy(0.05f),
         inactiveTickColor: Color = inactiveTrackColor.copy(alpha = 0.5f),
         disabledThumbColor: Color = thumbColor.copy(0.38f),
         disabledActiveTrackColor: Color = activeTrackColor.copy(0.38f),
@@ -99,11 +99,13 @@ object SliderDefaults {
 // SliderSize — Darwin extension (not in M3)
 // ===========================================================================
 
-enum class SliderSize(val trackHeight: Dp, val thumbSize: Dp) {
-    Sm(trackHeight = 4.dp, thumbSize = 12.dp),
-    Md(trackHeight = 8.dp, thumbSize = 16.dp),
-    Lg(trackHeight = 12.dp, thumbSize = 20.dp),
+enum class SliderSize(val trackHeight: Dp, val thumbWidth: Dp, val thumbHeight: Dp) {
+    Sm(trackHeight = 2.dp, thumbWidth = 16.dp, thumbHeight = 12.dp),
+    Md(trackHeight = 4.dp, thumbWidth = 20.dp, thumbHeight = 16.dp),
+    Lg(trackHeight = 6.dp, thumbWidth = 24.dp, thumbHeight = 20.dp),
 }
+
+private val ThumbShape = RoundedCornerShape(50)
 
 // ===========================================================================
 // Slider — M3-compatible
@@ -142,17 +144,17 @@ fun Slider(
 
     val animatedFraction by animateFloatAsState(
         targetValue = fraction,
-        animationSpec = if (isDragging) tween(0) else tween(100),
+        animationSpec = if (isDragging) tween(0) else darwinSpring(DarwinSpringPreset.Snappy),
     )
 
     val density = LocalDensity.current
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
-    val thumbSizePx = with(density) { sliderSize.thumbSize.toPx() }
+    val thumbWidthPx = with(density) { sliderSize.thumbWidth.toPx() }
 
     val isHovered by interactionSource.collectIsHoveredAsState()
     val thumbScale by animateFloatAsState(
         targetValue = if (isDragging || isHovered) 1.1f else 1f,
-        animationSpec = tween(150),
+        animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
     )
 
     fun valueFromPosition(x: Float): Float {
@@ -168,7 +170,7 @@ fun Slider(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(sliderSize.thumbSize)
+                .height(sliderSize.thumbHeight)
                 .onSizeChanged { containerSize = it }
                 .then(if (enabled) Modifier
                     .pointerInput(min, max, steps) {
@@ -203,7 +205,7 @@ fun Slider(
                 }
             }
 
-            val trackWidthPx = containerSize.width.toFloat() - thumbSizePx
+            val trackWidthPx = containerSize.width.toFloat() - thumbWidthPx
             val thumbOffsetPx = animatedFraction * trackWidthPx
             val thumbOffsetDp = with(density) { thumbOffsetPx.toDp() }
 
@@ -213,13 +215,12 @@ fun Slider(
                 Box(
                     modifier = Modifier
                         .offset(x = thumbOffsetDp)
-                        .size(sliderSize.thumbSize)
+                        .size(width = sliderSize.thumbWidth, height = sliderSize.thumbHeight)
                         .graphicsLayer { scaleX = thumbScale; scaleY = thumbScale }
                         .hoverable(interactionSource)
-                        .shadow(4.dp, CircleShape, clip = false)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                        .border(2.dp, thumbColor.copy(0.5f), CircleShape),
+                        .shadow(2.dp, ThumbShape, clip = false)
+                        .clip(ThumbShape)
+                        .background(thumbColor),
                 )
             }
         }
@@ -269,7 +270,7 @@ fun RangeSlider(
 
     val density = LocalDensity.current
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
-    val thumbSizePx = with(density) { sliderSize.thumbSize.toPx() }
+    val thumbWidthPx = with(density) { sliderSize.thumbWidth.toPx() }
 
     fun valueFromFraction(f: Float): Float = (min + f * (max - min)).coerceIn(min, max)
     fun fractionFromX(x: Float) = (x / containerSize.width.toFloat()).coerceIn(0f, 1f)
@@ -281,7 +282,7 @@ fun RangeSlider(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(sliderSize.thumbSize)
+            .height(sliderSize.thumbHeight)
             .onSizeChanged { containerSize = it }
             .then(if (!enabled) Modifier.graphicsLayer { alpha = 0.5f } else Modifier),
         contentAlignment = Alignment.CenterStart,
@@ -305,7 +306,7 @@ fun RangeSlider(
             }
         }
 
-        val trackWidthPx = containerSize.width.toFloat() - thumbSizePx
+        val trackWidthPx = containerSize.width.toFloat() - thumbWidthPx
 
         // Start thumb
         val startOffsetDp = with(density) { (startFraction * trackWidthPx).toDp() }
@@ -327,11 +328,10 @@ fun RangeSlider(
             Box(
                 modifier = Modifier
                     .offset(x = startOffsetDp)
-                    .size(sliderSize.thumbSize)
-                    .shadow(4.dp, CircleShape, clip = false)
-                    .clip(CircleShape)
-                    .background(Color.White)
-                    .border(2.dp, thumbColor.copy(0.5f), CircleShape),
+                    .size(width = sliderSize.thumbWidth, height = sliderSize.thumbHeight)
+                    .shadow(2.dp, ThumbShape, clip = false)
+                    .clip(ThumbShape)
+                    .background(thumbColor),
             )
         }
 
@@ -343,11 +343,10 @@ fun RangeSlider(
             Box(
                 modifier = Modifier
                     .offset(x = endOffsetDp)
-                    .size(sliderSize.thumbSize)
-                    .shadow(4.dp, CircleShape, clip = false)
-                    .clip(CircleShape)
-                    .background(Color.White)
-                    .border(2.dp, thumbColor.copy(0.5f), CircleShape),
+                    .size(width = sliderSize.thumbWidth, height = sliderSize.thumbHeight)
+                    .shadow(2.dp, ThumbShape, clip = false)
+                    .clip(ThumbShape)
+                    .background(thumbColor),
             )
         }
     }

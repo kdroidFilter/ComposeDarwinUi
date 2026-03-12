@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import io.github.kdroidfilter.darwinui.components.Button
+import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideCheck
@@ -65,6 +65,7 @@ import io.github.kdroidfilter.darwinui.theme.Zinc400
 import io.github.kdroidfilter.darwinui.theme.Zinc500
 import io.github.kdroidfilter.darwinui.theme.Zinc700
 import io.github.kdroidfilter.darwinui.theme.Zinc900
+import io.github.kdroidfilter.darwinui.theme.darwinGlass
 
 // =============================================================================
 // DropdownMenu — main component
@@ -96,7 +97,7 @@ fun DropdownMenu(
     val isDark = colors.isDark
     val shapes = DarwinTheme.shapes
 
-    val backgroundColor = if (isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
+    val fallbackBg = if (isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
     val borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
     if (expanded) {
@@ -129,8 +130,7 @@ fun DropdownMenu(
                         .width(IntrinsicSize.Max)
                         .widthIn(min = 180.dp)
                         .shadow(elevation = 8.dp, shape = shapes.large)
-                        .clip(shapes.large)
-                        .background(backgroundColor, shapes.large)
+                        .darwinGlass(shape = shapes.large, fallbackColor = fallbackBg)
                         .border(1.dp, borderColor, shapes.large)
                         .heightIn(max = 360.dp)
                         .verticalScroll(scrollState)
@@ -380,7 +380,7 @@ private fun DropdownMenuPreview() {
     DarwinTheme {
         var expanded by remember { mutableStateOf(false) }
         Box {
-            Button(onClick = { expanded = !expanded }) { Text("Menu") }
+            PushButton(onClick = { expanded = !expanded }) { Text("Menu") }
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },

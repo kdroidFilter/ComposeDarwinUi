@@ -5,14 +5,13 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.PrimaryButton
-import io.github.kdroidfilter.darwinui.components.SubtleButton
 import io.github.kdroidfilter.darwinui.components.Card
 import io.github.kdroidfilter.darwinui.components.CardContent
 import io.github.kdroidfilter.darwinui.components.CardDescription
 import io.github.kdroidfilter.darwinui.components.CardFooter
 import io.github.kdroidfilter.darwinui.components.CardHeader
 import io.github.kdroidfilter.darwinui.components.CardTitle
+import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
@@ -39,8 +38,8 @@ fun CardDefaultExample() {
             )
         }
         CardFooter {
-            PrimaryButton(text = "Action", onClick = {})
-            SubtleButton(text = "Cancel", onClick = {})
+            PushButton(text = "Action", onClick = {})
+            PushButton(text = "Cancel", onClick = {})
         }
     }
 }
@@ -57,7 +56,7 @@ internal fun CardPage() {
         CardDescription { Text("Description") }
     }
     CardContent { Text("Content") }
-    CardFooter { PrimaryButton(text = "Action", onClick = {}) }
+    CardFooter { PushButton(text = "Action", onClick = {}) }
 }""")
 
         SectionHeader("Examples")

@@ -4,8 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.OutlineButton
-import io.github.kdroidfilter.darwinui.components.SecondaryButton
+import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.Tooltip
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
@@ -17,9 +16,9 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 @Composable
 fun TooltipDefaultExample() {
     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-        Tooltip(text = "This is a tooltip!") { OutlineButton(text = "Hover me", onClick = {}) }
+        Tooltip(text = "This is a tooltip!") { PushButton(text = "Hover me", onClick = {}) }
         Tooltip(text = "Another tooltip with more info") {
-            SecondaryButton(text = "More info", onClick = {})
+            PushButton(text = "More info", onClick = {})
         }
     }
 }

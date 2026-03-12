@@ -2,70 +2,69 @@ package io.github.kdroidfilter.darwinui.sample.pages
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedIconButton
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.composables.icons.lucide.Heart
-import com.composables.icons.lucide.Lucide
-import com.composables.icons.lucide.Settings
-import com.composables.icons.lucide.Star
-import io.github.kdroidfilter.darwinui.components.OutlineButton
-import io.github.kdroidfilter.darwinui.components.PrimaryButton
-import io.github.kdroidfilter.darwinui.components.SecondaryButton
+import io.github.kdroidfilter.darwinui.components.HelpButton
+import io.github.kdroidfilter.darwinui.components.IconButton
+import io.github.kdroidfilter.darwinui.components.PushButton
+import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.sample.gallery.ComparisonSection
+import io.github.kdroidfilter.darwinui.icons.LucideSettings
+import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
+import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
+
+@GalleryExample("IconButton", "Help")
+@Composable
+fun IconButtonHelpExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        PushButton(text = "Avancé...", onClick = {})
+        HelpButton(onClick = {})
+    }
+}
+
+@GalleryExample("IconButton", "Icon")
+@Composable
+fun IconButtonIconExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconButton(onClick = {}) {
+            Icon(
+                imageVector = LucideSettings,
+                modifier = Modifier.size(14.dp),
+            )
+        }
+        IconButton(onClick = {}, enabled = false) {
+            Icon(
+                imageVector = LucideSettings,
+                modifier = Modifier.size(14.dp),
+            )
+        }
+    }
+}
 
 @Composable
 internal fun IconButtonPage() {
-    GalleryPage("Icon Button", "Darwin icon-in-button vs Material 3 dedicated IconButton components.") {
-        SectionHeader("Variants")
-        ComparisonSection(
-            darwinContent = {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    PrimaryButton(onClick = {}) { Icon(Lucide.Settings) }
-                    SecondaryButton(onClick = {}) { Icon(Lucide.Heart) }
-                    OutlineButton(onClick = {}) { Icon(Lucide.Star) }
-                }
-            },
-            materialContent = {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    IconButton(onClick = {}) { Icon(Lucide.Settings) }
-                    FilledIconButton(onClick = {}) { Icon(Lucide.Heart) }
-                    OutlinedIconButton(onClick = {}) { Icon(Lucide.Star) }
-                }
-            },
-            sourceCode = """
-                PrimaryButton(onClick = {}) { Icon(Lucide.Settings) }
-                SecondaryButton(onClick = {}) { Icon(Lucide.Heart) }
-                OutlineButton(onClick = {}) { Icon(Lucide.Star) }
-            """.trimIndent(),
-        )
-
-        SectionHeader("Disabled")
-        ComparisonSection(
-            darwinContent = {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    PrimaryButton(onClick = {}, enabled = false) { Icon(Lucide.Settings) }
-                    SecondaryButton(onClick = {}, enabled = false) { Icon(Lucide.Heart) }
-                    OutlineButton(onClick = {}, enabled = false) { Icon(Lucide.Star) }
-                }
-            },
-            materialContent = {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    IconButton(onClick = {}, enabled = false) { Icon(Lucide.Settings) }
-                    FilledIconButton(onClick = {}, enabled = false) { Icon(Lucide.Heart) }
-                    OutlinedIconButton(onClick = {}, enabled = false) { Icon(Lucide.Star) }
-                }
-            },
-            sourceCode = """
-                PrimaryButton(onClick = {}, enabled = false) { Icon(Lucide.Settings) }
-                SecondaryButton(onClick = {}, enabled = false) { Icon(Lucide.Heart) }
-                OutlineButton(onClick = {}, enabled = false) { Icon(Lucide.Star) }
-            """.trimIndent(),
-        )
+    GalleryPage("Icon Button", "macOS-native circular icon buttons with idiomatic Compose APIs.") {
+        SectionHeader("Examples")
+        ExampleCard(
+            title = "Help Button",
+            description = "Circular button with ? label, matching NSButton .helpButton bezel style",
+            sourceCode = GallerySources.IconButtonHelpExample,
+        ) { IconButtonHelpExample() }
+        ExampleCard(
+            title = "Icon Button",
+            description = "Circular button wrapping any icon content",
+            sourceCode = GallerySources.IconButtonIconExample,
+        ) { IconButtonIconExample() }
     }
 }

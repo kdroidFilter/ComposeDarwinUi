@@ -131,12 +131,12 @@ fun TextArea(
                     modifier = Modifier
                         .fillMaxWidth()
                         .defaultMinSize(minHeight = 0.dp)
-                        .clip(shapes.medium)
+                        .clip(shapes.small)
                         .background(backgroundColor)
                         .border(
                             width = resolvedBorderWidth,
                             color = borderColor,
-                            shape = shapes.medium,
+                            shape = shapes.small,
                         )
                         .then(
                             if (!enabled) Modifier.graphicsLayer { alpha = 0.5f }

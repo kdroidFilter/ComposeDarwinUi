@@ -1,11 +1,18 @@
 package io.github.kdroidfilter.darwinui.theme
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import io.github.fletchmckee.liquid.liquefiable
+import io.github.fletchmckee.liquid.rememberLiquidState
 
 /**
  * Darwin UI Theme — a macOS-inspired design system for Compose Multiplatform.
  * The API mirrors Material3's MaterialTheme for familiarity.
+ *
+ * @param liquidGlass When true, overlay components (dialogs, menus, popovers) render with a
+ *   frosted backdrop blur effect using Cloudy. Disable to fall back to opaque surfaces.
  *
  * Usage:
  * ```
@@ -22,10 +29,12 @@ fun DarwinTheme(
     typography: DarwinTypography = DarwinTypography(),
     shapes: DarwinShapes = DarwinShapes(),
     animations: DarwinAnimations = DarwinAnimations(),
+    liquidGlass: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val manrope = ManropeFontFamily()
     val resolvedTypography = typography.withFontFamily(manrope)
+    val liquidState = rememberLiquidState()
 
     CompositionLocalProvider(
         LocalDarwinColors provides colorScheme,
@@ -34,9 +43,13 @@ fun DarwinTheme(
         LocalDarwinAnimations provides animations,
         LocalDarwinTextStyle provides resolvedTypography.bodyMedium,
         LocalDarwinContentColor provides colorScheme.textPrimary,
+        LocalDarwinLiquidState provides if (liquidGlass) liquidState else null,
     ) {
         PlatformContextMenuOverride {
-            content()
+            // liquefiable must precede any draw modifiers so all content is captured
+            Box(modifier = if (liquidGlass) Modifier.liquefiable(liquidState) else Modifier) {
+                content()
+            }
         }
     }
 }

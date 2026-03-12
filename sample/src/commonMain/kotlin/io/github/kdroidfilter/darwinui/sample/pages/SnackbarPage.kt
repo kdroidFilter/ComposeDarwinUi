@@ -16,12 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.AlertBanner
 import io.github.kdroidfilter.darwinui.components.AlertType
-import io.github.kdroidfilter.darwinui.components.PrimaryButton
+import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.Snackbar as DarwinSnackbar
 import io.github.kdroidfilter.darwinui.components.SnackbarHost as DarwinSnackbarHost
 import io.github.kdroidfilter.darwinui.components.SnackbarHostState as DarwinSnackbarHostState
 import io.github.kdroidfilter.darwinui.components.Text
-import io.github.kdroidfilter.darwinui.components.TextButton as DarwinTextButton
 import io.github.kdroidfilter.darwinui.sample.gallery.ComparisonSection
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
@@ -40,7 +39,7 @@ internal fun SnackbarPage() {
                     }
                     DarwinSnackbar(
                         action = {
-                            DarwinTextButton(onClick = {}) { Text("Undo") }
+                            PushButton(onClick = {}) { Text("Undo") }
                         },
                     ) {
                         Text("Item deleted")
@@ -80,7 +79,7 @@ internal fun SnackbarPage() {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        PrimaryButton(
+                        PushButton(
                             text = "Show Darwin snackbar",
                             onClick = {
                                 scope.launch { hostState.showSnackbar("Hello from Darwin!") }
@@ -102,7 +101,7 @@ internal fun SnackbarPage() {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        PrimaryButton(
+                        PushButton(
                             text = "Show M3 snackbar",
                             onClick = {
                                 scope.launch { hostState.showSnackbar("Hello from Material 3!") }
@@ -118,7 +117,7 @@ internal fun SnackbarPage() {
             sourceCode = """
                 val hostState = remember { SnackbarHostState() }
                 val scope = rememberCoroutineScope()
-                PrimaryButton(
+                PushButton(
                     text = "Show snackbar",
                     onClick = { scope.launch { hostState.showSnackbar("Hello!") } },
                 )

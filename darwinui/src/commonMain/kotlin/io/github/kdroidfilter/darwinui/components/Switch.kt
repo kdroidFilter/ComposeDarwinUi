@@ -3,6 +3,7 @@ package io.github.kdroidfilter.darwinui.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
@@ -91,7 +92,7 @@ object SwitchDefaults {
 
 // ===========================================================================
 // Switch — macOS-style (Apple Human Interface Guidelines proportions)
-// Track: 44x26dp  Thumb: 22dp circle  Padding: 2dp
+// SVG is @1.3x → Track: 41.5x18.5dp  Thumb pill: 24.6x15.4dp rx=7.7dp  Padding: 1.5dp
 // ===========================================================================
 
 @Composable
@@ -104,15 +105,17 @@ fun Switch(
     colors: SwitchColors = SwitchDefaults.colors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    val trackWidth = 36.dp
-    val trackHeight = 14.dp
-    val thumbSize = 10.dp
-    val thumbPadding = 2.dp
+    val trackWidth = (54f / 1.3f).dp
+    val trackHeight = (24f / 1.3f).dp
+    val thumbWidth = (32f / 1.3f).dp
+    val thumbHeight = (20f / 1.3f).dp
+    val thumbPadding = (2f / 1.3f).dp
+    val thumbShape = RoundedCornerShape((10f / 1.3f).dp)
     val trackShape = RoundedCornerShape(50)
 
     // Thumb translates between left and right positions
     val thumbOffset by animateDpAsState(
-        targetValue = if (checked) (trackWidth - thumbSize - thumbPadding) else thumbPadding,
+        targetValue = if (checked) (trackWidth - thumbWidth - thumbPadding) else thumbPadding,
         animationSpec = darwinSpring(preset = DarwinSpringPreset.Snappy),
         label = "switchThumbOffset",
     )
@@ -155,14 +158,24 @@ fun Switch(
             .clip(trackShape)
             .background(trackColor, trackShape),
     ) {
+        // Indicator dot visible on the unchecked side (SVG x=40.75/1.7, centered vertically)
+        Box(
+            modifier = Modifier
+                .offset(x = (40.75f / 1.3f).dp)
+                .align(Alignment.CenterStart)
+                .size((4.5f / 1.3f).dp)
+                .border((1.5f / 1.3f).dp, Color(0xFFC6C6C6), CircleShape),
+        )
+
+        // Thumb pill
         Box(
             modifier = Modifier
                 .offset(x = thumbOffset)
                 .align(Alignment.CenterStart)
-                .size(thumbSize)
-                .shadow(elevation = 2.dp, shape = CircleShape, clip = false)
-                .clip(CircleShape)
-                .background(thumbColor, CircleShape),
+                .size(width = thumbWidth, height = thumbHeight)
+                .shadow(elevation = 2.dp, shape = thumbShape, clip = false)
+                .clip(thumbShape)
+                .background(thumbColor, thumbShape),
             contentAlignment = Alignment.Center,
         ) {
             thumbContent?.invoke()

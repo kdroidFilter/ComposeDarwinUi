@@ -4,189 +4,157 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.AccentButton
-import io.github.kdroidfilter.darwinui.components.Button
-import io.github.kdroidfilter.darwinui.components.ButtonSize
-import io.github.kdroidfilter.darwinui.components.DestructiveButton
-import io.github.kdroidfilter.darwinui.components.HyperlinkButton
-import io.github.kdroidfilter.darwinui.components.InfoButton
-import io.github.kdroidfilter.darwinui.components.OutlineButton
-import io.github.kdroidfilter.darwinui.components.PrimaryButton
-import io.github.kdroidfilter.darwinui.components.SecondaryButton
-import io.github.kdroidfilter.darwinui.components.SubtleButton
-import io.github.kdroidfilter.darwinui.components.SuccessButton
-import io.github.kdroidfilter.darwinui.components.WarningButton
+import io.github.kdroidfilter.darwinui.components.ArrowButton
+import io.github.kdroidfilter.darwinui.components.DisclosureButton
+import io.github.kdroidfilter.darwinui.components.MacNativeAccentButton
+import io.github.kdroidfilter.darwinui.components.MacNativeDestructiveButton
+import io.github.kdroidfilter.darwinui.components.MacNativeSecondaryButton
+import io.github.kdroidfilter.darwinui.components.PulldownButton
+import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.icons.LucideDownload
-import io.github.kdroidfilter.darwinui.icons.LucideHeart
-import io.github.kdroidfilter.darwinui.icons.LucidePlus
 import io.github.kdroidfilter.darwinui.icons.LucideSettings
-import io.github.kdroidfilter.darwinui.icons.LucideShare2
-import io.github.kdroidfilter.darwinui.icons.LucideTrash2
-import io.github.kdroidfilter.darwinui.sample.gallery.CodeBlock
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
-import io.github.kdroidfilter.darwinui.sample.gallery.PreviewContainer
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalLayoutApi::class)
+@GalleryExample("Button", "Pulldown")
 @Composable
-private fun ButtonPreview() {
-    var loading by remember { mutableStateOf(false) }
-
-    LaunchedEffect(loading) {
-        if (loading) {
-            delay(2000)
-            loading = false
-        }
-    }
-
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        // Text Buttons
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("TEXT BUTTONS", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                PrimaryButton(text = "Primary", onClick = {})
-                SecondaryButton(text = "Secondary", onClick = {})
-                OutlineButton(text = "Outline", onClick = {})
-                SubtleButton(text = "Ghost", onClick = {})
-                DestructiveButton(text = "Destructive", onClick = {})
-                PrimaryButton(
-                    text = if (loading) "Loading..." else "Click me",
-                    onClick = { loading = true },
-                    loading = loading,
-                )
-            }
-        }
-        // Icon Buttons
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("ICON BUTTONS", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                PrimaryButton(onClick = {}) { Icon(LucidePlus) }
-                SecondaryButton(onClick = {}) { Icon(LucideSettings) }
-                OutlineButton(onClick = {}) { Icon(LucideHeart) }
-                SubtleButton(onClick = {}) { Icon(LucideShare2) }
-                DestructiveButton(onClick = {}) { Icon(LucideTrash2) }
-            }
-        }
-        // With Icons
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("WITH ICONS", style = DarwinTheme.typography.labelSmall, color = DarwinTheme.colors.textTertiary)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                PrimaryButton(
-                    text = "Create New",
-                    onClick = {},
-                    leftIcon = { Icon(LucidePlus, modifier = Modifier.padding(end = 4.dp)) },
-                )
-                SecondaryButton(
-                    text = "Download",
-                    onClick = {},
-                    leftIcon = { Icon(LucideDownload, modifier = Modifier.padding(end = 4.dp)) },
-                )
-                OutlineButton(
-                    text = "Share",
-                    onClick = {},
-                    leftIcon = { Icon(LucideShare2, modifier = Modifier.padding(end = 4.dp)) },
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@GalleryExample("Button", "Variants")
-@Composable
-fun ButtonVariantsExample() {
+fun ButtonPulldownExample() {
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Button(onClick = {}) { Text("Default") }
-        PrimaryButton(text = "Primary", onClick = {})
-        SecondaryButton(text = "Secondary", onClick = {})
-        AccentButton(text = "Accent", onClick = {})
-        SuccessButton(text = "Success", onClick = {})
-        WarningButton(text = "Warning", onClick = {})
-        InfoButton(text = "Info", onClick = {})
-        DestructiveButton(text = "Destructive", onClick = {})
-        OutlineButton(text = "Outline", onClick = {})
-        SubtleButton(text = "Ghost", onClick = {})
-        HyperlinkButton(text = "Link", onClick = {})
+        PulldownButton(text = "Sort by", onClick = {})
+        PulldownButton(text = "View", onClick = {}, leadingIcon = { Icon(LucideSettings) })
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
-@GalleryExample("Button", "Sizes")
+@GalleryExample("Button", "Disclosure")
 @Composable
-fun ButtonSizesExample() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            PrimaryButton(text = "Small", onClick = {}, size = ButtonSize.Small)
-            PrimaryButton(text = "Default", onClick = {}, size = ButtonSize.Default)
-            PrimaryButton(text = "Large", onClick = {}, size = ButtonSize.Large)
+fun ButtonDisclosureExample() {
+    var expanded by remember { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            DisclosureButton(expanded = expanded, onToggle = { expanded = !expanded })
+            Text(if (expanded) "Collapse" else "Expand")
         }
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            SecondaryButton(text = "Small", onClick = {}, size = ButtonSize.Small)
-            SecondaryButton(text = "Default", onClick = {}, size = ButtonSize.Default)
-            SecondaryButton(text = "Large", onClick = {}, size = ButtonSize.Large)
+        if (expanded) {
+            Text("Hidden content revealed after toggle.", color = DarwinTheme.colors.textSecondary)
         }
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
-@GalleryExample("Button", "States")
+@GalleryExample("Button", "Push")
 @Composable
-fun ButtonStatesExample() {
+fun ButtonPushExample() {
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Button(onClick = {}, enabled = false) { Text("Disabled") }
-        PrimaryButton(text = "Loading", onClick = {}, loading = true)
-        PrimaryButton(text = "Loading + text", onClick = {}, loading = true, loadingText = "Saving...")
-        Button(onClick = {}) { Text("Default") }
+        PushButton(text = "Label", onClick = {})
+        PushButton(text = "Cancel", onClick = {})
+        PushButton(text = "Apply", onClick = {})
+        PushButton(text = "Disabled", onClick = {}, enabled = false)
+    }
+}
+
+@GalleryExample("Button", "Arrow")
+@Composable
+fun ButtonArrowExample() {
+    var value by remember { mutableStateOf(0) }
+    Row(
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        ArrowButton(
+            onIncrement = { value++ },
+            onDecrement = { value-- },
+        )
+        Text("Value: $value")
+    }
+}
+
+@GalleryExample("Button", "Compact")
+@Composable
+fun ButtonAlertSheetExample() {
+    Column(
+        modifier = Modifier.widthIn(max = 260.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        MacNativeAccentButton(text = "Save", onClick = {})
+        MacNativeDestructiveButton(text = "Don't Save", onClick = {})
+        MacNativeSecondaryButton(text = "Cancel", onClick = {})
+    }
+}
+
+@GalleryExample("Button", "Compact Footer")
+@Composable
+fun ButtonAlertSheetFooterExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+    ) {
+        MacNativeDestructiveButton(text = "Delete", onClick = {}, fillWidth = false)
+        Spacer(modifier = Modifier.weight(1f))
+        MacNativeSecondaryButton(text = "Cancel", onClick = {}, fillWidth = false)
+        MacNativeAccentButton(text = "Save", onClick = {}, fillWidth = false)
     }
 }
 
 @Composable
 internal fun ButtonPage() {
-    GalleryPage("Button", "A beautiful, accessible button component with native macOS styling.") {
-        PreviewContainer { ButtonPreview() }
-
-        SectionHeader("Usage")
-        CodeBlock("""PrimaryButton(text = "Primary", onClick = {})
-SecondaryButton(text = "Secondary", onClick = {})
-DestructiveButton(text = "Destructive", onClick = {})""")
-
+    GalleryPage("Button", "Native macOS button controls with idiomatic Compose APIs.") {
         SectionHeader("Examples")
         ExampleCard(
-            title = "Variants",
-            description = "All available button variants",
-            sourceCode = GallerySources.ButtonVariantsExample,
-        ) { ButtonVariantsExample() }
+            title = "Pulldown",
+            description = "macOS-native pulldown button with glass appearance",
+            sourceCode = GallerySources.ButtonPulldownExample,
+        ) { ButtonPulldownExample() }
         ExampleCard(
-            title = "Sizes",
-            description = "Small, default, and large button sizes",
-            sourceCode = GallerySources.ButtonSizesExample,
-        ) { ButtonSizesExample() }
+            title = "Disclosure",
+            description = "Circular toggle button that reveals or hides content",
+            sourceCode = GallerySources.ButtonDisclosureExample,
+        ) { ButtonDisclosureExample() }
         ExampleCard(
-            title = "States",
-            description = "Disabled and loading states",
-            sourceCode = GallerySources.ButtonStatesExample,
-        ) { ButtonStatesExample() }
+            title = "Push",
+            description = "macOS-native compact push button (bezel/rounded style)",
+            sourceCode = GallerySources.ButtonPushExample,
+        ) { ButtonPushExample() }
+        ExampleCard(
+            title = "Arrow",
+            description = "Circular stepper button with up/down increment zones",
+            sourceCode = GallerySources.ButtonArrowExample,
+        ) { ButtonArrowExample() }
+
+        SectionHeader("Compact")
+        ExampleCard(
+            title = "Compact",
+            description = "Pill-shaped compact buttons for dialogs and panels",
+            sourceCode = GallerySources.ButtonAlertSheetExample,
+        ) { ButtonAlertSheetExample() }
+        ExampleCard(
+            title = "Compact Footer",
+            description = "Horizontal layout: destructive left, cancel + confirm right",
+            sourceCode = GallerySources.ButtonAlertSheetFooterExample,
+        ) { ButtonAlertSheetFooterExample() }
     }
 }

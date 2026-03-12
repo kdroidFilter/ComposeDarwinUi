@@ -28,9 +28,14 @@ import io.github.kdroidfilter.darwinui.components.Switcher
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.icons.LucideBarChart3
+import io.github.kdroidfilter.darwinui.icons.LucideCalendar
+import io.github.kdroidfilter.darwinui.icons.LucideDownload
 import io.github.kdroidfilter.darwinui.icons.LucideFolder
 import io.github.kdroidfilter.darwinui.icons.LucideHome
 import io.github.kdroidfilter.darwinui.icons.LucideSettings
+import io.github.kdroidfilter.darwinui.icons.LucideStar
+import io.github.kdroidfilter.darwinui.icons.LucideTrash2
+import io.github.kdroidfilter.darwinui.icons.LucideUpload
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
@@ -40,13 +45,19 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 @GalleryExample("Sidebar", "Preview")
 @Composable
 fun SidebarPreviewExample() {
-    var activeItem by remember { mutableStateOf("Dashboard") }
+    var activeItem by remember { mutableStateOf("Favorites") }
     var isCollapsed by remember { mutableStateOf(false) }
     val sidebarItems = remember {
         listOf(
-            SidebarItem("Dashboard", onClick = { activeItem = "Dashboard" }, icon = LucideHome),
-            SidebarItem("Projects", onClick = { activeItem = "Projects" }, icon = LucideFolder),
-            SidebarItem("Analytics", onClick = { activeItem = "Analytics" }, icon = LucideBarChart3),
+            SidebarItem("Favorites", onClick = { activeItem = "Favorites" }, icon = LucideStar, group = "Favorites"),
+            SidebarItem("Recents", onClick = { activeItem = "Recents" }, icon = LucideCalendar, group = "Favorites"),
+            SidebarItem("iCloud Shared", onClick = { activeItem = "iCloud Shared" }, icon = LucideFolder, group = "Favorites"),
+            SidebarItem("Documents", onClick = { activeItem = "Documents" }, icon = LucideFolder, group = "Favorites"),
+            SidebarItem("Downloads", onClick = { activeItem = "Downloads" }, icon = LucideDownload, group = "Favorites"),
+            SidebarItem("iCloud Drive", onClick = { activeItem = "iCloud Drive" }, icon = LucideUpload, group = "Locations"),
+            SidebarItem("Home", onClick = { activeItem = "Home" }, icon = LucideHome, group = "Locations"),
+            SidebarItem("Mac HD", onClick = { activeItem = "Mac HD" }, icon = LucideBarChart3, group = "Locations"),
+            SidebarItem("Trash", onClick = { activeItem = "Trash" }, icon = LucideTrash2, group = "Locations"),
         )
     }
     val pinnedItems = remember {
@@ -100,12 +111,14 @@ fun SidebarPreviewExample() {
 @GalleryExample("Sidebar", "Collapsible")
 @Composable
 fun SidebarCollapsibleExample() {
-    var active by remember { mutableStateOf("Dashboard") }
+    var active by remember { mutableStateOf("Favorites") }
     var collapsed by remember { mutableStateOf(false) }
     val items = remember {
         listOf(
-            SidebarItem("Dashboard", onClick = { active = "Dashboard" }, icon = LucideHome),
-            SidebarItem("Projects", onClick = { active = "Projects" }, icon = LucideFolder),
+            SidebarItem("Favorites", onClick = { active = "Favorites" }, icon = LucideStar, group = "Favorites"),
+            SidebarItem("Recents", onClick = { active = "Recents" }, icon = LucideCalendar, group = "Favorites"),
+            SidebarItem("Home", onClick = { active = "Home" }, icon = LucideHome, group = "Locations"),
+            SidebarItem("Trash", onClick = { active = "Trash" }, icon = LucideTrash2, group = "Locations"),
         )
     }
     val pinnedItems = remember {

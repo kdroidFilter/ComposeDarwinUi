@@ -6,7 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import io.github.kdroidfilter.darwinui.components.OutlineButton
+import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.DropdownMenu
 import io.github.kdroidfilter.darwinui.components.DropdownMenuCheckboxItem
 import io.github.kdroidfilter.darwinui.components.DropdownMenuItem
@@ -25,7 +25,7 @@ import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 fun DropdownMenuDefaultExample() {
     var dropdownExpanded by remember { mutableStateOf(false) }
     Box {
-        OutlineButton(
+        PushButton(
             text = "Open Menu",
             onClick = { dropdownExpanded = !dropdownExpanded },
         )
@@ -48,7 +48,7 @@ fun DropdownMenuLabelsExample() {
     var dropdownExpanded by remember { mutableStateOf(false) }
     var checkboxState by remember { mutableStateOf(false) }
     Box {
-        OutlineButton(
+        PushButton(
             text = "Actions",
             onClick = { dropdownExpanded = !dropdownExpanded },
         )

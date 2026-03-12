@@ -15,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.ModalBottomSheet as DarwinModalBottomSheet
-import io.github.kdroidfilter.darwinui.components.PrimaryButton
+import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.sample.gallery.ComparisonSection
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
@@ -35,7 +35,7 @@ internal fun BottomSheetPage() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    PrimaryButton(text = "Open Darwin Sheet", onClick = { showSheet = true })
+                    PushButton(text = "Open Darwin Sheet", onClick = { showSheet = true })
                 }
 
                 if (showSheet) {
@@ -48,7 +48,7 @@ internal fun BottomSheetPage() {
                         ) {
                             Text("Darwin Bottom Sheet")
                             Text("iOS-style sheet with Darwin theme.")
-                            PrimaryButton(
+                            PushButton(
                                 text = "Dismiss",
                                 onClick = { showSheet = false },
                                 modifier = Modifier.fillMaxWidth(),
@@ -64,7 +64,7 @@ internal fun BottomSheetPage() {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    PrimaryButton(text = "Open M3 Sheet", onClick = { showSheet = true })
+                    PushButton(text = "Open M3 Sheet", onClick = { showSheet = true })
                 }
 
                 if (showSheet) {
@@ -77,7 +77,7 @@ internal fun BottomSheetPage() {
                         ) {
                             M3Text("Material 3 Bottom Sheet")
                             M3Text("Standard M3 sheet with Material theme.")
-                            PrimaryButton(
+                            PushButton(
                                 text = "Dismiss",
                                 onClick = { showSheet = false },
                                 modifier = Modifier.fillMaxWidth(),
@@ -88,11 +88,11 @@ internal fun BottomSheetPage() {
             },
             sourceCode = """
                 var showSheet by remember { mutableStateOf(false) }
-                PrimaryButton(text = "Open Sheet", onClick = { showSheet = true })
+                PushButton(text = "Open Sheet", onClick = { showSheet = true })
                 if (showSheet) {
                     ModalBottomSheet(onDismissRequest = { showSheet = false }) {
                         Text("Sheet content")
-                        PrimaryButton(text = "Dismiss", onClick = { showSheet = false })
+                        PushButton(text = "Dismiss", onClick = { showSheet = false })
                     }
                 }
             """.trimIndent(),

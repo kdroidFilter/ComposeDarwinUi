@@ -39,14 +39,18 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.darwinGlass
 import kotlinx.coroutines.delay
 
 // ===========================================================================
@@ -212,15 +216,13 @@ fun AlertBanner(
 // ===========================================================================
 
 /**
- * A modal alert dialog that overlays the screen with a scrim and a centered card.
+ * A modal alert dialog matching the macOS native alert panel.
  *
  * Features:
  * - Animated entry/exit (scale + fade)
- * - Type-specific icon displayed prominently at 48dp
- * - Title in headlineSmall typography
- * - Message in bodyMedium with secondary text color
- * - Footer with optional Cancel (outline) and Confirm (filled) buttons
- * - Error type uses destructive red for the confirm button
+ * - Large rounded corners (26dp) with frosted-glass appearance
+ * - Vertically stacked full-width pill buttons (accent, destructive, secondary)
+ * - Centered title (bold) and message text
  *
  * Usage:
  * ```
@@ -229,23 +231,26 @@ fun AlertBanner(
  * AlertDialog(
  *     open = showDialog,
  *     onDismissRequest = { showDialog = false },
- *     title = "Delete Item?",
- *     message = "This action cannot be undone.",
- *     type = AlertType.Error,
- *     confirmText = "Delete",
- *     onConfirm = { /* delete logic */ },
+ *     title = "Save the document?",
+ *     message = "Your changes will be lost if you don't save them.",
+ *     confirmText = "Save",
+ *     destructiveText = "Don't Save",
+ *     cancelText = "Cancel",
+ *     onConfirm = { /* save logic */ },
+ *     onDestructive = { /* discard logic */ },
  * )
  * ```
  *
  * @param open Whether the dialog is visible.
- * @param onDismissRequest Callback invoked when the dialog should close
- *                         (scrim tap or cancel).
- * @param title The dialog title text.
- * @param message The dialog body message.
- * @param type The semantic type determining icon and confirm button color.
- * @param confirmText The label for the confirm button.
+ * @param onDismissRequest Callback invoked when the dialog should close.
+ * @param title The dialog title text (bold, centered).
+ * @param message The dialog body message (regular, centered).
+ * @param type The semantic type (currently used for theming compatibility).
+ * @param confirmText The label for the primary action button (blue accent).
+ * @param destructiveText Optional label for a destructive action button (red tint).
  * @param cancelText The label for the cancel button. Pass null to hide it.
  * @param onConfirm Callback invoked when the confirm button is pressed.
+ * @param onDestructive Optional callback for the destructive action button.
  * @param onCancel Optional callback invoked when the cancel button is pressed.
  *                 Falls back to [onDismissRequest] when null.
  */
@@ -257,8 +262,10 @@ fun AlertDialog(
     message: String,
     type: AlertType = AlertType.Info,
     confirmText: String = "OK",
+    destructiveText: String? = null,
     cancelText: String? = "Cancel",
     onConfirm: () -> Unit = {},
+    onDestructive: (() -> Unit)? = null,
     onCancel: (() -> Unit)? = null,
 ) {
     // Keep the popup mounted while the exit animation plays
@@ -325,6 +332,7 @@ fun AlertDialog(
                         type = type,
                         confirmText = confirmText,
                         cancelText = cancelText,
+                        destructiveText = destructiveText,
                         onConfirm = {
                             onConfirm()
                             onDismissRequest()
@@ -332,6 +340,12 @@ fun AlertDialog(
                         onCancel = {
                             (onCancel ?: onDismissRequest).invoke()
                         },
+                        onDestructive = if (onDestructive != null) {
+                            {
+                                onDestructive()
+                                onDismissRequest()
+                            }
+                        } else null,
                     )
                 }
             }
@@ -350,130 +364,157 @@ private fun AlertDialogContent(
     type: AlertType,
     confirmText: String,
     cancelText: String?,
+    destructiveText: String? = null,
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
+    onDestructive: (() -> Unit)? = null,
 ) {
     val colors = DarwinTheme.colors
-    val typography = DarwinTheme.typography
-    val shapes = DarwinTheme.shapes
+    val isDark = colors.isDark
 
-    val accentColor = resolveAlertTypeColor(type)
-    val backgroundColor = colors.card
-    val borderColor = colors.border
+    // macOS native alert panel appearance — frosted glass vibrancy
+    val fallbackBg = if (isDark) Color(0xFF262626).copy(alpha = 0.85f)
+    else Color(0xFFF5F5F5).copy(alpha = 0.82f)
+    val borderColor = if (isDark) Color(0xFF5E5E5E).copy(alpha = 0.6f)
+    else Color(0xFFC1C1C1).copy(alpha = 0.45f)
+    val textColor = if (isDark) Color.White else Color.Black.copy(alpha = 0.85f)
 
-    val confirmBackgroundColor = when (type) {
-        AlertType.Error -> colors.destructive
-        AlertType.Success -> colors.success
-        AlertType.Warning -> colors.warning
-        AlertType.Info -> colors.accent
-    }
-    val confirmContentColor = when (type) {
-        AlertType.Error -> colors.onDestructive
-        AlertType.Success -> colors.onSuccess
-        AlertType.Warning -> colors.onWarning
-        AlertType.Info -> colors.onAccent
-    }
-
-    val shape = shapes.extraLarge
+    val shape = RoundedCornerShape(26.dp)
 
     Column(
         modifier = Modifier
-            .width(400.dp)
-            .shadow(elevation = 16.dp, shape = shape, clip = false)
-            .clip(shape)
-            .background(backgroundColor, shape)
-            .border(width = 1.dp, color = borderColor, shape = shape)
+            .widthIn(max = 260.dp)
+            .shadow(elevation = 25.dp, shape = shape, clip = false, ambientColor = Color.Black.copy(alpha = 0.5f))
+            .darwinGlass(shape = shape, fallbackColor = fallbackBg)
+            .border(width = 0.5.dp, color = borderColor, shape = shape)
             // Prevent click-through to scrim
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
                 onClick = {},
             )
-            .padding(24.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Type icon (48dp)
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .drawBehind { drawAlertTypeIcon(type, accentColor) },
+        // Title — macOS uses ~13sp bold, centered
+        Text(
+            text = title,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            color = textColor,
+            textAlign = TextAlign.Center,
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // Message — macOS uses ~11sp regular, centered
+        Text(
+            text = message,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Normal,
+            color = textColor,
+            textAlign = TextAlign.Center,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Title
-        Text(
-            text = title,
-            style = typography.headlineSmall,
-            color = colors.textPrimary,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Message
-        Text(
-            text = message,
-            style = typography.bodyMedium,
-            color = colors.textSecondary,
-            textAlign = TextAlign.Center,
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Footer buttons
-        Row(
+        // Vertically stacked full-width pill buttons (macOS native style)
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            // Cancel button (outline style)
-            if (cancelText != null) {
-                val cancelShape = shapes.medium
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp)
-                        .clip(cancelShape)
-                        .background(Color.Transparent, cancelShape)
-                        .border(1.dp, colors.border, cancelShape)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = onCancel,
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = cancelText,
-                        style = typography.labelLarge,
-                        color = colors.textPrimary,
-                    )
-                }
+            // Primary action — accent blue pill
+            AlertPillButton(
+                text = confirmText,
+                onClick = onConfirm,
+                style = AlertPillButtonStyle.Accent,
+            )
+
+            // Destructive action — red tinted pill (optional)
+            if (destructiveText != null && onDestructive != null) {
+                AlertPillButton(
+                    text = destructiveText,
+                    onClick = onDestructive,
+                    style = AlertPillButtonStyle.Destructive,
+                )
             }
 
-            // Confirm button (filled, colored by type)
-            val confirmShape = shapes.medium
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(40.dp)
-                    .clip(confirmShape)
-                    .background(confirmBackgroundColor, confirmShape)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onConfirm,
-                    ),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = confirmText,
-                    style = typography.labelLarge,
-                    color = confirmContentColor,
+            // Cancel — neutral gray pill
+            if (cancelText != null) {
+                AlertPillButton(
+                    text = cancelText,
+                    onClick = onCancel,
+                    style = AlertPillButtonStyle.Secondary,
                 )
             }
         }
+    }
+}
+
+// ===========================================================================
+// AlertPillButton — macOS-native full-width pill button for alert dialogs
+// ===========================================================================
+
+private enum class AlertPillButtonStyle { Accent, Destructive, Secondary }
+
+@Composable
+private fun AlertPillButton(
+    text: String,
+    onClick: () -> Unit,
+    style: AlertPillButtonStyle,
+    modifier: Modifier = Modifier,
+) {
+    val isDark = DarwinTheme.colors.isDark
+    val interactionSource = remember { MutableInteractionSource() }
+
+    val pillShape = RoundedCornerShape(14.dp)
+
+    val backgroundColor: Color
+    val textColor: Color
+    val borderColor: Color
+
+    when (style) {
+        AlertPillButtonStyle.Accent -> {
+            backgroundColor = Color(0xFF0088FF)
+            textColor = Color.White
+            borderColor = Color.Transparent
+        }
+        AlertPillButtonStyle.Destructive -> {
+            backgroundColor = Color(0xFFFF383C).copy(alpha = 0.23f)
+            textColor = Color(0xFFFF383C)
+            borderColor = Color.Transparent
+        }
+        AlertPillButtonStyle.Secondary -> {
+            backgroundColor = if (isDark) Color.White.copy(alpha = 0.12f) else Color(0xFFE6E6E6)
+            textColor = if (isDark) Color.White else Color.Black.copy(alpha = 0.85f)
+            borderColor = Color.Transparent
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(28.dp)
+            .clip(pillShape)
+            .background(backgroundColor, pillShape)
+            .then(
+                if (borderColor != Color.Transparent) Modifier.border(0.5.dp, borderColor, pillShape)
+                else Modifier,
+            )
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick,
+            ),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = text,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            color = textColor,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
@@ -649,11 +690,11 @@ fun AlertDialog(
     icon: (@Composable () -> Unit)? = null,
     title: (@Composable () -> Unit)? = null,
     text: (@Composable () -> Unit)? = null,
-    shape: androidx.compose.ui.graphics.Shape = DarwinTheme.shapes.extraLarge,
-    containerColor: Color = DarwinTheme.colors.card,
-    iconContentColor: Color = DarwinTheme.colors.primary,
-    titleContentColor: Color = DarwinTheme.colors.textPrimary,
-    textContentColor: Color = DarwinTheme.colors.textSecondary,
+    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(26.dp),
+    containerColor: Color = Color.Unspecified,
+    iconContentColor: Color = Color.Unspecified,
+    titleContentColor: Color = Color.Unspecified,
+    textContentColor: Color = Color.Unspecified,
     tonalElevation: androidx.compose.ui.unit.Dp = 0.dp,
 ) {
     Popup(
@@ -662,6 +703,16 @@ fun AlertDialog(
         properties = PopupProperties(focusable = true),
     ) {
         val colors = DarwinTheme.colors
+        val isDark = colors.isDark
+
+        // macOS native alert panel colors
+        val fallbackBg = if (containerColor != Color.Unspecified) containerColor
+        else if (isDark) Color(0xFF262626).copy(alpha = 0.85f) else Color(0xFFF5F5F5).copy(alpha = 0.82f)
+        val borderColor = if (isDark) Color(0xFF5E5E5E).copy(alpha = 0.6f) else Color(0xFFC1C1C1).copy(alpha = 0.45f)
+        val nativeTextColor = if (isDark) Color.White else Color.Black.copy(alpha = 0.85f)
+        val resolvedIconColor = if (iconContentColor != Color.Unspecified) iconContentColor else nativeTextColor
+        val resolvedTitleColor = if (titleContentColor != Color.Unspecified) titleContentColor else nativeTextColor
+        val resolvedTextColor = if (textContentColor != Color.Unspecified) textContentColor else nativeTextColor
 
         Box(
             modifier = Modifier
@@ -677,48 +728,55 @@ fun AlertDialog(
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(
                 modifier = modifier
-                    .width(400.dp)
-                    .shadow(elevation = 16.dp, shape = shape, clip = false)
-                    .clip(shape)
-                    .background(containerColor, shape)
-                    .border(width = 1.dp, color = colors.border, shape = shape)
+                    .widthIn(max = 260.dp)
+                    .shadow(elevation = 25.dp, shape = shape, clip = false, ambientColor = Color.Black.copy(alpha = 0.5f))
+                    .darwinGlass(shape = shape, fallbackColor = fallbackBg)
+                    .border(width = 0.5.dp, color = borderColor, shape = shape)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
                         onClick = {},
                     )
-                    .padding(24.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 if (icon != null) {
                     androidx.compose.runtime.CompositionLocalProvider(
-                        io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides iconContentColor,
+                        io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides resolvedIconColor,
                     ) {
-                        Box(modifier = Modifier.padding(bottom = 16.dp)) { icon() }
+                        Box(modifier = Modifier.padding(bottom = 10.dp)) { icon() }
                     }
                 }
                 if (title != null) {
                     androidx.compose.runtime.CompositionLocalProvider(
-                        io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides DarwinTheme.typography.headlineSmall.copy(color = titleContentColor),
-                        io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides titleContentColor,
+                        io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides DarwinTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp,
+                            color = resolvedTitleColor,
+                        ),
+                        io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides resolvedTitleColor,
                     ) {
-                        Box(modifier = Modifier.padding(bottom = 8.dp)) { title() }
+                        Box(modifier = Modifier.padding(bottom = 4.dp)) { title() }
                     }
                 }
                 if (text != null) {
                     androidx.compose.runtime.CompositionLocalProvider(
-                        io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides DarwinTheme.typography.bodyMedium.copy(color = textContentColor),
-                        io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides textContentColor,
+                        io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle provides DarwinTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 11.sp,
+                            color = resolvedTextColor,
+                        ),
+                        io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides resolvedTextColor,
                     ) {
-                        Box(modifier = Modifier.padding(bottom = 24.dp)) { text() }
+                        Box(modifier = Modifier.padding(bottom = 16.dp)) { text() }
                     }
                 }
-                Row(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
-                    dismissButton?.invoke()
                     confirmButton()
+                    dismissButton?.invoke()
                 }
             }
         }
