@@ -30,26 +30,34 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 @Composable
 fun ComparisonSection(
     darwinContent: @Composable ColumnScope.() -> Unit,
-    materialContent: @Composable ColumnScope.() -> Unit,
+    materialContent: (@Composable ColumnScope.() -> Unit)? = null,
     sourceCode: String = "",
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
+        if (materialContent != null) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                ComparisonPane(
+                    title = "Darwin",
+                    modifier = Modifier.weight(1f),
+                    content = darwinContent,
+                )
+                ComparisonPane(
+                    title = "Material 3",
+                    modifier = Modifier.weight(1f),
+                    content = materialContent,
+                )
+            }
+        } else {
             ComparisonPane(
                 title = "Darwin",
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxWidth(),
                 content = darwinContent,
-            )
-            ComparisonPane(
-                title = "Material 3",
-                modifier = Modifier.weight(1f),
-                content = materialContent,
             )
         }
 

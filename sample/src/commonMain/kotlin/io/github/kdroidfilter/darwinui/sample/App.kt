@@ -33,13 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.sp
 import com.composables.icons.lucide.Bell
-import com.composables.icons.lucide.Calendar
 import com.composables.icons.lucide.ChevronsUpDown
 import com.composables.icons.lucide.CircleUser
 import com.composables.icons.lucide.Columns3
 import com.composables.icons.lucide.CreditCard
 import com.composables.icons.lucide.Ellipsis
-import com.composables.icons.lucide.Layers
 import com.composables.icons.lucide.ListChecks
 import com.composables.icons.lucide.Loader
 import com.composables.icons.lucide.Lucide
@@ -74,49 +72,35 @@ import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideMoon
 import io.github.kdroidfilter.darwinui.icons.LucideSun
 import io.github.kdroidfilter.darwinui.sample.pages.AccordionPage
-import io.github.kdroidfilter.darwinui.sample.pages.BottomAppBarPage
-import io.github.kdroidfilter.darwinui.sample.pages.NavigationRailPage
-import io.github.kdroidfilter.darwinui.sample.pages.SegmentedControlPage
-import io.github.kdroidfilter.darwinui.sample.pages.TimePickerPage
-import io.github.kdroidfilter.darwinui.sample.pages.IconButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.AlertPage
 import io.github.kdroidfilter.darwinui.sample.pages.AvatarPage
 import io.github.kdroidfilter.darwinui.sample.pages.BadgePage
-import io.github.kdroidfilter.darwinui.sample.pages.BottomSheetPage
 import io.github.kdroidfilter.darwinui.sample.pages.ButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.CardPage
 import io.github.kdroidfilter.darwinui.sample.pages.CheckboxPage
-import io.github.kdroidfilter.darwinui.sample.pages.ChipsPage
+import io.github.kdroidfilter.darwinui.sample.pages.ColorWellPage
 import io.github.kdroidfilter.darwinui.sample.pages.ContextMenuPage
-import io.github.kdroidfilter.darwinui.sample.pages.DateSelectPage
 import io.github.kdroidfilter.darwinui.sample.pages.DialogPage
-import io.github.kdroidfilter.darwinui.sample.pages.DividerPage
+import io.github.kdroidfilter.darwinui.sample.pages.DropdownMenuPage
 import io.github.kdroidfilter.darwinui.sample.pages.GroupBoxPage
 import io.github.kdroidfilter.darwinui.sample.pages.GroupedListPage
-import io.github.kdroidfilter.darwinui.sample.pages.DropdownMenuPage
+import io.github.kdroidfilter.darwinui.sample.pages.IconButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.InputPage
-import io.github.kdroidfilter.darwinui.sample.pages.ListItemPage
-import io.github.kdroidfilter.darwinui.sample.pages.M3ButtonsPage
 import io.github.kdroidfilter.darwinui.sample.pages.MultiSelectPage
-import io.github.kdroidfilter.darwinui.sample.pages.NavigationBarPage
 import io.github.kdroidfilter.darwinui.sample.pages.PopoverPage
 import io.github.kdroidfilter.darwinui.sample.pages.ProgressPage
-import io.github.kdroidfilter.darwinui.sample.pages.RadioButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.SearchInputPage
+import io.github.kdroidfilter.darwinui.sample.pages.SegmentedControlPage
 import io.github.kdroidfilter.darwinui.sample.pages.SelectPage
 import io.github.kdroidfilter.darwinui.sample.pages.SidebarPage
 import io.github.kdroidfilter.darwinui.sample.pages.SkeletonPage
 import io.github.kdroidfilter.darwinui.sample.pages.SliderPage
-import io.github.kdroidfilter.darwinui.sample.pages.SnackbarPage
-import io.github.kdroidfilter.darwinui.sample.pages.SurfacePage
 import io.github.kdroidfilter.darwinui.sample.pages.SwitchPage
 import io.github.kdroidfilter.darwinui.sample.pages.TablePage
 import io.github.kdroidfilter.darwinui.sample.pages.TabsPage
 import io.github.kdroidfilter.darwinui.sample.pages.TextAreaPage
 import io.github.kdroidfilter.darwinui.sample.pages.ToastPage
-import io.github.kdroidfilter.darwinui.sample.pages.TopAppBarPage
 import io.github.kdroidfilter.darwinui.sample.pages.TooltipPage
-import io.github.kdroidfilter.darwinui.sample.pages.ColorWellPage
 import io.github.kdroidfilter.darwinui.sample.pages.UploadPage
 import io.github.kdroidfilter.darwinui.theme.AccentColor
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
@@ -135,7 +119,6 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("multiselect", "Multi Select", "FORM CONTROLS", Lucide.ListChecks),
     SidebarEntryDef("searchinput", "Search Input", "FORM CONTROLS", Lucide.Search),
     SidebarEntryDef("slider", "Slider", "FORM CONTROLS", Lucide.SlidersHorizontal),
-    SidebarEntryDef("dateselect", "Date Select", "FORM CONTROLS", Lucide.Calendar),
     SidebarEntryDef("upload", "Upload", "FORM CONTROLS", Lucide.Upload),
     SidebarEntryDef("colorwell", "Color Well", "FORM CONTROLS", Lucide.Scan),
     SidebarEntryDef("groupbox", "Group Box", "DATA DISPLAY", Lucide.SquareDashed),
@@ -156,20 +139,7 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("tabs", "Tabs", "NAVIGATION", Lucide.Columns3),
     SidebarEntryDef("accordion", "Accordion", "NAVIGATION", Lucide.ChevronsUpDown),
     SidebarEntryDef("sidebar", "Sidebar", "NAVIGATION", Lucide.PanelLeft),
-    SidebarEntryDef("m3buttons", "M3 Buttons", "MATERIAL 3", Lucide.MousePointerClick),
-    SidebarEntryDef("topappbar", "Top App Bar", "MATERIAL 3", Lucide.PanelTopOpen),
-    SidebarEntryDef("navigationbar", "Navigation Bar", "MATERIAL 3", Lucide.Menu),
-    SidebarEntryDef("chips", "Chips", "MATERIAL 3", Lucide.Tag),
-    SidebarEntryDef("listitem", "List Item", "MATERIAL 3", Lucide.ListChecks),
-    SidebarEntryDef("divider", "Divider", "MATERIAL 3", Lucide.SlidersHorizontal),
-    SidebarEntryDef("snackbar", "Snackbar", "MATERIAL 3", Lucide.Bell),
-    SidebarEntryDef("bottomsheet", "Bottom Sheet", "MATERIAL 3", Lucide.PanelLeft),
-    SidebarEntryDef("radiobutton", "Radio Button", "MATERIAL 3", Lucide.ListChecks),
-    SidebarEntryDef("surface", "Surface", "MATERIAL 3", Lucide.Layers),
-    SidebarEntryDef("navigationrail", "Navigation Rail", "MATERIAL 3", Lucide.PanelLeft),
-    SidebarEntryDef("bottomappbar", "Bottom App Bar", "MATERIAL 3", Lucide.PanelTopOpen),
-    SidebarEntryDef("segmentedcontrol", "Segmented Control", "DARWIN", Lucide.Columns3),
-    SidebarEntryDef("timepicker", "Time Picker", "MATERIAL 3", Lucide.Calendar),
+    SidebarEntryDef("segmentedcontrol", "Segmented Control", "NAVIGATION", Lucide.Columns3),
 )
 
 @Composable
@@ -281,7 +251,6 @@ fun App() {
                         "multiselect" -> MultiSelectPage()
                         "slider" -> SliderPage()
                         "upload" -> UploadPage()
-                        "dateselect" -> DateSelectPage()
                         "groupbox" -> GroupBoxPage()
                         "groupedlist" -> GroupedListPage()
                         "badge" -> BadgePage()
@@ -300,20 +269,7 @@ fun App() {
                         "tabs" -> TabsPage()
                         "accordion" -> AccordionPage()
                         "sidebar" -> SidebarPage()
-                        "m3buttons" -> M3ButtonsPage()
-                        "topappbar" -> TopAppBarPage()
-                        "navigationbar" -> NavigationBarPage()
-                        "chips" -> ChipsPage()
-                        "listitem" -> ListItemPage()
-                        "divider" -> DividerPage()
-                        "snackbar" -> SnackbarPage()
-                        "bottomsheet" -> BottomSheetPage()
-                        "radiobutton" -> RadioButtonPage()
-                        "surface" -> SurfacePage()
-                        "navigationrail" -> NavigationRailPage()
-                        "bottomappbar" -> BottomAppBarPage()
                         "segmentedcontrol" -> SegmentedControlPage()
-                        "timepicker" -> TimePickerPage()
                         "colorwell" -> ColorWellPage()
                     }
                     Spacer(modifier = Modifier.height(48.dp))

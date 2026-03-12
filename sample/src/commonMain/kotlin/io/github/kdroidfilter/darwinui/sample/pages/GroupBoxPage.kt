@@ -1,11 +1,16 @@
 package io.github.kdroidfilter.darwinui.sample.pages
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,10 +18,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.CheckBox
 import io.github.kdroidfilter.darwinui.components.GroupBox
-import io.github.kdroidfilter.darwinui.components.RadioButton
 import io.github.kdroidfilter.darwinui.components.Slider
 import io.github.kdroidfilter.darwinui.components.Switch
 import io.github.kdroidfilter.darwinui.components.Text
@@ -30,6 +35,23 @@ import io.github.kdroidfilter.darwinui.sample.gallery.PreviewContainer
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+
+@Composable
+private fun RadioButton(selected: Boolean, onClick: () -> Unit) {
+    val accent = DarwinTheme.colors.accent
+    Box(
+        modifier = Modifier
+            .size(18.dp)
+            .border(1.5.dp, if (selected) accent else Color.Gray.copy(alpha = 0.5f), CircleShape)
+            .background(if (selected) accent else Color.Transparent, CircleShape)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (selected) {
+            Box(modifier = Modifier.size(7.dp).background(Color.White, CircleShape))
+        }
+    }
+}
 
 @Composable
 private fun GroupBoxPreview() {

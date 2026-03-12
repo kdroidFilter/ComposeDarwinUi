@@ -144,14 +144,9 @@ fun PulldownButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    leadingIcon: (@Composable () -> Unit)? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     PulldownButton(onClick, modifier, enabled, interactionSource) {
-        if (leadingIcon != null) {
-            leadingIcon()
-            Spacer(Modifier.width(6.dp))
-        }
         Text(text)
     }
 }

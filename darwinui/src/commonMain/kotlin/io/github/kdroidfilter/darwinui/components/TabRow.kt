@@ -66,7 +66,7 @@ fun TabRow(
         }
     },
     divider: @Composable () -> Unit = {
-        HorizontalDivider(color = DarwinTheme.colorScheme.outlineVariant)
+        Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(DarwinTheme.colorScheme.outlineVariant))
     },
     tabs: @Composable () -> Unit,
 ) {
@@ -190,7 +190,7 @@ fun ScrollableTabRow(
         ) {
             tabs()
         }
-        HorizontalDivider(color = DarwinTheme.colorScheme.outlineVariant)
+        Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(DarwinTheme.colorScheme.outlineVariant))
     }
 }
 

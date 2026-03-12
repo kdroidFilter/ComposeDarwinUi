@@ -13,8 +13,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.ContentDialog
-import io.github.kdroidfilter.darwinui.components.ContentDialogButton
 import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.SmallDialog
 import io.github.kdroidfilter.darwinui.components.Text
@@ -25,31 +23,12 @@ import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
-@GalleryExample("Dialog", "Default")
-@Composable
-fun DialogDefaultExample() {
-    var showDialog by remember { mutableStateOf(false) }
-    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        PushButton(text = "Open Dialog", onClick = { showDialog = true })
-    }
-    ContentDialog(
-        title = "Confirm Action",
-        visible = showDialog,
-        content = {
-            Text("Are you sure you want to proceed? This action cannot be undone.")
-        },
-        primaryButtonText = "Confirm",
-        closeButtonText = "Cancel",
-        onButtonClick = { showDialog = false },
-    )
-}
-
 @GalleryExample("Dialog", "Small Dialog")
 @Composable
 fun SmallDialogExample() {
     var showDialog by remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        PushButton(text = "Open Small Dialog", onClick = { showDialog = true })
+        PushButton(text = "Open Dialog", onClick = { showDialog = true })
     }
     SmallDialog(
         visible = showDialog,
@@ -108,9 +87,6 @@ fun SmallDialogDestructiveExample() {
 @Composable
 internal fun DialogPage() {
     GalleryPage("Dialog", "A modal dialog that interrupts the user with important content.") {
-        SectionHeader("Content Dialog")
-        ExampleCard(title = "Default", sourceCode = GallerySources.DialogDefaultExample) { DialogDefaultExample() }
-
         SectionHeader("Small Dialog")
         ExampleCard(
             title = "Simple",

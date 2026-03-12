@@ -24,7 +24,6 @@ import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.icons.LucideSettings
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
@@ -40,7 +39,7 @@ fun ButtonPulldownExample() {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         PulldownButton(text = "Sort by", onClick = {})
-        PulldownButton(text = "View", onClick = {}, leadingIcon = { Icon(LucideSettings) })
+        PulldownButton(text = "View", onClick = {})
     }
 }
 
