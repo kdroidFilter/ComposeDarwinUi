@@ -3,6 +3,7 @@ package io.github.kdroidfilter.darwinui.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -24,11 +25,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.github.fletchmckee.liquid.liquid
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
+import io.github.kdroidfilter.darwinui.theme.LocalToolbarGlassState
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import io.github.kdroidfilter.darwinui.theme.darwinTween
 
@@ -38,19 +41,23 @@ import io.github.kdroidfilter.darwinui.theme.darwinTween
 
 /**
  * macOS-native circular icon button. Matches NSButton with a circular bezel style.
+ *
+ * When placed inside a [DarwinScaffold] title bar area, automatically renders
+ * with a frosted liquid glass background for a native macOS toolbar look.
  */
 @Composable
 fun IconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    size: Dp = 24.dp,
+    size: Dp = 30.dp,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable () -> Unit,
 ) {
     val isDark = DarwinTheme.colors.isDark
     val isPressed by interactionSource.collectIsPressedAsState()
     val isHovered by interactionSource.collectIsHoveredAsState()
+    val toolbarGlassState = LocalToolbarGlassState.current
 
     val scale by animateFloatAsState(
         targetValue = if (isPressed && enabled) 0.93f else 1f,
@@ -62,17 +69,36 @@ fun IconButton(
         animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
         label = "icon_btn_alpha",
     )
-    val bgColor by animateColorAsState(
+
+    // Hover/press overlay (used on top of glass or as standalone bg)
+    val overlayColor by animateColorAsState(
         targetValue = when {
-            isPressed && enabled -> if (isDark) Color.White.copy(alpha = 0.14f) else Color.Black.copy(alpha = 0.10f)
-            isHovered && enabled -> if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.07f)
-            else -> if (isDark) Color.White.copy(alpha = 0.07f) else Color.Black.copy(alpha = 0.05f)
+            isPressed && enabled -> if (isDark) Color.White.copy(alpha = 0.20f) else Color.Black.copy(alpha = 0.10f)
+            isHovered && enabled -> if (isDark) Color.White.copy(alpha = 0.14f) else Color.Black.copy(alpha = 0.06f)
+            else -> Color.Transparent
         },
         animationSpec = darwinTween(DarwinDuration.Fast),
-        label = "icon_btn_bg",
+        label = "icon_btn_overlay",
     )
 
+    val bgModifier = if (toolbarGlassState != null) {
+        // No background in toolbar — only hover/press overlay
+        Modifier.clip(CircleShape)
+    } else {
+        // Plain background fallback outside toolbar
+        val bgColor = when {
+            isPressed && enabled -> if (isDark) Color.White.copy(alpha = 0.20f) else Color.Black.copy(alpha = 0.12f)
+            isHovered && enabled -> if (isDark) Color.White.copy(alpha = 0.14f) else Color.Black.copy(alpha = 0.10f)
+            else -> if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.07f)
+        }
+        Modifier
+            .clip(CircleShape)
+            .background(bgColor, CircleShape)
+    }
+
     val contentColor = if (isDark) Color.White.copy(alpha = 0.85f) else Color.Black.copy(alpha = 0.75f)
+
+    val borderColor = if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.12f)
 
     CompositionLocalProvider(
         LocalDarwinContentColor provides contentColor,
@@ -83,8 +109,16 @@ fun IconButton(
                 .size(size)
                 .scale(scale)
                 .alpha(alpha)
-                .clip(CircleShape)
-                .background(bgColor, CircleShape)
+                .then(bgModifier)
+                .then(
+                    if (toolbarGlassState != null) {
+                        Modifier
+                            .border(0.5.dp, borderColor, CircleShape)
+                            .background(overlayColor, CircleShape)
+                    } else {
+                        Modifier
+                    }
+                )
                 .hoverable(interactionSource = interactionSource, enabled = enabled)
                 .clickable(
                     interactionSource = interactionSource,
@@ -119,6 +153,7 @@ fun HelpButton(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
+        size = 24.dp,
         interactionSource = interactionSource,
     ) {
         Text("?")

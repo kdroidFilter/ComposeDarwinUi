@@ -10,12 +10,12 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -63,9 +63,13 @@ import com.composables.icons.lucide.Upload
 import io.github.kdroidfilter.darwinui.components.DarwinScaffold
 import io.github.kdroidfilter.darwinui.components.IconButton
 import io.github.kdroidfilter.darwinui.components.NavigationButtons
+import io.github.kdroidfilter.darwinui.components.Popover
+import io.github.kdroidfilter.darwinui.components.PopoverPlacement
 import io.github.kdroidfilter.darwinui.components.SearchSuggestionHeader
 import io.github.kdroidfilter.darwinui.components.SearchSuggestionItem
 import io.github.kdroidfilter.darwinui.components.SearchSuggestionSeparator
+import io.github.kdroidfilter.darwinui.components.SegmentedControl
+import io.github.kdroidfilter.darwinui.components.SegmentedControlSize
 import io.github.kdroidfilter.darwinui.components.Sidebar
 import io.github.kdroidfilter.darwinui.components.SidebarIconSize
 import io.github.kdroidfilter.darwinui.components.SidebarItem
@@ -77,6 +81,7 @@ import io.github.kdroidfilter.darwinui.components.rememberToastState
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideMoon
 import io.github.kdroidfilter.darwinui.icons.LucidePanelLeft
+import io.github.kdroidfilter.darwinui.icons.LucideSettings
 import io.github.kdroidfilter.darwinui.icons.LucideSun
 import io.github.kdroidfilter.darwinui.sample.pages.AccordionPage
 import io.github.kdroidfilter.darwinui.sample.pages.AlertPage
@@ -97,6 +102,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.MultiSelectPage
 import io.github.kdroidfilter.darwinui.sample.pages.PopoverPage
 import io.github.kdroidfilter.darwinui.sample.pages.ProgressPage
 import io.github.kdroidfilter.darwinui.sample.pages.RadioButtonPage
+import io.github.kdroidfilter.darwinui.sample.pages.ScaffoldPage
 import io.github.kdroidfilter.darwinui.sample.pages.SearchInputPage
 import io.github.kdroidfilter.darwinui.sample.pages.SegmentedControlPage
 import io.github.kdroidfilter.darwinui.sample.pages.SelectPage
@@ -151,6 +157,7 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("sidebar", "Sidebar", "NAVIGATION", Lucide.PanelLeft),
     SidebarEntryDef("segmentedcontrol", "Segmented Control", "NAVIGATION", Lucide.Columns3),
     SidebarEntryDef("titlebar", "Title Bar", "NAVIGATION", Lucide.PanelTopOpen),
+    SidebarEntryDef("scaffold", "Scaffold", "NAVIGATION", Lucide.PanelLeft),
 )
 
 @Composable
@@ -166,6 +173,7 @@ fun App() {
         var searchExpanded by remember { mutableStateOf(false) }
         var sidebarVisible by remember { mutableStateOf(true) }
         var sidebarCollapsed by remember { mutableStateOf(false) }
+        var settingsExpanded by remember { mutableStateOf(false) }
 
         // Navigation helpers
         val currentIndex = sidebarEntryDefs.indexOfFirst { it.id == selectedPage }
@@ -197,38 +205,29 @@ fun App() {
                         collapsible = true,
                         iconSize = sidebarIconSize,
                         header = {
-                            Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 10.dp)) {
-                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Column {
-                                            Text(
-                                                text = "Darwin UI",
-                                                fontSize = 18.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = DarwinTheme.colors.textPrimary,
-                                            )
-                                            Text(
-                                                text = "Component Docs",
-                                                style = DarwinTheme.typography.bodySmall,
-                                                color = DarwinTheme.colors.textTertiary,
-                                            )
-                                        }
-                                        IconButton(onClick = { sidebarVisible = false }) {
-                                            Icon(LucidePanelLeft, modifier = Modifier.size(14.dp))
-                                        }
-                                    }
-                                    AccentColorPicker(
-                                        selected = accentColor,
-                                        onSelect = { accentColor = it },
+                            // Title + toggle — aligns vertically with 52dp title bar
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Darwin UI",
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = DarwinTheme.colors.textPrimary,
                                     )
-                                    SidebarIconSizePicker(
-                                        selected = sidebarIconSize,
-                                        onSelect = { sidebarIconSize = it },
+                                    Text(
+                                        text = "Component Docs",
+                                        style = DarwinTheme.typography.bodySmall,
+                                        color = DarwinTheme.colors.textTertiary,
                                     )
+                                }
+                                IconButton(onClick = { sidebarVisible = false }) {
+                                    Icon(LucidePanelLeft, modifier = Modifier.size(18.dp))
                                 }
                             }
                         },
@@ -236,6 +235,7 @@ fun App() {
                 },
                 titleBar = {
                     TitleBar(
+                        glass = true,
                         navigationActions = {
                             NavigationButtons(
                                 onBack = {
@@ -250,8 +250,46 @@ fun App() {
                         },
                         title = { Text(currentPageLabel) },
                         actions = {
+                            Popover(
+                                expanded = settingsExpanded,
+                                onDismissRequest = { settingsExpanded = false },
+                                placement = PopoverPlacement.Bottom,
+                                trigger = {
+                                    IconButton(onClick = { settingsExpanded = !settingsExpanded }) {
+                                        Icon(LucideSettings, modifier = Modifier.size(18.dp))
+                                    }
+                                },
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(16.dp).width(220.dp),
+                                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                                ) {
+                                    Text(
+                                        text = "Accent Color",
+                                        style = DarwinTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = DarwinTheme.colors.textSecondary,
+                                    )
+                                    AccentColorPicker(
+                                        selected = accentColor,
+                                        onSelect = { accentColor = it },
+                                    )
+                                    Text(
+                                        text = "Sidebar Icon Size",
+                                        style = DarwinTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = DarwinTheme.colors.textSecondary,
+                                    )
+                                    SegmentedControl(
+                                        options = listOf("S", "M", "L"),
+                                        selectedIndex = SidebarIconSize.entries.indexOf(sidebarIconSize),
+                                        onSelectedIndexChange = { sidebarIconSize = SidebarIconSize.entries[it] },
+                                        size = SegmentedControlSize.Small,
+                                    )
+                                }
+                            }
                             IconButton(onClick = { isDark = !isDark }) {
-                                Icon(if (isDark) LucideSun else LucideMoon, modifier = Modifier.size(14.dp))
+                                Icon(if (isDark) LucideSun else LucideMoon, modifier = Modifier.size(18.dp))
                             }
                             ToolbarSearchField(
                                 value = searchQuery,
@@ -293,12 +331,13 @@ fun App() {
                         },
                     )
                 },
-            ) {
+            ) { contentPadding ->
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        .padding(40.dp),
+                        .padding(contentPadding)
+                        .padding(horizontal = 40.dp, vertical = 40.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                 ) {
                     when (selectedPage) {
@@ -334,6 +373,7 @@ fun App() {
                         "sidebar" -> SidebarPage()
                         "segmentedcontrol" -> SegmentedControlPage()
                         "titlebar" -> TitleBarPage()
+                        "scaffold" -> ScaffoldPage()
                         "colorwell" -> ColorWellPage()
                     }
                     Spacer(modifier = Modifier.height(48.dp))
@@ -355,7 +395,7 @@ private fun AccentColorPicker(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        AccentColor.entries.forEach { color ->
+        AccentColor.entries.filter { it != AccentColor.Teal }.forEach { color ->
             val isSelected = color == selected
             val displayColor = if (DarwinTheme.colors.isDark) color.dark else color.light
             Box(
@@ -376,53 +416,3 @@ private fun AccentColorPicker(
     }
 }
 
-@Composable
-private fun SidebarIconSizePicker(
-    selected: SidebarIconSize,
-    onSelect: (SidebarIconSize) -> Unit,
-) {
-    val colors = DarwinTheme.colors
-    val shape = DarwinTheme.shapes.small
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(26.dp)
-            .clip(shape)
-            .background(
-                if (colors.isDark) Color.White.copy(alpha = 0.06f) else Color.Black.copy(alpha = 0.04f),
-                shape,
-            ),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        SidebarIconSize.entries.forEach { size ->
-            val isSelected = size == selected
-            val label = when (size) {
-                SidebarIconSize.Small -> "S"
-                SidebarIconSize.Medium -> "M"
-                SidebarIconSize.Large -> "L"
-            }
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .padding(2.dp)
-                    .clip(DarwinTheme.shapes.extraSmall)
-                    .then(
-                        if (isSelected) Modifier.background(colors.accent, DarwinTheme.shapes.extraSmall)
-                        else Modifier
-                    )
-                    .clickable { onSelect(size) },
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = label,
-                    style = DarwinTheme.typography.bodySmall,
-                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (isSelected) colors.onAccent else colors.textSecondary,
-                )
-            }
-        }
-    }
-}

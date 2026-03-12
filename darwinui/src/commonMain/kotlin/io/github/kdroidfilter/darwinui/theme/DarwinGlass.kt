@@ -19,6 +19,14 @@ import io.github.fletchmckee.liquid.liquid
 val LocalDarwinLiquidState = compositionLocalOf<LiquidState?> { null }
 
 /**
+ * Provides a [LiquidState] for toolbar-level glass effects on buttons.
+ * Set by [DarwinScaffold][io.github.kdroidfilter.darwinui.components.DarwinScaffold]
+ * inside the title bar area so toolbar buttons can render with frosted glass.
+ * Null when outside a scaffold title bar or when glass is unavailable.
+ */
+val LocalToolbarGlassState = compositionLocalOf<LiquidState?> { null }
+
+/**
  * Applies a liquid glass (frosted backdrop blur) effect to overlay composables.
  *
  * When [LocalDarwinLiquidState] is available ([DarwinTheme] created with `liquidGlass = true`),

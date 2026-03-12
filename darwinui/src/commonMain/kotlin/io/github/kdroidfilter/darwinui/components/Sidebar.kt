@@ -82,23 +82,23 @@ enum class SidebarIconSize(
 ) {
     Small(
         iconDp = 14.dp,
-        itemHeight = 22.dp,
+        itemHeight = 26.dp,
         hPadding = 6.dp,
         iconGap = 5.dp,
         itemSpacing = 0.dp,
-        groupHeaderMaxHeight = 22.dp,
+        groupHeaderMaxHeight = 30.dp,
     ),
     Medium(
         iconDp = 16.dp,
-        itemHeight = 26.dp,
+        itemHeight = 30.dp,
         hPadding = 8.dp,
         iconGap = 6.dp,
         itemSpacing = 1.dp,
-        groupHeaderMaxHeight = 24.dp,
+        groupHeaderMaxHeight = 32.dp,
     ),
     Large(
         iconDp = 22.dp,
-        itemHeight = 34.dp,
+        itemHeight = 36.dp,
         hPadding = 10.dp,
         iconGap = 8.dp,
         itemSpacing = 2.dp,

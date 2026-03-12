@@ -343,16 +343,7 @@ private fun TextFieldImpl(
                         if (suffix != null) {
                             Box(modifier = Modifier.padding(start = 4.dp)) { suffix() }
                         }
-                        val resolvedTrailingIcon: (@Composable () -> Unit)? = when {
-                            isError -> ({
-                                io.github.kdroidfilter.darwinui.icons.Icon(
-                                    io.github.kdroidfilter.darwinui.icons.LucideX,
-                                    tint = colors.errorTrailingIconColor,
-                                )
-                            })
-                            else -> trailingIcon
-                        }
-                        if (resolvedTrailingIcon != null) {
+                        if (trailingIcon != null) {
                             val iconColor = when {
                                 !enabled -> colors.disabledTrailingIconColor
                                 isError -> colors.errorTrailingIconColor
@@ -362,7 +353,7 @@ private fun TextFieldImpl(
                             Box(modifier = Modifier.padding(start = 8.dp), contentAlignment = Alignment.Center) {
                                 androidx.compose.runtime.CompositionLocalProvider(
                                     io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor provides iconColor,
-                                ) { resolvedTrailingIcon() }
+                                ) { trailingIcon() }
                             }
                         }
                     }

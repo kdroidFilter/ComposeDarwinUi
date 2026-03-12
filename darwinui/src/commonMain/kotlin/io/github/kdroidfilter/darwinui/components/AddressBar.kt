@@ -103,7 +103,7 @@ fun AddressBar(
     Row(
         modifier = modifier
             .onFocusChanged { isFocused = it.hasFocus }
-            .height(28.dp)
+            .height(30.dp)
             .shadow(
                 elevation = if (isFocused) 4.dp else 0.dp,
                 shape = shape,

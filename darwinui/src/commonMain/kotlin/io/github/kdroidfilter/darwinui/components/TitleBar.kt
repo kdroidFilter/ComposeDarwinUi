@@ -2,6 +2,7 @@ package io.github.kdroidfilter.darwinui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -18,6 +19,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import io.github.fletchmckee.liquid.liquid
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.icons.LucideChevronLeft
@@ -39,6 +41,8 @@ import io.github.kdroidfilter.darwinui.theme.*
  * @param actions Right-side action buttons (e.g. [TitleBarButtonGroup]).
  * @param backgroundColor Background color of the title bar.
  * @param showBottomBorder Whether to show a subtle border at the bottom.
+ * @param glass When true, uses a translucent glass background so content
+ *   can scroll behind the title bar (macOS vibrancy style).
  * @param height Height of the title bar (default 52dp).
  */
 @Composable
@@ -49,15 +53,25 @@ fun TitleBar(
     actions: @Composable RowScope.() -> Unit = {},
     backgroundColor: Color = DarwinTheme.colors.background,
     showBottomBorder: Boolean = true,
+    glass: Boolean = false,
     height: Int = 52
 ) {
-    val borderColor = if (DarwinTheme.colors.isDark) Color.Black.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.1f)
+    val isDark = DarwinTheme.colors.isDark
+    val borderColor = if (isDark) Color.Black.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.1f)
+
+    // Automatically transparent when inside a DarwinScaffold (glass provided by scaffold)
+    val insideScaffold = LocalToolbarGlassState.current != null
+    val bgModifier = if (glass || insideScaffold) {
+        Modifier // Transparent — scaffold provides frosted glass blur
+    } else {
+        Modifier.background(backgroundColor)
+    }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(height.dp)
-            .background(backgroundColor)
+            .then(bgModifier)
             .then(
                 if (showBottomBorder) {
                     Modifier.drawBehind {
@@ -120,12 +134,19 @@ fun TitleBarButtonGroup(
     content: @Composable RowScope.() -> Unit,
 ) {
     val isDark = DarwinTheme.colors.isDark
-    val bgColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.055f)
+    val toolbarGlassState = LocalToolbarGlassState.current
+    val fallbackBg = if (isDark) Color.White.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.50f)
+
+    val glassModifier = Modifier.clip(TitleBarGroupShape)
+
+    val borderColor = if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.12f)
+
     Row(
         modifier = modifier
-            .height(28.dp)
-            .clip(TitleBarGroupShape)
-            .background(bgColor, TitleBarGroupShape),
+            .height(32.dp)
+            .then(glassModifier)
+            .border(0.5.dp, borderColor, TitleBarGroupShape)
+            .clip(TitleBarGroupShape),
         verticalAlignment = Alignment.CenterVertically,
         content = content,
     )
@@ -140,6 +161,7 @@ fun TitleBarGroupButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 8.dp),
     content: @Composable () -> Unit,
 ) {
     val isDark = DarwinTheme.colors.isDark
@@ -149,8 +171,8 @@ fun TitleBarGroupButton(
 
     val bgOverlay by animateColorAsState(
         targetValue = when {
-            isPressed && enabled -> if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.09f)
-            isHovered && enabled -> if (isDark) Color.White.copy(alpha = 0.07f) else Color.Black.copy(alpha = 0.05f)
+            isPressed && enabled -> if (isDark) Color.White.copy(alpha = 0.18f) else Color.Black.copy(alpha = 0.12f)
+            isHovered && enabled -> if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.08f)
             else -> Color.Transparent
         },
         animationSpec = darwinTween(DarwinDuration.Fast),
@@ -158,9 +180,9 @@ fun TitleBarGroupButton(
     )
     val contentColor by animateColorAsState(
         targetValue = if (!enabled) {
-            if (isDark) Color.White.copy(alpha = 0.28f) else Color.Black.copy(alpha = 0.22f)
+            if (isDark) Color.White.copy(alpha = 0.28f) else Color(0xFFC6C6C6)
         } else {
-            if (isDark) Color.White.copy(alpha = 0.85f) else Color.Black.copy(alpha = 0.65f)
+            if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF4C4C4C)
         },
         animationSpec = darwinTween(DarwinDuration.Fast),
         label = "tbar_grp_btn_content",
@@ -182,7 +204,7 @@ fun TitleBarGroupButton(
                     role = Role.Button,
                     onClick = onClick,
                 )
-                .padding(horizontal = 10.dp),
+                .padding(contentPadding),
             contentAlignment = Alignment.Center,
         ) {
             content()
@@ -198,9 +220,9 @@ fun TitleBarGroupDivider(modifier: Modifier = Modifier) {
     val isDark = DarwinTheme.colors.isDark
     Spacer(
         modifier = modifier
-            .width(0.5.dp)
-            .height(14.dp)
-            .background(if (isDark) Color.White.copy(alpha = 0.18f) else Color.Black.copy(alpha = 0.15f)),
+            .width(1.dp)
+            .height(20.dp)
+            .background(if (isDark) Color.White.copy(alpha = 0.18f) else Color(0xFFE6E6E6)),
     )
 }
 
@@ -226,12 +248,20 @@ fun NavigationButtons(
     forwardEnabled: Boolean = false,
 ) {
     TitleBarButtonGroup(modifier = modifier) {
-        TitleBarGroupButton(onClick = onBack, enabled = backEnabled) {
-            Icon(LucideChevronLeft, modifier = Modifier.size(16.dp))
+        TitleBarGroupButton(
+            onClick = onBack,
+            enabled = backEnabled,
+            contentPadding = PaddingValues(horizontal = 6.dp),
+        ) {
+            Icon(LucideChevronLeft, modifier = Modifier.size(24.dp))
         }
         TitleBarGroupDivider()
-        TitleBarGroupButton(onClick = onForward, enabled = forwardEnabled) {
-            Icon(LucideChevronRight, modifier = Modifier.size(16.dp))
+        TitleBarGroupButton(
+            onClick = onForward,
+            enabled = forwardEnabled,
+            contentPadding = PaddingValues(horizontal = 6.dp),
+        ) {
+            Icon(LucideChevronRight, modifier = Modifier.size(24.dp))
         }
     }
 }
@@ -260,7 +290,7 @@ fun SidebarButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    icon: @Composable () -> Unit = { Icon(LucidePanelLeft, modifier = Modifier.size(16.dp)) },
+    icon: @Composable () -> Unit = { Icon(LucidePanelLeft, modifier = Modifier.size(20.dp)) },
     menuContent: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
@@ -276,7 +306,7 @@ fun SidebarButton(
                     onClick = { menuExpanded = true },
                     enabled = enabled,
                 ) {
-                    Icon(LucideChevronDown, modifier = Modifier.size(10.dp))
+                    Icon(LucideChevronDown, modifier = Modifier.size(12.dp))
                 }
             }
         }

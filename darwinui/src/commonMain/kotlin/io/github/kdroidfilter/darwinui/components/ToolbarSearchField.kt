@@ -115,7 +115,7 @@ fun ToolbarSearchField(
             exit = fadeOut(darwinTween(DarwinDuration.Fast)),
         ) {
             IconButton(onClick = { onExpandedChange(true) }) {
-                Icon(LucideSearch, modifier = Modifier.size(14.dp))
+                Icon(LucideSearch, modifier = Modifier.size(16.dp))
             }
         }
 
@@ -197,7 +197,7 @@ private fun ExpandedField(
             Row(
                 modifier = Modifier
                     .width(expandedWidth)
-                    .height(28.dp)
+                    .height(30.dp)
                     .shadow(
                         elevation = 4.dp,
                         shape = shape,
@@ -216,7 +216,7 @@ private fun ExpandedField(
                 Icon(
                     imageVector = LucideSearch,
                     tint = iconColor,
-                    modifier = Modifier.size(14.dp),
+                    modifier = Modifier.size(16.dp),
                 )
 
                 // Text field
@@ -308,8 +308,8 @@ private fun SearchSuggestionsPopup(
     val fallbackBg = if (isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
     val borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
-    // 28dp field height + 4dp gap, converted to pixels
-    val offsetY = with(density) { 32.dp.roundToPx() }
+    // 30dp field height + 4dp gap, converted to pixels
+    val offsetY = with(density) { 34.dp.roundToPx() }
 
     Popup(
         alignment = Alignment.TopEnd,
