@@ -3,6 +3,7 @@ package io.github.kdroidfilter.darwinui.sample
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -169,7 +170,8 @@ private val sidebarEntryDefs = listOf(
 
 @Composable
 fun App() {
-    var isDark by remember { mutableStateOf(false) }
+    val systemTheme = isSystemInDarkTheme()
+    var isDark by remember { mutableStateOf(systemTheme) }
     var accentColor by remember { mutableStateOf(AccentColor.Blue) }
     var sidebarIconSize by remember { mutableStateOf(SidebarIconSize.Medium) }
 
