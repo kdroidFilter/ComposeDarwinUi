@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.AlertDialog
+import io.github.kdroidfilter.darwinui.components.AlertDialogButtonLayout
 import io.github.kdroidfilter.darwinui.components.AlertType
 import io.github.kdroidfilter.darwinui.components.PushButton
 import io.github.kdroidfilter.darwinui.components.SaveDialog
@@ -199,6 +200,26 @@ fun AlertDialogSimpleExample() {
     }
 }
 
+@GalleryExample("Dialog", "Alert Dialog — Side by Side")
+@Composable
+fun AlertDialogSideBySideExample() {
+    var showAlertDialog by remember { mutableStateOf(false) }
+    PushButton(text = "Show Side by Side Alert", onClick = { showAlertDialog = true })
+    if (showAlertDialog) {
+        AlertDialog(
+            open = true,
+            onDismissRequest = { showAlertDialog = false },
+            title = "Save the messages, draft, and attachments?",
+            message = "This message has not been sent. You can save it later.",
+            confirmText = "Save",
+            cancelText = "Cancel",
+            onConfirm = { showAlertDialog = false },
+            onCancel = { showAlertDialog = false },
+            buttonLayout = AlertDialogButtonLayout.SideBySide,
+        )
+    }
+}
+
 @Composable
 internal fun DialogPage() {
     GalleryPage("Dialog", "A modal dialog that interrupts the user with important content.") {
@@ -242,5 +263,10 @@ internal fun DialogPage() {
             description = "macOS-native simple alert with 2 buttons",
             sourceCode = GallerySources.AlertDialogSimpleExample,
         ) { AlertDialogSimpleExample() }
+        ExampleCard(
+            title = "Side by Side Alert",
+            description = "macOS-native alert with side-by-side buttons",
+            sourceCode = GallerySources.AlertDialogSideBySideExample,
+        ) { AlertDialogSideBySideExample() }
     }
 }

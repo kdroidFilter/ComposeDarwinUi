@@ -253,6 +253,8 @@ fun AlertBanner(
  * @param onDestructive Optional callback for the destructive action button.
  * @param onCancel Optional callback invoked when the cancel button is pressed.
  *                 Falls back to [onDismissRequest] when null.
+ * @param buttonLayout The arrangement of buttons: [AlertDialogButtonLayout.Stacked] (default)
+ *                     for vertical stacking, or [AlertDialogButtonLayout.SideBySide] for horizontal layout.
  */
 @Composable
 fun AlertDialog(
@@ -267,6 +269,7 @@ fun AlertDialog(
     onConfirm: () -> Unit = {},
     onDestructive: (() -> Unit)? = null,
     onCancel: (() -> Unit)? = null,
+    buttonLayout: AlertDialogButtonLayout = AlertDialogButtonLayout.Stacked,
 ) {
     // Keep the popup mounted while the exit animation plays
     var showPopup by remember { mutableStateOf(false) }
@@ -346,6 +349,7 @@ fun AlertDialog(
                                 onDismissRequest()
                             }
                         } else null,
+                        buttonLayout = buttonLayout,
                     )
                 }
             }
@@ -368,6 +372,7 @@ private fun AlertDialogContent(
     onConfirm: () -> Unit,
     onCancel: () -> Unit,
     onDestructive: (() -> Unit)? = null,
+    buttonLayout: AlertDialogButtonLayout = AlertDialogButtonLayout.Stacked,
 ) {
     val colors = DarwinTheme.colorScheme
     val isDark = colors.isDark
@@ -418,34 +423,70 @@ private fun AlertDialogContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Vertically stacked full-width pill buttons (macOS native style)
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            // Primary action — accent blue pill
-            AlertPillButton(
-                text = confirmText,
-                onClick = onConfirm,
-                style = AlertPillButtonStyle.Accent,
-            )
-
-            // Destructive action — red tinted pill (optional)
-            if (destructiveText != null && onDestructive != null) {
-                AlertPillButton(
-                    text = destructiveText,
-                    onClick = onDestructive,
-                    style = AlertPillButtonStyle.Destructive,
-                )
+        when (buttonLayout) {
+            AlertDialogButtonLayout.Stacked -> {
+                // Vertically stacked full-width pill buttons (macOS native style)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    AlertPillButton(
+                        text = confirmText,
+                        onClick = onConfirm,
+                        style = AlertPillButtonStyle.Accent,
+                    )
+                    if (destructiveText != null && onDestructive != null) {
+                        AlertPillButton(
+                            text = destructiveText,
+                            onClick = onDestructive,
+                            style = AlertPillButtonStyle.Destructive,
+                        )
+                    }
+                    if (cancelText != null) {
+                        AlertPillButton(
+                            text = cancelText,
+                            onClick = onCancel,
+                            style = AlertPillButtonStyle.Secondary,
+                        )
+                    }
+                }
             }
 
-            // Cancel — neutral gray pill
-            if (cancelText != null) {
-                AlertPillButton(
-                    text = cancelText,
-                    onClick = onCancel,
-                    style = AlertPillButtonStyle.Secondary,
-                )
+            AlertDialogButtonLayout.SideBySide -> {
+                // Side-by-side pill buttons (macOS style for 2-button alerts)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    // Destructive action on its own row if present
+                    if (destructiveText != null && onDestructive != null) {
+                        AlertPillButton(
+                            text = destructiveText,
+                            onClick = onDestructive,
+                            style = AlertPillButtonStyle.Destructive,
+                        )
+                    }
+                    // Cancel + Confirm side by side
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        if (cancelText != null) {
+                            AlertPillButton(
+                                text = cancelText,
+                                onClick = onCancel,
+                                style = AlertPillButtonStyle.Secondary,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                        AlertPillButton(
+                            text = confirmText,
+                            onClick = onConfirm,
+                            style = AlertPillButtonStyle.Accent,
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
+                }
             }
         }
     }
@@ -454,6 +495,21 @@ private fun AlertDialogContent(
 // ===========================================================================
 // AlertPillButton — macOS-native full-width pill button for alert dialogs
 // ===========================================================================
+
+// ===========================================================================
+// AlertDialog Button Layout
+// ===========================================================================
+
+/**
+ * Controls the button arrangement in an [AlertDialog].
+ */
+enum class AlertDialogButtonLayout {
+    /** Buttons stacked vertically (macOS default for 3+ buttons). */
+    Stacked,
+
+    /** Buttons placed side by side (macOS style for 2-button alerts). */
+    SideBySide,
+}
 
 private enum class AlertPillButtonStyle { Accent, Destructive, Secondary }
 
