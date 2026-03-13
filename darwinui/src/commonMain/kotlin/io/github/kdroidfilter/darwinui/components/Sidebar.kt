@@ -26,7 +26,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,12 +51,25 @@ import io.github.kdroidfilter.darwinui.components.TrackClickBehavior
 import io.github.kdroidfilter.darwinui.components.rememberScrollbarState
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.Icon
+import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
 import io.github.kdroidfilter.darwinui.icons.LucideChevronsLeft
 import io.github.kdroidfilter.darwinui.icons.LucideLogOut
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalSidebarResize
+import io.github.kdroidfilter.darwinui.theme.LocalSidebarWidth
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 
 // =============================================================================
@@ -128,17 +143,35 @@ enum class SidebarIconSize(
  *   items are rendered in groups with a header label above each group.
  * @param id Unique identifier used for active-item matching. Defaults to [label].
  */
+/**
+ * Data for a single sidebar navigation item.
+ *
+ * [onClick] is intentionally excluded from [equals]/[hashCode] to keep
+ * [SidebarItem] stable for Compose's skipping mechanism (lambdas don't
+ * implement structural equality).
+ *
+ * @param label Display text for the item.
+ * @param onClick Callback invoked when this item is clicked.
+ * @param icon Optional Lucide-style [ImageVector] rendered before the label.
+ * @param group Optional group header text. When any item has a non-null group,
+ *   items are rendered in groups with a header label above each group.
+ * @param id Unique identifier used for active-item matching. Defaults to [label].
+ * @param children Child items displayed in a collapsible disclosure section.
+ *   When non-empty, a disclosure chevron is shown that toggles visibility of children.
+ */
 class SidebarItem(
     val label: String,
     val onClick: () -> Unit,
     val icon: ImageVector? = null,
     val group: String? = null,
     val id: String = label,
+    val children: List<SidebarItem> = emptyList(),
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is SidebarItem) return false
-        return id == other.id && label == other.label && icon == other.icon && group == other.group
+        return id == other.id && label == other.label && icon == other.icon
+            && group == other.group && children == other.children
     }
 
     override fun hashCode(): Int {
@@ -146,6 +179,7 @@ class SidebarItem(
         result = 31 * result + (icon?.hashCode() ?: 0)
         result = 31 * result + (group?.hashCode() ?: 0)
         result = 31 * result + id.hashCode()
+        result = 31 * result + children.hashCode()
         return result
     }
 }
@@ -154,12 +188,33 @@ class SidebarItem(
 // Sidebar — main component
 // =============================================================================
 
+/**
+ * macOS-style sidebar navigation component.
+ *
+ * @param items Navigation items to display.
+ * @param activeItem The [SidebarItem.id] of the currently selected item.
+ * @param modifier Modifier applied to the root container.
+ * @param iconSize Icon size preset matching macOS sidebar settings.
+ * @param width Width of the sidebar when expanded.
+ * @param collapsedWidth Width of the sidebar when collapsed (icon-only mode).
+ * @param onLogout Optional logout callback. When non-null, a logout button is shown at the bottom.
+ * @param logoutLabel Label for the logout button.
+ * @param collapsed Whether the sidebar is in collapsed (icon-only) mode.
+ * @param onCollapsedChange Called when the collapse toggle is clicked.
+ * @param collapsible Whether the collapse toggle is shown.
+ * @param showBorder Whether to show a right border on the sidebar.
+ * @param scrollbarTrackClickBehavior Scrollbar track click behavior.
+ * @param header Optional composable header above the items.
+ * @param pinnedItems Items pinned to the bottom of the sidebar.
+ */
 @Composable
 fun Sidebar(
     items: List<SidebarItem>,
     activeItem: String,
     modifier: Modifier = Modifier,
     iconSize: SidebarIconSize = SidebarIconSize.Medium,
+    width: Dp = 240.dp,
+    collapsedWidth: Dp = 56.dp,
     onLogout: (() -> Unit)? = null,
     logoutLabel: String = "Logout",
     collapsed: Boolean = false,
@@ -173,12 +228,16 @@ fun Sidebar(
     val colors = DarwinTheme.colorScheme
     val isDark = colors.isDark
 
+    // Scaffold-provided width takes precedence over the parameter
+    val scaffoldWidth = LocalSidebarWidth.current
+    val effectiveWidth = if (scaffoldWidth != Dp.Unspecified) scaffoldWidth else width
+
     val hasGroups = remember(items) { items.any { it.group != null } }
     val groupedItems = remember(items) { if (hasGroups) items.groupBy { it.group } else null }
 
-    // Animated width: collapsed=56dp, expanded=240dp (matches macOS Finder sidebar)
+    // Animated width: collapsed=collapsedWidth, expanded=effectiveWidth
     val animatedWidth by animateDpAsState(
-        targetValue = if (collapsed) 56.dp else 240.dp,
+        targetValue = if (collapsed) collapsedWidth else effectiveWidth,
         animationSpec = sidebarSpring(),
     )
 
@@ -187,6 +246,13 @@ fun Sidebar(
         targetValue = if (collapsed) 4.dp else 6.dp,
         animationSpec = sidebarSpring(),
     )
+
+    // Scrollbar track padding: reduced in collapsed mode so icons have more room
+    val animatedTrackPadding by animateDpAsState(
+        targetValue = if (collapsed) 4.dp else TRACK_BREADTH,
+        animationSpec = sidebarSpring(),
+    )
+
 
     val hasBottomSection = collapsible || pinnedItems.isNotEmpty() || onLogout != null
 
@@ -260,7 +326,7 @@ fun Sidebar(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(itemsScrollState)
-                        .padding(start = TRACK_BREADTH, end = TRACK_BREADTH, top = 2.dp, bottom = 2.dp),
+                        .padding(start = animatedTrackPadding, end = animatedTrackPadding, top = 2.dp, bottom = 2.dp),
                     verticalArrangement = Arrangement.spacedBy(iconSize.itemSpacing),
                 ) {
                     if (hasGroups && groupedItems != null) {
@@ -293,11 +359,13 @@ fun Sidebar(
                     }
                 }
 
-                VerticalScrollbar(
-                    state = rememberScrollbarState(itemsScrollState),
-                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-                    trackClickBehavior = scrollbarTrackClickBehavior,
-                )
+                if (!collapsed) {
+                    VerticalScrollbar(
+                        state = rememberScrollbarState(itemsScrollState),
+                        modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                        trackClickBehavior = scrollbarTrackClickBehavior,
+                    )
+                }
             }
 
             // ---- Bottom section ----
@@ -350,6 +418,30 @@ fun Sidebar(
                     .background(borderColor),
             )
         }
+
+        // Right-edge drag handle for resizing
+        val resizeCallbacks = LocalSidebarResize.current
+        if (resizeCallbacks != null && !collapsed) {
+            val density = LocalDensity.current
+            val dragInteractionSource = remember { MutableInteractionSource() }
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .width(8.dp)
+                    .fillMaxHeight()
+                    .hoverable(dragInteractionSource)
+                    .pointerHoverIcon(PointerIcon.Crosshair) // col-resize cursor
+                    .draggable(
+                        orientation = Orientation.Horizontal,
+                        state = rememberDraggableState { deltaPx ->
+                            with(density) { resizeCallbacks.onDrag(deltaPx.toDp()) }
+                        },
+                    )
+                    .pointerInput(Unit) {
+                        detectTapGestures(onDoubleTap = { resizeCallbacks.onReset() })
+                    },
+            )
+        }
     }
 }
 
@@ -360,6 +452,9 @@ fun Sidebar(
  * Icon items: always present, label clips naturally via the sidebar width.
  * Text-only items: height + alpha animate to 0 when collapsed. The element
  * stays in the composition tree so [Arrangement.spacedBy] gaps don't snap.
+ *
+ * Items with [SidebarItem.children] show a disclosure chevron and render
+ * their children in an animated collapsible section.
  */
 @Composable
 private fun SidebarItemWithVisibility(
@@ -367,7 +462,21 @@ private fun SidebarItemWithVisibility(
     activeItem: String,
     collapsed: Boolean,
     sidebarIconSize: SidebarIconSize = SidebarIconSize.Medium,
+    indentLevel: Int = 0,
 ) {
+    if (item.children.isNotEmpty()) {
+        DisclosureItem(
+            item = item,
+            activeItem = activeItem,
+            collapsed = collapsed,
+            sidebarIconSize = sidebarIconSize,
+            indentLevel = indentLevel,
+        )
+        return
+    }
+
+    val indentPadding = (indentLevel * 16).dp
+
     if (item.icon != null) {
         SidebarItemRow(
             label = item.label,
@@ -376,6 +485,7 @@ private fun SidebarItemWithVisibility(
             icon = item.icon,
             isCollapsed = collapsed,
             sidebarIconSize = sidebarIconSize,
+            modifier = Modifier.padding(start = indentPadding),
         )
     } else {
         val alpha by animateFloatAsState(
@@ -387,9 +497,6 @@ private fun SidebarItemWithVisibility(
             animationSpec = sidebarSpring(),
         )
 
-        // The outer Box handles visibility for text-only items.
-        // isCollapsed=false is passed to SidebarItemRow so its internal
-        // labelAlpha always targets 1f — the Box controls visibility, not the row.
         Box(
             modifier = Modifier
                 .height(itemHeight)
@@ -403,7 +510,117 @@ private fun SidebarItemWithVisibility(
                 icon = null,
                 isCollapsed = false,
                 sidebarIconSize = sidebarIconSize,
+                modifier = Modifier.padding(start = indentPadding),
             )
+        }
+    }
+}
+
+/**
+ * A sidebar item with a collapsible disclosure section for its children.
+ * Shows a rotating chevron that toggles child visibility.
+ */
+@Composable
+private fun DisclosureItem(
+    item: SidebarItem,
+    activeItem: String,
+    collapsed: Boolean,
+    sidebarIconSize: SidebarIconSize,
+    indentLevel: Int = 0,
+) {
+    var expanded by remember { mutableStateOf(true) }
+    val chevronRotation by animateFloatAsState(
+        targetValue = if (expanded) 90f else 0f,
+        animationSpec = sidebarSpring(),
+    )
+
+    val indentPadding = (indentLevel * 16).dp
+
+    // Parent item row with chevron
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = indentPadding)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+            ) {
+                if (item.onClick != {}) item.onClick() else expanded = !expanded
+            },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        // Disclosure chevron (hidden when sidebar is collapsed)
+        val chevronAlpha by animateFloatAsState(
+            targetValue = if (collapsed) 0f else 1f,
+            animationSpec = sidebarSpring(),
+        )
+        Box(
+            modifier = Modifier
+                .size(sidebarIconSize.itemHeight)
+                .graphicsLayer {
+                    alpha = chevronAlpha
+                    rotationZ = chevronRotation
+                }
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) { expanded = !expanded },
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                LucideChevronRight,
+                modifier = Modifier.size(12.dp),
+                tint = DarwinTheme.colorScheme.textTertiary,
+            )
+        }
+
+        // Item content
+        Box(modifier = Modifier.weight(1f)) {
+            SidebarItemRow(
+                label = item.label,
+                onClick = { expanded = !expanded },
+                active = activeItem == item.id,
+                icon = item.icon,
+                isCollapsed = collapsed,
+                sidebarIconSize = sidebarIconSize,
+            )
+        }
+    }
+
+    // Children with animated visibility
+    val childAlpha by animateFloatAsState(
+        targetValue = if (expanded && !collapsed) 1f else 0f,
+        animationSpec = sidebarSpring(),
+    )
+    val childFraction by animateFloatAsState(
+        targetValue = if (expanded && !collapsed) 1f else 0f,
+        animationSpec = sidebarSpring(),
+    )
+
+    Box(
+        modifier = Modifier
+            .clipToBounds()
+            .graphicsLayer { alpha = childAlpha }
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                val h = (placeable.height * childFraction).toInt()
+                layout(placeable.width, h) { placeable.placeRelative(0, 0) }
+            },
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(sidebarIconSize.itemSpacing),
+        ) {
+            item.children.forEach { child ->
+                key(child.id) {
+                    SidebarItemWithVisibility(
+                        item = child,
+                        activeItem = activeItem,
+                        collapsed = collapsed,
+                        sidebarIconSize = sidebarIconSize,
+                        indentLevel = indentLevel + 1,
+                    )
+                }
+            }
         }
     }
 }
@@ -463,6 +680,7 @@ private fun SidebarItemRow(
     icon: ImageVector?,
     isCollapsed: Boolean,
     sidebarIconSize: SidebarIconSize = SidebarIconSize.Medium,
+    modifier: Modifier = Modifier,
     iconModifier: Modifier = Modifier,
     iconContentDescription: String? = null,
 ) {
@@ -491,9 +709,9 @@ private fun SidebarItemRow(
         animationSpec = sidebarSpring(),
     )
 
-    // When collapsed: center the icon within 56dp total sidebar width.
-    // Total horizontal insets = animatedPadding(4dp) + scrollColumn padding(4dp) + hPadding.
-    // To center: each side = (56dp - iconDp) / 2, so hPadding = (56dp - iconDp) / 2 - 8dp.
+    // When collapsed: center the icon within the collapsed sidebar width.
+    // In collapsed mode: outer padding = 4dp, track padding = 4dp → 8dp per side.
+    // To center: hPadding = (collapsedWidth - iconDp) / 2 - 8dp
     val collapsedHPadding = ((56.dp - sidebarIconSize.iconDp) / 2 - 8.dp).coerceAtLeast(0.dp)
     val hPadding = lerp(sidebarIconSize.hPadding, collapsedHPadding, collapseFraction)
     val iconLabelGap = lerp(sidebarIconSize.iconGap, 0.dp, collapseFraction)
@@ -506,7 +724,7 @@ private fun SidebarItemRow(
     }
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(sidebarIconSize.itemHeight)
             .clip(itemShape)

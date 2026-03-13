@@ -1,6 +1,7 @@
 package io.github.kdroidfilter.darwinui.sample.pages
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.components.Card
+import io.github.kdroidfilter.darwinui.components.ColumnVisibility
+import io.github.kdroidfilter.darwinui.components.DarwinColumnWidth
 import io.github.kdroidfilter.darwinui.components.DarwinScaffold
 import io.github.kdroidfilter.darwinui.components.IconButton
 import io.github.kdroidfilter.darwinui.components.NavigationButtons
@@ -32,6 +35,7 @@ import io.github.kdroidfilter.darwinui.components.Sidebar
 import io.github.kdroidfilter.darwinui.components.SidebarItem
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.components.TitleBar
+import io.github.kdroidfilter.darwinui.components.TitleBarStyle
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideCalendar
@@ -44,6 +48,7 @@ import io.github.kdroidfilter.darwinui.icons.LucideSettings
 import io.github.kdroidfilter.darwinui.icons.LucideStar
 import io.github.kdroidfilter.darwinui.icons.LucideSun
 import io.github.kdroidfilter.darwinui.icons.LucideTrash2
+import io.github.kdroidfilter.darwinui.icons.LucideInfo
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
@@ -54,7 +59,7 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 @Composable
 fun ScaffoldFullLayoutExample() {
     var selectedPage by remember { mutableStateOf("Favorites") }
-    var sidebarVisible by remember { mutableStateOf(true) }
+    var columnVisibility by remember { mutableStateOf(ColumnVisibility.All) }
 
     val sidebarItems = remember {
         listOf(
@@ -69,8 +74,8 @@ fun ScaffoldFullLayoutExample() {
 
     Card(modifier = Modifier.fillMaxWidth().height(400.dp)) {
         DarwinScaffold(
-            sidebarVisible = sidebarVisible,
-            onSidebarVisibleChange = { sidebarVisible = it },
+            columnVisibility = columnVisibility,
+            onColumnVisibilityChange = { columnVisibility = it },
             sidebar = {
                 Sidebar(
                     items = sidebarItems,
@@ -97,9 +102,16 @@ fun ScaffoldFullLayoutExample() {
                                     color = DarwinTheme.colorScheme.textTertiary,
                                 )
                             }
-                            IconButton(onClick = { sidebarVisible = false }) {
-                                Icon(LucidePanelLeft, modifier = Modifier.size(18.dp))
-                            }
+                            Icon(
+                                LucidePanelLeft,
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .clickable(
+                                        interactionSource = null,
+                                        indication = null,
+                                        onClick = { columnVisibility = ColumnVisibility.DoubleColumn },
+                                    ),
+                            )
                         }
                     },
                 )
@@ -196,6 +208,255 @@ fun ScaffoldNoSidebarExample() {
     }
 }
 
+@GalleryExample("Scaffold", "Three Columns")
+@Composable
+fun ScaffoldThreeColumnsExample() {
+    var columnVisibility by remember { mutableStateOf(ColumnVisibility.All) }
+    var selectedMailbox by remember { mutableStateOf("Inbox") }
+    var selectedMessage by remember { mutableStateOf("Welcome") }
+
+    val sidebarItems = remember {
+        listOf(
+            SidebarItem(
+                "Inbox", onClick = { selectedMailbox = "Inbox" }, icon = LucideFolder,
+                group = "Mailboxes",
+                children = listOf(
+                    SidebarItem("Primary", onClick = { selectedMailbox = "Primary" }, icon = LucideStar),
+                    SidebarItem("Updates", onClick = { selectedMailbox = "Updates" }, icon = LucideInfo),
+                ),
+            ),
+            SidebarItem("Sent", onClick = { selectedMailbox = "Sent" }, icon = LucideFolder, group = "Mailboxes"),
+            SidebarItem("Trash", onClick = { selectedMailbox = "Trash" }, icon = LucideTrash2, group = "Mailboxes"),
+        )
+    }
+
+    Card(modifier = Modifier.fillMaxWidth().height(450.dp)) {
+        DarwinScaffold(
+            columnVisibility = columnVisibility,
+            onColumnVisibilityChange = { columnVisibility = it },
+            sidebar = {
+                Sidebar(
+                    items = sidebarItems,
+                    activeItem = selectedMailbox,
+                    showBorder = false,
+                )
+            },
+            sidebarWidth = DarwinColumnWidth.Flexible(min = 150.dp, ideal = 200.dp, max = 300.dp),
+            contentList = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    listOf("Welcome", "Meeting Notes", "Project Update", "Newsletter", "Reminder").forEach { msg ->
+                        Text(
+                            text = msg,
+                            style = DarwinTheme.typography.subheadline,
+                            fontWeight = if (msg == selectedMessage) FontWeight.Bold else FontWeight.Normal,
+                            color = if (msg == selectedMessage) DarwinTheme.colorScheme.accent
+                            else DarwinTheme.colorScheme.textPrimary,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { selectedMessage = msg }
+                                .padding(8.dp),
+                        )
+                    }
+                }
+            },
+            contentListWidth = DarwinColumnWidth.Flexible(min = 180.dp, ideal = 220.dp, max = 350.dp),
+            titleBar = {
+                TitleBar(
+                    style = TitleBarStyle.UnifiedCompact,
+                    title = { Text(selectedMailbox) },
+                )
+            },
+            titleBarStyle = TitleBarStyle.UnifiedCompact,
+        ) { contentPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(contentPadding)
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(
+                    text = selectedMessage,
+                    style = DarwinTheme.typography.title3,
+                    fontWeight = FontWeight.Bold,
+                    color = DarwinTheme.colorScheme.textPrimary,
+                )
+                Text(
+                    text = "3-column layout with resizable sidebar and content list. " +
+                        "Drag the dividers to resize columns. Double-click to reset.",
+                    style = DarwinTheme.typography.subheadline,
+                    color = DarwinTheme.colorScheme.textSecondary,
+                )
+                repeat(6) { i ->
+                    Text(
+                        text = "Message content line ${i + 1}.",
+                        style = DarwinTheme.typography.body,
+                        color = DarwinTheme.colorScheme.textSecondary,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@GalleryExample("Scaffold", "Inspector")
+@Composable
+fun ScaffoldInspectorExample() {
+    var inspectorVisible by remember { mutableStateOf(true) }
+
+    Card(modifier = Modifier.fillMaxWidth().height(400.dp)) {
+        DarwinScaffold(
+            inspector = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Text(
+                        text = "Inspector",
+                        style = DarwinTheme.typography.headline,
+                        color = DarwinTheme.colorScheme.textPrimary,
+                    )
+                    Text(
+                        text = "Properties and details for the selected item.",
+                        style = DarwinTheme.typography.subheadline,
+                        color = DarwinTheme.colorScheme.textSecondary,
+                    )
+                    repeat(4) { i ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Text(
+                                "Property ${i + 1}",
+                                style = DarwinTheme.typography.caption1,
+                                color = DarwinTheme.colorScheme.textTertiary,
+                            )
+                            Text(
+                                "Value ${i + 1}",
+                                style = DarwinTheme.typography.caption1,
+                                color = DarwinTheme.colorScheme.textPrimary,
+                            )
+                        }
+                    }
+                }
+            },
+            inspectorVisible = inspectorVisible,
+            onInspectorVisibleChange = { inspectorVisible = it },
+            titleBar = {
+                TitleBar(
+                    title = { Text("Document") },
+                    actions = {
+                        IconButton(onClick = { inspectorVisible = !inspectorVisible }) {
+                            Icon(LucideInfo, modifier = Modifier.size(16.dp))
+                        }
+                    },
+                )
+            },
+        ) { contentPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(contentPadding)
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(
+                    text = "Main Content",
+                    style = DarwinTheme.typography.title3,
+                    fontWeight = FontWeight.Bold,
+                    color = DarwinTheme.colorScheme.textPrimary,
+                )
+                Text(
+                    text = "Right-side inspector panel. Toggle with the info button. " +
+                        "Drag the divider to resize.",
+                    style = DarwinTheme.typography.subheadline,
+                    color = DarwinTheme.colorScheme.textSecondary,
+                )
+                repeat(8) { i ->
+                    Text(
+                        text = "Content line ${i + 1}.",
+                        style = DarwinTheme.typography.body,
+                        color = DarwinTheme.colorScheme.textSecondary,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@GalleryExample("Scaffold", "Bottom Bar")
+@Composable
+fun ScaffoldBottomBarExample() {
+    Card(modifier = Modifier.fillMaxWidth().height(350.dp)) {
+        DarwinScaffold(
+            titleBar = {
+                TitleBar(
+                    title = { Text("Player") },
+                )
+            },
+            bottomBar = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = "Now Playing: Song Title",
+                        style = DarwinTheme.typography.caption1,
+                        color = DarwinTheme.colorScheme.textPrimary,
+                    )
+                    Text(
+                        text = "3:42 / 5:10",
+                        style = DarwinTheme.typography.caption1,
+                        color = DarwinTheme.colorScheme.textTertiary,
+                    )
+                }
+            },
+        ) { contentPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(contentPadding)
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text(
+                    text = "Bottom Bar",
+                    style = DarwinTheme.typography.title3,
+                    fontWeight = FontWeight.Bold,
+                    color = DarwinTheme.colorScheme.textPrimary,
+                )
+                Text(
+                    text = "Glass bottom bar overlay with status content. " +
+                        "Scroll to see the glass blur effect.",
+                    style = DarwinTheme.typography.subheadline,
+                    color = DarwinTheme.colorScheme.textSecondary,
+                )
+                repeat(10) { i ->
+                    Text(
+                        text = "Track ${i + 1} — Playlist item",
+                        style = DarwinTheme.typography.body,
+                        color = DarwinTheme.colorScheme.textSecondary,
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 internal fun ScaffoldPage() {
     GalleryPage("Scaffold", "macOS-style scaffold layout with optional sidebar, title bar, and glass blur.") {
@@ -210,5 +471,20 @@ internal fun ScaffoldPage() {
             description = "Minimal scaffold with only a title bar overlay",
             sourceCode = GallerySources.ScaffoldNoSidebarExample,
         ) { ScaffoldNoSidebarExample() }
+        ExampleCard(
+            title = "Three Columns",
+            description = "Mail-style 3-column layout with sidebar, content list, and detail",
+            sourceCode = GallerySources.ScaffoldThreeColumnsExample,
+        ) { ScaffoldThreeColumnsExample() }
+        ExampleCard(
+            title = "Inspector",
+            description = "Right-side inspector panel with toggle and draggable divider",
+            sourceCode = GallerySources.ScaffoldInspectorExample,
+        ) { ScaffoldInspectorExample() }
+        ExampleCard(
+            title = "Bottom Bar",
+            description = "Glass bottom bar overlay for status content",
+            sourceCode = GallerySources.ScaffoldBottomBarExample,
+        ) { ScaffoldBottomBarExample() }
     }
 }

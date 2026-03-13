@@ -49,7 +49,7 @@ import com.composables.icons.lucide.Menu
 import com.composables.icons.lucide.MessageCircle
 import com.composables.icons.lucide.MessageSquare
 import com.composables.icons.lucide.MousePointerClick
-import com.composables.icons.lucide.PanelLeft
+import io.github.kdroidfilter.darwinui.icons.LucidePanelLeft
 import com.composables.icons.lucide.PanelTopOpen
 import com.composables.icons.lucide.Scan
 import com.composables.icons.lucide.Search
@@ -63,6 +63,7 @@ import com.composables.icons.lucide.TextAlignStart
 import com.composables.icons.lucide.TextCursorInput
 import com.composables.icons.lucide.ToggleLeft
 import com.composables.icons.lucide.TriangleAlert
+import io.github.kdroidfilter.darwinui.components.ColumnVisibility
 import io.github.kdroidfilter.darwinui.components.DarwinScaffold
 import io.github.kdroidfilter.darwinui.components.TrackClickBehavior
 import io.github.kdroidfilter.darwinui.components.VerticalScrollbar
@@ -86,7 +87,6 @@ import io.github.kdroidfilter.darwinui.components.ToolbarSearchField
 import io.github.kdroidfilter.darwinui.components.rememberToastState
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideMoon
-import io.github.kdroidfilter.darwinui.icons.LucidePanelLeft
 import io.github.kdroidfilter.darwinui.icons.LucideSettings
 import io.github.kdroidfilter.darwinui.icons.LucideSun
 import io.github.kdroidfilter.darwinui.sample.pages.AccordionPage
@@ -162,10 +162,10 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("contextmenu", "Context Menu", "OVERLAYS", Lucide.Ellipsis),
     SidebarEntryDef("tabs", "Tabs", "NAVIGATION", Lucide.Columns3),
     SidebarEntryDef("accordion", "Accordion", "NAVIGATION", Lucide.ChevronsUpDown),
-    SidebarEntryDef("sidebar", "Sidebar", "NAVIGATION", Lucide.PanelLeft),
+    SidebarEntryDef("sidebar", "Sidebar", "NAVIGATION", LucidePanelLeft),
     SidebarEntryDef("segmentedcontrol", "Segmented Control", "NAVIGATION", Lucide.Columns3),
     SidebarEntryDef("titlebar", "Title Bar", "NAVIGATION", Lucide.PanelTopOpen),
-    SidebarEntryDef("scaffold", "Scaffold", "NAVIGATION", Lucide.PanelLeft),
+    SidebarEntryDef("scaffold", "Scaffold", "NAVIGATION", LucidePanelLeft),
 )
 
 @Composable
@@ -180,7 +180,7 @@ fun App() {
         var selectedPage by remember { mutableStateOf("button") }
         var searchQuery by remember { mutableStateOf("") }
         var searchExpanded by remember { mutableStateOf(false) }
-        var sidebarVisible by remember { mutableStateOf(true) }
+        var columnVisibility by remember { mutableStateOf(ColumnVisibility.All) }
         var sidebarCollapsed by remember { mutableStateOf(false) }
         var settingsExpanded by remember { mutableStateOf(false) }
 
@@ -202,8 +202,8 @@ fun App() {
 
         Box(modifier = Modifier.fillMaxSize()) {
             DarwinScaffold(
-                sidebarVisible = sidebarVisible,
-                onSidebarVisibleChange = { sidebarVisible = it },
+                columnVisibility = columnVisibility,
+                onColumnVisibilityChange = { columnVisibility = it },
                 sidebar = {
                     Sidebar(
                         items = sidebarItems,
@@ -235,9 +235,16 @@ fun App() {
                                         color = DarwinTheme.colorScheme.textTertiary,
                                     )
                                 }
-                                IconButton(onClick = { sidebarVisible = false }) {
-                                    Icon(LucidePanelLeft, modifier = Modifier.size(18.dp))
-                                }
+                                Icon(
+                                    LucidePanelLeft,
+                                    modifier = Modifier
+                                        .size(20.dp)
+                                        .clickable(
+                                            interactionSource = null,
+                                            indication = null,
+                                            onClick = { columnVisibility = ColumnVisibility.DoubleColumn },
+                                        ),
+                                )
                             }
                         },
                     )

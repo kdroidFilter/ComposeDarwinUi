@@ -13,6 +13,43 @@ import io.github.fletchmckee.liquid.LiquidState
 import io.github.fletchmckee.liquid.liquid
 
 /**
+ * Provides the height of the enclosing title bar so descendant composables
+ * (e.g. [Sidebar][io.github.kdroidfilter.darwinui.components.Sidebar]) can
+ * add an appropriate top inset when positioned behind it.
+ *
+ * Set by [DarwinScaffold][io.github.kdroidfilter.darwinui.components.DarwinScaffold].
+ * Defaults to 0.dp (no title bar).
+ */
+val LocalTitleBarHeight = compositionLocalOf { 0.dp }
+
+/**
+ * Provides the current expanded width of the sidebar column.
+ * Set by [DarwinScaffold][io.github.kdroidfilter.darwinui.components.DarwinScaffold]
+ * when a resizable sidebar is used. The [Sidebar][io.github.kdroidfilter.darwinui.components.Sidebar]
+ * reads this to synchronize its expanded width with the scaffold's drag state.
+ *
+ * Defaults to [Dp.Unspecified] (sidebar uses its own [width] parameter).
+ */
+val LocalSidebarWidth = compositionLocalOf { Dp.Unspecified }
+
+/**
+ * Callbacks for resizing the sidebar by dragging its right edge.
+ * Null when the sidebar is not resizable (i.e. [DarwinColumnWidth.Fixed]).
+ */
+class SidebarResizeCallbacks(
+    val onDrag: (Dp) -> Unit,
+    val onReset: () -> Unit,
+)
+
+/**
+ * Provides resize callbacks for the sidebar's right edge drag handle.
+ * Set by [DarwinScaffold][io.github.kdroidfilter.darwinui.components.DarwinScaffold]
+ * when [sidebarWidth] is [DarwinColumnWidth.Flexible].
+ * Null when the sidebar is not resizable.
+ */
+val LocalSidebarResize = compositionLocalOf<SidebarResizeCallbacks?> { null }
+
+/**
  * Provides a [LiquidState] for backdrop glass effects via [Modifier.darwinGlass].
  * Null when liquid glass is disabled in [DarwinTheme].
  */

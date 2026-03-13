@@ -12,89 +12,138 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import io.github.fletchmckee.liquid.liquefiable
 import io.github.fletchmckee.liquid.liquid
 import io.github.fletchmckee.liquid.rememberLiquidState
-import io.github.kdroidfilter.darwinui.icons.Icon
-import io.github.kdroidfilter.darwinui.icons.LucidePanelLeft
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinLiquidState
+import io.github.kdroidfilter.darwinui.theme.LocalSidebarResize
+import io.github.kdroidfilter.darwinui.theme.LocalSidebarWidth
+import io.github.kdroidfilter.darwinui.theme.LocalTitleBarHeight
+import io.github.kdroidfilter.darwinui.theme.SidebarResizeCallbacks
 import io.github.kdroidfilter.darwinui.theme.LocalToolbarGlassState
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import io.github.kdroidfilter.darwinui.theme.darwinTween
 
 /**
- * macOS-style scaffold layout with optional sidebar and title bar.
+ * macOS-style scaffold layout with optional sidebar, content list, inspector,
+ * title bar, and bottom bar.
  *
- * The sidebar occupies the full height on the left edge. The title bar
- * overlays the content from the top with a frosted glass blur — content
- * scrolls behind it, matching the macOS vibrancy effect.
+ * Supports 2-column (sidebar + content), 3-column (sidebar + contentList + content),
+ * and inspector layouts. Columns are separated by draggable dividers when their
+ * width is [DarwinColumnWidth.Flexible].
  *
- * The [content] lambda receives [PaddingValues] with a top inset equal
- * to the title bar height so initial content appears below the bar.
- * Apply it to the scroll container (not the outer Box) so items scroll
- * behind the title bar.
- *
- * When [onSidebarVisibleChange] is provided, the scaffold renders a
- * toggle button that slides into the title bar when the sidebar is hidden.
- * The caller should place a corresponding hide button inside the sidebar
- * (e.g. in its header slot).
+ * The title bar overlays the full width with frosted glass blur — content scrolls
+ * behind it, matching the macOS vibrancy effect.
  *
  * @param modifier Modifier applied to the root container.
  * @param containerColor Background color for the scaffold.
- * @param sidebarVisible Whether the sidebar is currently visible.
- * @param onSidebarVisibleChange Called when the user toggles the sidebar.
- *   When non-null, the scaffold renders the "show" toggle in the title bar.
+ * @param columnVisibility Controls which columns are visible.
+ * @param onColumnVisibilityChange Called when column visibility changes (e.g. sidebar toggle).
+ *   When non-null, the scaffold renders a sidebar toggle button in the title bar.
  * @param sidebar Optional sidebar composable (e.g. [Sidebar]).
+ * @param sidebarWidth Width configuration for the sidebar column.
+ * @param contentList Optional middle column (e.g. message list in a mail app).
+ * @param contentListWidth Width configuration for the content list column.
+ * @param inspector Optional right-side inspector panel.
+ * @param inspectorVisible Whether the inspector is currently visible.
+ * @param onInspectorVisibleChange Called when the inspector visibility changes.
+ * @param inspectorWidth Width configuration for the inspector column.
  * @param titleBar Optional title bar composable (e.g. [TitleBar]).
- *   When used with glass, pass `glass = true` to [TitleBar] so it renders
- *   with a transparent background (the scaffold provides the frosted blur).
- * @param titleBarHeight Height of the title bar for content inset (default 52dp).
- * @param content Main content area. Receives [PaddingValues] for the title bar inset.
+ * @param titleBarStyle Visual style of the title bar (determines default height).
+ * @param titleBarHeight Height of the title bar for content inset.
+ * @param bottomBar Optional bottom bar composable overlaying the content area.
+ * @param bottomBarHeight Height of the bottom bar.
+ * @param content Main content area. Receives [PaddingValues] for title bar and bottom bar insets.
  */
 @Composable
 fun DarwinScaffold(
     modifier: Modifier = Modifier,
     containerColor: Color = DarwinTheme.colorScheme.background,
-    sidebarVisible: Boolean = true,
-    onSidebarVisibleChange: ((Boolean) -> Unit)? = null,
+    columnVisibility: ColumnVisibility = ColumnVisibility.Automatic,
+    onColumnVisibilityChange: ((ColumnVisibility) -> Unit)? = null,
     sidebar: (@Composable () -> Unit)? = null,
+    sidebarWidth: DarwinColumnWidth = DarwinColumnWidth.Fixed(240.dp),
+    contentList: (@Composable () -> Unit)? = null,
+    contentListWidth: DarwinColumnWidth = DarwinColumnWidth.Fixed(250.dp),
+    inspector: (@Composable () -> Unit)? = null,
+    inspectorVisible: Boolean = false,
+    onInspectorVisibleChange: ((Boolean) -> Unit)? = null,
+    inspectorWidth: DarwinColumnWidth = DarwinColumnWidth.Fixed(260.dp),
     titleBar: (@Composable () -> Unit)? = null,
-    titleBarHeight: Int = 52,
+    titleBarStyle: TitleBarStyle = TitleBarStyle.Unified,
+    titleBarHeight: Int = titleBarStyle.height,
+    bottomBar: (@Composable () -> Unit)? = null,
+    bottomBarHeight: Int = 38,
     content: @Composable (PaddingValues) -> Unit,
 ) {
-    val managedToggle = sidebar != null && onSidebarVisibleChange != null
-    val contentPadding = if (titleBar != null) PaddingValues(top = titleBarHeight.dp) else PaddingValues()
+    // --- Resolve effective column visibility ---
+    val effectiveVisibility = if (columnVisibility == ColumnVisibility.Automatic) {
+        ColumnVisibility.All
+    } else {
+        columnVisibility
+    }
 
-    // Content captured → title bar blurs it
+    val showSidebar = sidebar != null && effectiveVisibility == ColumnVisibility.All
+    val showContentList = contentList != null && effectiveVisibility != ColumnVisibility.DetailOnly
+
+    // Toggle callback: switches between All ↔ DoubleColumn
+    val managedToggle = sidebar != null && onColumnVisibilityChange != null
+    val toggleSidebar: () -> Unit = {
+        val newVisibility = if (effectiveVisibility == ColumnVisibility.All) {
+            ColumnVisibility.DoubleColumn
+        } else {
+            ColumnVisibility.All
+        }
+        onColumnVisibilityChange?.invoke(newVisibility)
+    }
+
+    // --- Column width states ---
+    var currentSidebarWidth by remember { mutableStateOf(sidebarWidth.idealOrFixed()) }
+    var currentContentListWidth by remember { mutableStateOf(contentListWidth.idealOrFixed()) }
+    var currentInspectorWidth by remember { mutableStateOf(inspectorWidth.idealOrFixed()) }
+
+    // --- Content padding ---
+    val topPadding = if (titleBar != null) titleBarHeight.dp else 0.dp
+    val bottomPadding = if (bottomBar != null) bottomBarHeight.dp else 0.dp
+    val contentPadding = PaddingValues(top = topPadding, bottom = bottomPadding)
+
+    // --- Glass blur ---
     val titleBarGlassState = rememberLiquidState()
-    // Reuse the root liquid state from DarwinTheme for button-level glass
+    val bottomBarGlassState = rememberLiquidState()
     val rootLiquidState = LocalDarwinLiquidState.current
 
     val isDark = DarwinTheme.colorScheme.isDark
-    val glassTint = if (isDark) Color.Black.copy(alpha = 0.15f)
-                    else Color.White.copy(alpha = 0.15f)
+    val glassTint = if (isDark) Color.Black.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.15f)
+    val borderColor = if (isDark) Color.Black.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.1f)
 
     Row(
         modifier = modifier
             .fillMaxSize()
             .background(containerColor),
     ) {
-        // Sidebar — full height, push animation
+        // ---- Sidebar (full height, side-by-side with the title bar) ----
         if (sidebar != null) {
             AnimatedVisibility(
-                visible = sidebarVisible,
+                visible = showSidebar,
                 enter = expandHorizontally(
                     animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
                     expandFrom = Alignment.Start,
@@ -104,39 +153,196 @@ fun DarwinScaffold(
                     shrinkTowards = Alignment.Start,
                 ),
             ) {
-                sidebar()
+                val sidebarResizeCallbacks = if (sidebarWidth is DarwinColumnWidth.Flexible) {
+                    val flex = sidebarWidth
+                    SidebarResizeCallbacks(
+                        onDrag = { delta ->
+                            currentSidebarWidth = (currentSidebarWidth + delta)
+                                .coerceIn(flex.min, flex.max)
+                        },
+                        onReset = { currentSidebarWidth = flex.ideal },
+                    )
+                } else {
+                    null
+                }
+
+                CompositionLocalProvider(
+                    LocalSidebarWidth provides currentSidebarWidth,
+                    LocalSidebarResize provides sidebarResizeCallbacks,
+                ) {
+                    sidebar()
+                }
             }
         }
 
-        // Main area: content with title bar overlay
+        // ---- Content area (title bar + columns) ----
         Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight(),
         ) {
-            // Content captured by liquefiable — title bar blurs this
-            // Background MUST be inside liquefiable so it's part of the captured layer,
-            // otherwise text on transparent background produces invisible blur.
+            // Content layer captured for title bar glass
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .liquefiable(titleBarGlassState)
                     .background(containerColor),
             ) {
-                content(contentPadding)
+                Row(modifier = Modifier.fillMaxSize()) {
+                    // ---- Content List (middle column) ----
+                    if (contentList != null) {
+                        AnimatedVisibility(
+                            visible = showContentList,
+                            enter = expandHorizontally(
+                                animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+                                expandFrom = Alignment.Start,
+                            ),
+                            exit = shrinkHorizontally(
+                                animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+                                shrinkTowards = Alignment.Start,
+                            ),
+                        ) {
+                            Row {
+                                Box(
+                                    modifier = Modifier
+                                        .width(currentContentListWidth)
+                                        .fillMaxHeight()
+                                        .padding(top = topPadding)
+                                        .background(DarwinTheme.colorScheme.surface)
+                                        .drawBehind {
+                                            // Right border
+                                            drawLine(
+                                                color = borderColor,
+                                                start = Offset(size.width, 0f),
+                                                end = Offset(size.width, size.height),
+                                                strokeWidth = 1.dp.toPx(),
+                                            )
+                                        },
+                                ) {
+                                    contentList()
+                                }
+
+                                // Content list divider
+                                if (contentListWidth is DarwinColumnWidth.Flexible) {
+                                    val flex = contentListWidth
+                                    ColumnDivider(
+                                        onDrag = { delta ->
+                                            currentContentListWidth = (currentContentListWidth + delta)
+                                                .coerceIn(flex.min, flex.max)
+                                        },
+                                        onReset = { currentContentListWidth = flex.ideal },
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // ---- Main content area ----
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                    ) {
+                        // Content captured for bottom bar glass
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .liquefiable(bottomBarGlassState)
+                                .background(containerColor),
+                        ) {
+                            content(contentPadding)
+                        }
+
+                        // Bottom bar overlay with glass
+                        if (bottomBar != null) {
+                            val bottomBarGlassModifier = Modifier.liquid(bottomBarGlassState) {
+                                frost = 16.dp
+                                shape = RectangleShape
+                                tint = glassTint
+                                saturation = 1.05f
+                            }
+
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .fillMaxWidth()
+                                    .height(bottomBarHeight.dp)
+                                    .then(bottomBarGlassModifier)
+                                    .drawBehind {
+                                        // Top border
+                                        drawLine(
+                                            color = borderColor,
+                                            start = Offset(0f, 0f),
+                                            end = Offset(size.width, 0f),
+                                            strokeWidth = 0.5.dp.toPx(),
+                                        )
+                                    },
+                            ) {
+                                bottomBar()
+                            }
+                        }
+                    }
+
+                    // ---- Inspector (right panel) ----
+                    if (inspector != null) {
+                        AnimatedVisibility(
+                            visible = inspectorVisible,
+                            enter = expandHorizontally(
+                                animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+                                expandFrom = Alignment.End,
+                            ),
+                            exit = shrinkHorizontally(
+                                animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+                                shrinkTowards = Alignment.End,
+                            ),
+                        ) {
+                            Row {
+                                // Inspector divider
+                                if (inspectorWidth is DarwinColumnWidth.Flexible) {
+                                    val flex = inspectorWidth
+                                    ColumnDivider(
+                                        onDrag = { delta ->
+                                            currentInspectorWidth = (currentInspectorWidth - delta)
+                                                .coerceIn(flex.min, flex.max)
+                                        },
+                                        onReset = { currentInspectorWidth = flex.ideal },
+                                    )
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .width(currentInspectorWidth)
+                                        .fillMaxHeight()
+                                        .padding(top = topPadding)
+                                        .background(DarwinTheme.colorScheme.surface)
+                                        .drawBehind {
+                                            // Left border
+                                            drawLine(
+                                                color = borderColor,
+                                                start = Offset(0f, 0f),
+                                                end = Offset(0f, size.height),
+                                                strokeWidth = 1.dp.toPx(),
+                                            )
+                                        },
+                                ) {
+                                    inspector()
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
-            // Title bar overlaid at top with frosted glass blur
-            val titleBarGlassModifier = Modifier.liquid(titleBarGlassState) {
-                frost = 16.dp
-                shape = RectangleShape
-                tint = glassTint
-                saturation = 1.05f
-            }
+            // ---- Title bar overlay (over content area only) ----
+            if (titleBar != null || managedToggle) {
+                val titleBarGlassModifier = Modifier.liquid(titleBarGlassState) {
+                    frost = 16.dp
+                    shape = RectangleShape
+                    tint = glassTint
+                    saturation = 1.05f
+                }
 
-            // Provide root liquid state for button-level glass inside title bar
-            CompositionLocalProvider(LocalToolbarGlassState provides rootLiquidState) {
-                if (managedToggle) {
+                CompositionLocalProvider(LocalToolbarGlassState provides rootLiquidState) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -144,35 +350,26 @@ fun DarwinScaffold(
                             .then(titleBarGlassModifier),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        AnimatedVisibility(
-                            visible = !sidebarVisible,
-                            enter = expandHorizontally(
-                                animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
-                                expandFrom = Alignment.Start,
-                            ) + fadeIn(darwinTween(DarwinDuration.Normal)),
-                            exit = shrinkHorizontally(
-                                animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
-                                shrinkTowards = Alignment.Start,
-                            ) + fadeOut(darwinTween(DarwinDuration.Fast)),
-                        ) {
-                            Box(modifier = Modifier.padding(start = 12.dp)) {
-                                IconButton(onClick = { onSidebarVisibleChange(true) }) {
-                                    Icon(LucidePanelLeft, modifier = Modifier.size(20.dp))
+                        if (managedToggle) {
+                            AnimatedVisibility(
+                                visible = !showSidebar,
+                                enter = expandHorizontally(
+                                    animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+                                    expandFrom = Alignment.Start,
+                                ) + fadeIn(darwinTween(DarwinDuration.Normal)),
+                                exit = shrinkHorizontally(
+                                    animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
+                                    shrinkTowards = Alignment.Start,
+                                ) + fadeOut(darwinTween(DarwinDuration.Fast)),
+                            ) {
+                                Box(modifier = Modifier.padding(start = 12.dp)) {
+                                    SidebarButton(onClick = toggleSidebar)
                                 }
                             }
                         }
                         Box(modifier = Modifier.weight(1f)) {
                             titleBar?.invoke()
                         }
-                    }
-                } else if (titleBar != null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.TopStart)
-                            .then(titleBarGlassModifier),
-                    ) {
-                        titleBar()
                     }
                 }
             }

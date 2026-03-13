@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import io.github.fletchmckee.liquid.liquid
@@ -35,83 +36,147 @@ import io.github.kdroidfilter.darwinui.theme.*
  * provided natively by the OS and should not be redrawn in Compose.
  *
  * @param modifier Modifier applied to the entire TitleBar.
+ * @param style Visual style variant (Unified, UnifiedCompact, Expanded).
+ * @param showsTitle When false the title slot is invisible but its space is preserved.
+ * @param backgroundStyle Controls whether the title bar uses glass, opaque, or transparent background.
+ * @param forcedColorScheme When non-null, overrides the color scheme for the title bar and all its children.
  * @param navigationActions Left-side actions (e.g. [NavigationButtons]).
  * @param title The central area, typically containing a title or an [AddressBar].
- *   Use `Modifier.fillMaxWidth()` to fill the available space.
  * @param actions Right-side action buttons (e.g. [TitleBarButtonGroup]).
- * @param backgroundColor Background color of the title bar.
+ * @param backgroundColor Background color of the title bar (used when not glass).
  * @param showBottomBorder Whether to show a subtle border at the bottom.
  * @param glass When true, uses a translucent glass background so content
  *   can scroll behind the title bar (macOS vibrancy style).
- * @param height Height of the title bar (default 52dp).
+ * @param height Height of the title bar. Defaults to the [style] height.
  */
 @Composable
 fun TitleBar(
     modifier: Modifier = Modifier,
+    style: TitleBarStyle = TitleBarStyle.Unified,
+    showsTitle: Boolean = true,
+    backgroundStyle: TitleBarBackground = TitleBarBackground.Automatic,
+    forcedColorScheme: ColorScheme? = null,
     navigationActions: @Composable RowScope.() -> Unit = {},
     title: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     backgroundColor: Color = DarwinTheme.colorScheme.background,
     showBottomBorder: Boolean = true,
     glass: Boolean = false,
-    height: Int = 52
+    height: Int = style.height,
+) {
+    val content = @Composable {
+        TitleBarContent(
+            modifier = modifier,
+            style = style,
+            showsTitle = showsTitle,
+            backgroundStyle = backgroundStyle,
+            navigationActions = navigationActions,
+            title = title,
+            actions = actions,
+            backgroundColor = backgroundColor,
+            showBottomBorder = showBottomBorder,
+            glass = glass,
+            height = height,
+        )
+    }
+
+    if (forcedColorScheme != null) {
+        CompositionLocalProvider(LocalDarwinColors provides forcedColorScheme) {
+            content()
+        }
+    } else {
+        content()
+    }
+}
+
+@Composable
+private fun TitleBarContent(
+    modifier: Modifier,
+    style: TitleBarStyle,
+    showsTitle: Boolean,
+    backgroundStyle: TitleBarBackground,
+    navigationActions: @Composable RowScope.() -> Unit,
+    title: @Composable () -> Unit,
+    actions: @Composable RowScope.() -> Unit,
+    backgroundColor: Color,
+    showBottomBorder: Boolean,
+    glass: Boolean,
+    height: Int,
 ) {
     val isDark = DarwinTheme.colorScheme.isDark
     val borderColor = if (isDark) Color.Black.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.1f)
 
-    // Automatically transparent when inside a DarwinScaffold (glass provided by scaffold)
+    // Resolve background behavior
     val insideScaffold = LocalToolbarGlassState.current != null
-    val bgModifier = if (glass || insideScaffold) {
-        Modifier // Transparent — scaffold provides frosted glass blur
-    } else {
-        Modifier.background(backgroundColor)
+    val isTransparent = when (backgroundStyle) {
+        is TitleBarBackground.Automatic -> glass || insideScaffold
+        is TitleBarBackground.Visible -> false
+        is TitleBarBackground.Hidden -> true
+        is TitleBarBackground.Material -> true // glass effect handled by scaffold
+    }
+    val bgModifier = if (isTransparent) Modifier else Modifier.background(backgroundColor)
+
+    val showBorder = showBottomBorder && backgroundStyle !is TitleBarBackground.Hidden
+
+    val titleTextStyle = when (style) {
+        TitleBarStyle.UnifiedCompact -> DarwinTheme.typography.caption1
+        TitleBarStyle.Expanded -> DarwinTheme.typography.headline
+        else -> DarwinTheme.typography.body
     }
 
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(height.dp)
-            .then(bgModifier)
-            .then(
-                if (showBottomBorder) {
-                    Modifier.drawBehind {
-                        drawLine(
-                            color = borderColor,
-                            start = Offset(0f, size.height),
-                            end = Offset(size.width, size.height),
-                            strokeWidth = 0.5.dp.toPx()
-                        )
-                    }
-                } else Modifier
-            )
-            .padding(horizontal = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
+    CompositionLocalProvider(
+        LocalTitleBarStyle provides style,
+        LocalDarwinTextStyle provides titleTextStyle,
     ) {
-        // Left section: Nav Actions
         Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(height.dp)
+                .then(bgModifier)
+                .then(
+                    if (showBorder) {
+                        Modifier.drawBehind {
+                            drawLine(
+                                color = borderColor,
+                                start = Offset(0f, size.height),
+                                end = Offset(size.width, size.height),
+                                strokeWidth = 0.5.dp.toPx(),
+                            )
+                        }
+                    } else {
+                        Modifier
+                    },
+                )
+                .padding(horizontal = style.horizontalPadding),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(end = 8.dp).widthIn(min = 80.dp)
         ) {
-            navigationActions()
-        }
+            // Left section: Nav Actions
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(end = 8.dp).widthIn(min = style.navMinWidth),
+            ) {
+                navigationActions()
+            }
 
-        // Center section: Title or Search
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            contentAlignment = Alignment.Center,
-        ) {
-            title()
-        }
+            // Center section: Title or Search
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .graphicsLayer { alpha = if (showsTitle) 1f else 0f },
+                contentAlignment = Alignment.Center,
+            ) {
+                title()
+            }
 
-        // Right section: Actions
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
-            modifier = Modifier.padding(start = 8.dp).widthIn(min = 80.dp),
-        ) {
-            actions()
+            // Right section: Actions
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(style.actionSpacing, Alignment.End),
+                modifier = Modifier.padding(start = 8.dp).widthIn(min = style.actionsMinWidth),
+            ) {
+                actions()
+            }
         }
     }
 }
@@ -126,6 +191,7 @@ private val TitleBarGroupShape = RoundedCornerShape(percent = 50)
  * A pill-shaped container grouping toolbar buttons, matching the macOS NSToolbar
  * button-group style (e.g. Safari's back/forward or action clusters).
  *
+ * Adapts its height to the current [TitleBarStyle] via [LocalTitleBarStyle].
  * Place [TitleBarGroupButton] and [TitleBarGroupDivider] inside.
  */
 @Composable
@@ -134,17 +200,13 @@ fun TitleBarButtonGroup(
     content: @Composable RowScope.() -> Unit,
 ) {
     val isDark = DarwinTheme.colorScheme.isDark
-    val toolbarGlassState = LocalToolbarGlassState.current
-    val fallbackBg = if (isDark) Color.White.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.50f)
-
-    val glassModifier = Modifier.clip(TitleBarGroupShape)
-
+    val style = LocalTitleBarStyle.current
     val borderColor = if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.12f)
 
     Row(
         modifier = modifier
-            .height(32.dp)
-            .then(glassModifier)
+            .height(style.buttonHeight)
+            .clip(TitleBarGroupShape)
             .border(0.5.dp, borderColor, TitleBarGroupShape)
             .clip(TitleBarGroupShape),
         verticalAlignment = Alignment.CenterVertically,
@@ -218,10 +280,13 @@ fun TitleBarGroupButton(
 @Composable
 fun TitleBarGroupDivider(modifier: Modifier = Modifier) {
     val isDark = DarwinTheme.colorScheme.isDark
+    val style = LocalTitleBarStyle.current
+    // Scale divider height proportionally to button height
+    val dividerHeight = (style.buttonHeight - 12.dp).coerceAtLeast(16.dp)
     Spacer(
         modifier = modifier
             .width(1.dp)
-            .height(20.dp)
+            .height(dividerHeight)
             .background(if (isDark) Color.White.copy(alpha = 0.18f) else Color(0xFFE6E6E6)),
     )
 }
@@ -247,13 +312,14 @@ fun NavigationButtons(
     backEnabled: Boolean = true,
     forwardEnabled: Boolean = false,
 ) {
+    val style = LocalTitleBarStyle.current
     TitleBarButtonGroup(modifier = modifier) {
         TitleBarGroupButton(
             onClick = onBack,
             enabled = backEnabled,
             contentPadding = PaddingValues(horizontal = 6.dp),
         ) {
-            Icon(LucideChevronLeft, modifier = Modifier.size(24.dp))
+            Icon(LucideChevronLeft, modifier = Modifier.size(style.iconSize + 4.dp))
         }
         TitleBarGroupDivider()
         TitleBarGroupButton(
@@ -261,7 +327,7 @@ fun NavigationButtons(
             enabled = forwardEnabled,
             contentPadding = PaddingValues(horizontal = 6.dp),
         ) {
-            Icon(LucideChevronRight, modifier = Modifier.size(24.dp))
+            Icon(LucideChevronRight, modifier = Modifier.size(style.iconSize + 4.dp))
         }
     }
 }
@@ -290,14 +356,21 @@ fun SidebarButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    icon: @Composable () -> Unit = { Icon(LucidePanelLeft, modifier = Modifier.size(20.dp)) },
+    icon: @Composable () -> Unit = {
+        val style = LocalTitleBarStyle.current
+        Icon(LucidePanelLeft, modifier = Modifier.size(style.iconSize))
+    },
     menuContent: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
     Box {
         TitleBarButtonGroup(modifier = modifier) {
-            TitleBarGroupButton(onClick = onClick, enabled = enabled) {
+            TitleBarGroupButton(
+                onClick = onClick,
+                enabled = enabled,
+                contentPadding = PaddingValues(horizontal = 6.dp),
+            ) {
                 icon()
             }
             if (menuContent != null) {
