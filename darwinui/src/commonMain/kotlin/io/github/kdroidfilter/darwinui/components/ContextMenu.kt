@@ -57,7 +57,6 @@ import io.github.kdroidfilter.darwinui.icons.LucideCheck
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
-import io.github.kdroidfilter.darwinui.theme.Red500
 import io.github.kdroidfilter.darwinui.theme.darwinGlass
 
 // CompositionLocal to allow items to auto-close the menu
@@ -169,14 +168,14 @@ fun ContextMenuItem(
 
     val itemBg = when {
         !enabled -> Color.Transparent
-        destructive && isHighlighted -> Red500
+        destructive && isHighlighted -> colors.destructive
         isHighlighted -> accentColor
         else -> Color.Transparent
     }
 
     val textColor = when {
         isHighlighted -> Color.White
-        destructive -> Red500
+        destructive -> colors.destructive
         else -> if (colors.isDark) Color.White.copy(alpha = 0.85f)
         else Color(0xFF1A1A1A)
     }

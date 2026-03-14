@@ -3,8 +3,10 @@ package io.github.kdroidfilter.darwinui.theme
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 
-// ==================== Base Palette ====================
+// ==================== macOS System Colors ====================
 
+// Legacy Zinc palette — kept for backward compatibility with components
+// that still reference these. Will be removed as components are migrated.
 val Zinc50 = Color(0xFFFAFAFA)
 val Zinc100 = Color(0xFFF4F4F5)
 val Zinc200 = Color(0xFFE4E4E7)
@@ -16,35 +18,6 @@ val Zinc700 = Color(0xFF3F3F46)
 val Zinc800 = Color(0xFF27272A)
 val Zinc900 = Color(0xFF18181B)
 val Zinc950 = Color(0xFF09090B)
-
-val Blue500 = Color(0xFF3B82F6)
-val Blue600 = Color(0xFF2563EB)
-val Purple500 = Color(0xFF8B5CF6)
-val Violet500 = Color(0xFF8B5CF6)
-val Green500 = Color(0xFF22C55E)
-val Green600 = Color(0xFF16A34A)
-val Orange500 = Color(0xFFF97316)
-val Red500 = Color(0xFFEF4444)
-val Red600 = Color(0xFFDC2626)
-val Red700 = Color(0xFFB91C1C)
-val Yellow500 = Color(0xFFEAB308)
-val Yellow600 = Color(0xFFCA8A04)
-val Amber400 = Color(0xFFFBBF24)
-val Amber500 = Color(0xFFF59E0B)
-val Amber600 = Color(0xFFD97706)
-val Cyan500 = Color(0xFF06B6D4)
-val Pink500 = Color(0xFFEC4899)
-val Teal500 = Color(0xFF14B8A6)
-
-val Emerald400 = Color(0xFF34D399)
-val Emerald500 = Color(0xFF10B981)
-val Emerald600 = Color(0xFF059669)
-
-val Sky400 = Color(0xFF38BDF8)
-val Sky500 = Color(0xFF0EA5E9)
-val Sky600 = Color(0xFF0284C7)
-
-val Red400 = Color(0xFFF87171)
 
 /**
  * Color scheme for Darwin UI — aligns with Material3's ColorScheme API
@@ -228,26 +201,26 @@ fun darkColorScheme(accentColor: AccentColor = AccentColor.Blue): ColorScheme {
 
     return ColorScheme(
         // M3 standard — primary is neutral gray (Apple buttons are not accent-colored)
-        primary = Color(0xFFFAFAFA),
-        onPrimary = Color(0xFF0A0A0B),
-        primaryContainer = Color(0xFF27272A),
-        onPrimaryContainer = Color(0xFFFAFAFA),
-        secondary = Color(0xFF27272A),
-        onSecondary = Color(0xFFFAFAFA),
+        primary = Color(0xFFF5F5F5),
+        onPrimary = Color(0xFF1C1C1E),
+        primaryContainer = Color(0xFF2C2C2E),
+        onPrimaryContainer = Color(0xFFF5F5F5),
+        secondary = Color(0xFF2C2C2E),
+        onSecondary = Color(0xFFF5F5F5),
         secondaryContainer = accentContainer,
-        onSecondaryContainer = Color(0xFFFAFAFA),
+        onSecondaryContainer = Color(0xFFF5F5F5),
         tertiary = accent,
         onTertiary = Color.White,
         tertiaryContainer = accentContainer,
-        onTertiaryContainer = Color(0xFFF5F3FF),
-        error = Color(0xFF7F1D1D),
-        onError = Color(0xFFFAFAFA),
-        errorContainer = Color(0xFF450A0A),
-        onErrorContainer = Color(0xFFFCA5A5),
+        onTertiaryContainer = Color(0xFFF5F5F5),
+        error = Color(0xFFFF4245),
+        onError = Color.White,
+        errorContainer = Color(0xFF73191B),
+        onErrorContainer = Color(0xFFFF4245),
         background = Color(0xFF1C1C1E),
-        onBackground = Color(0xFFFFFFFF),
+        onBackground = Color.White,
         surface = Color(0xFF1C1C1E),
-        onSurface = Color(0xFFFFFFFF),
+        onSurface = Color.White,
         surfaceVariant = Color(0xFF2C2C2E),
         onSurfaceVariant = Color(0xFFAEAEB2),
         surfaceTint = accent,
@@ -262,39 +235,43 @@ fun darkColorScheme(accentColor: AccentColor = AccentColor.Blue): ColorScheme {
         surfaceContainerHigh = Color(0xFF3A3A3C),
         surfaceContainerHighest = Color(0xFF48484A),
         outline = Color(0xFF3A3A3C),
+        // Label Quaternary (White 10%)
         outlineVariant = Color(0x1AFFFFFF),
         scrim = Color(0xCC000000),
 
-        // Darwin extended — macOS dark gray palette
+        // Darwin extended — macOS 26 dark palette
         backgroundElevated = Color(0xFF2C2C2E),
         backgroundSubtle = Color(0xFF242426),
-        textPrimary = Color(0xFFFFFFFF),
-        textSecondary = Color(0xFFAEAEB2),
-        textTertiary = Color(0xFF8E8E93),
-        textQuaternary = Color(0xFF636366),
+        // Label colors from Apple macOS 26 (standard, translucent)
+        textPrimary = Color.White,                // Label Dark Primary: White 100%
+        textSecondary = Color(0x8CFFFFFF),        // Label Dark Secondary: White 55%
+        textTertiary = Color(0x40FFFFFF),          // Label Dark Tertiary: White 25%
+        textQuaternary = Color(0x1AFFFFFF),        // Label Dark Quaternary: White 10%
         accent = accent,
         onAccent = Color.White,
-        destructive = Color(0xFFFF453A),
+        // System Colors from Apple macOS 26
+        destructive = Color(0xFFFF4245),           // System Red Dark
         onDestructive = Color.White,
-        success = Color(0xFF30D158),
+        success = Color(0xFF30D158),               // System Green Dark
         onSuccess = Color.White,
-        warning = Color(0xFFFFD60A),
+        warning = Color(0xFFFFD600),               // System Yellow Dark
         onWarning = Color.Black,
         info = accent,
         onInfo = Color.White,
         borderStrong = Color(0x4DFFFFFF),
-        inputBackground = Color(0xFF2C2C2E),
+        // Fill colors from Apple macOS 26 (Dark)
+        inputBackground = Color(0x1AFFFFFF),       // Fills Dark Primary: White 10%
         inputFocusBackground = Color(0xFF3A3A3C),
-        inputBorder = Color(0x33FFFFFF),
+        inputBorder = Color(0x14FFFFFF),           // Fills Dark Secondary: White 8%
         inputFocusBorder = accent,
         card = Color(0xFF2C2C2E),
-        cardForeground = Color(0xFFFFFFFF),
+        cardForeground = Color.White,
         overlay = Color(0x80000000),
         ring = accent,
         muted = Color(0xFF3A3A3C),
-        mutedForeground = Color(0xFFAEAEB2),
+        mutedForeground = Color(0x8CFFFFFF),       // Label Dark Secondary
         popover = Color(0xFF2C2C2E),
-        popoverForeground = Color(0xFFFFFFFF),
+        popoverForeground = Color.White,
         isDark = true,
     )
 }
@@ -305,73 +282,77 @@ fun lightColorScheme(accentColor: AccentColor = AccentColor.Blue): ColorScheme {
 
     return ColorScheme(
         // M3 standard — primary is neutral (Apple buttons are not accent-colored)
-        primary = Color(0xFF18181B),
+        primary = Color(0xFF1C1C1E),
         onPrimary = Color.White,
-        primaryContainer = Color(0xFFF4F4F5),
-        onPrimaryContainer = Color(0xFF18181B),
-        secondary = Color(0xFFF4F4F5),
-        onSecondary = Color(0xFF18181B),
+        primaryContainer = Color(0xFFF2F2F7),
+        onPrimaryContainer = Color(0xFF1C1C1E),
+        secondary = Color(0xFFF2F2F7),
+        onSecondary = Color(0xFF1C1C1E),
         secondaryContainer = accentContainer,
-        onSecondaryContainer = Color(0xFF18181B),
+        onSecondaryContainer = Color(0xFF1C1C1E),
         tertiary = accent,
         onTertiary = Color.White,
         tertiaryContainer = accentContainer,
-        onTertiaryContainer = Color(0xFF4C1D95),
-        error = Color(0xFFEF4444),
+        onTertiaryContainer = Color(0xFF1C1C1E),
+        error = Color(0xFFFF383C),
         onError = Color.White,
-        errorContainer = Color(0xFFFEE2E2),
-        onErrorContainer = Color(0xFF7F1D1D),
+        errorContainer = Color(0xFFFFD6D7),
+        onErrorContainer = Color(0xFFFF383C),
         background = Color.White,
-        onBackground = Color(0xFF0A0A0B),
-        surface = Color(0xFFFAFAFA),
-        onSurface = Color(0xFF0A0A0B),
-        surfaceVariant = Color(0xFFF4F4F5),
-        onSurfaceVariant = Color(0xFF52525B),
+        onBackground = Color(0xD9000000),
+        surface = Color.White,
+        onSurface = Color(0xD9000000),
+        surfaceVariant = Color(0xFFF2F2F7),
+        onSurfaceVariant = Color(0x80000000),
         surfaceTint = accent,
-        inverseSurface = Color(0xFF18181B),
-        inverseOnSurface = Color(0xFFFAFAFA),
-        inversePrimary = Color(0xFFFAFAFA),
-        surfaceDim = Color(0xFFE4E4E7),
+        inverseSurface = Color(0xFF1C1C1E),
+        inverseOnSurface = Color.White,
+        inversePrimary = Color(0xFFF5F5F5),
+        surfaceDim = Color(0xFFE5E5EA),
         surfaceBright = Color.White,
         surfaceContainerLowest = Color.White,
-        surfaceContainerLow = Color(0xFFFAFAFA),
-        surfaceContainer = Color(0xFFF4F4F5),
-        surfaceContainerHigh = Color(0xFFE4E4E7),
-        surfaceContainerHighest = Color(0xFFD4D4D8),
-        outline = Color(0xFFE4E4E7),
+        surfaceContainerLow = Color(0xFFF2F2F7),
+        surfaceContainer = Color(0xFFE5E5EA),
+        surfaceContainerHigh = Color(0xFFD1D1D6),
+        surfaceContainerHighest = Color(0xFFC7C7CC),
+        outline = Color(0xFFD1D1D6),
+        // Label Quaternary (Black 10%)
         outlineVariant = Color(0x1A000000),
         scrim = Color(0x99000000),
 
-        // Darwin extended
-        backgroundElevated = Color(0xFFFAFAFA),
-        backgroundSubtle = Color(0xFFF4F4F5),
-        textPrimary = Color(0xFF18181B),
-        textSecondary = Color(0xFF52525B),
-        textTertiary = Color(0xFF71717A),
-        textQuaternary = Color(0xFFA1A1AA),
+        // Darwin extended — macOS 26 light palette
+        backgroundElevated = Color(0xFFF2F2F7),
+        backgroundSubtle = Color(0xFFE5E5EA),
+        // Label colors from Apple macOS 26 (standard, translucent)
+        textPrimary = Color(0xD9000000),           // Label Light Primary: Black 85%
+        textSecondary = Color(0x80000000),          // Label Light Secondary: Black 50%
+        textTertiary = Color(0x40000000),           // Label Light Tertiary: Black 25%
+        textQuaternary = Color(0x1A000000),         // Label Light Quaternary: Black 10%
         accent = accent,
         onAccent = Color.White,
-        destructive = Color(0xFFEF4444),
+        // System Colors from Apple macOS 26
+        destructive = Color(0xFFFF383C),            // System Red Light
         onDestructive = Color.White,
-        success = Color(0xFF16A34A),
+        success = Color(0xFF34C759),                // System Green Light
         onSuccess = Color.White,
-        warning = Color(0xFFCA8A04),
-        onWarning = Color.White,
+        warning = Color(0xFFFFCC00),                // System Yellow Light
+        onWarning = Color.Black,
         info = accent,
         onInfo = Color.White,
         borderStrong = Color(0x33000000),
-        inputBackground = Color(0x0D000000),
+        // Fill colors from Apple macOS 26 (Light)
+        inputBackground = Color(0x1A000000),        // Fills Light Primary: Black 10%
         inputFocusBackground = Color(0xE6FFFFFF),
-        inputBorder = Color(0x1A000000),
+        inputBorder = Color(0x14000000),            // Fills Light Secondary: Black 8%
         inputFocusBorder = accent,
-        card = Color(0xFFFAFAFA),
-        cardForeground = Color(0xFF0A0A0B),
+        card = Color(0xFFF2F2F7),
+        cardForeground = Color(0xD9000000),
         overlay = Color(0x40000000),
         ring = accent,
-        muted = Color(0xFFF4F4F5),
-        mutedForeground = Color(0xFF71717A),
+        muted = Color(0xFFF2F2F7),
+        mutedForeground = Color(0x80000000),        // Label Light Secondary
         popover = Color.White,
-        popoverForeground = Color(0xFF0A0A0B),
+        popoverForeground = Color(0xD9000000),
         isDark = false,
     )
 }

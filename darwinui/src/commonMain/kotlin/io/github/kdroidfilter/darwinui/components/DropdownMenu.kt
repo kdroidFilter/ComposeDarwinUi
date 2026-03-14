@@ -71,13 +71,6 @@ import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
 import kotlinx.coroutines.delay
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
-import io.github.kdroidfilter.darwinui.theme.Red500
-import io.github.kdroidfilter.darwinui.theme.Zinc100
-import io.github.kdroidfilter.darwinui.theme.Zinc300
-import io.github.kdroidfilter.darwinui.theme.Zinc400
-import io.github.kdroidfilter.darwinui.theme.Zinc500
-import io.github.kdroidfilter.darwinui.theme.Zinc700
-import io.github.kdroidfilter.darwinui.theme.Zinc900
 import io.github.kdroidfilter.darwinui.theme.darwinGlass
 
 // =============================================================================
@@ -154,7 +147,7 @@ fun DropdownMenu(
     val isDark = colors.isDark
     val shapes = DarwinTheme.shapes
 
-    val fallbackBg = if (isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
+    val fallbackBg = if (isDark) Color(0xFF18181B).copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
     val borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
     if (expanded) {
@@ -274,14 +267,14 @@ fun DropdownMenuItem(
 
     val itemBackground = when {
         !enabled -> Color.Transparent
-        destructive && isHighlighted -> Red500
+        destructive && isHighlighted -> colors.destructive
         isHighlighted -> accentColor
         else -> Color.Transparent
     }
 
     val textColor = when {
         isHighlighted && enabled -> Color.White
-        destructive -> Red500
+        destructive -> colors.destructive
         else -> if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1A1A1A)
     }
 
@@ -411,7 +404,7 @@ fun DropdownMenuSubMenu(
     }
 
     val chevronColor = if (isActive && enabled) Color.White
-        else if (isDark) Zinc400 else Zinc500
+        else if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A)
 
     val itemShape = RoundedCornerShape(6.dp)
     val contentStyle = TextStyle(fontSize = 13.sp, color = textColor, letterSpacing = 0.sp)
@@ -468,7 +461,7 @@ fun DropdownMenuSubMenu(
         }
 
         if (submenuExpanded) {
-            val fallbackBg = if (isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
+            val fallbackBg = if (isDark) Color(0xFF18181B).copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
             val borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
             val menuShape = DarwinTheme.shapes.large
 
@@ -533,7 +526,7 @@ fun DropdownMenuCheckboxItem(
                     Icon(
                         imageVector = LucideCheck,
                         modifier = Modifier.size(12.dp),
-                        tint = if (DarwinTheme.colorScheme.isDark) Zinc300 else Zinc700,
+                        tint = if (DarwinTheme.colorScheme.isDark) Color(0xFFD4D4D8) else Color(0xFF3F3F46),
                     )
                 }
             }
@@ -572,7 +565,7 @@ fun DropdownMenuLabel(
             style = TextStyle(
                 fontSize = 11.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = if (isDark) Zinc400 else Zinc500,
+                color = if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A),
                 letterSpacing = 0.sp,
             ),
         )
@@ -626,7 +619,7 @@ fun DropdownMenuShortcut(
         text = text,
         style = typography.caption1.merge(
             TextStyle(
-                color = if (isDark) Zinc400 else Zinc500,
+                color = if (isDark) Color(0xFFA1A1AA) else Color(0xFF71717A),
                 letterSpacing = 1.2.sp, // tracking-widest ≈ 0.1em at 12sp
             )
         ),

@@ -22,7 +22,6 @@ import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.Emerald500
 
 @Composable
 private fun ProgressPreview() {
@@ -37,7 +36,7 @@ private fun ProgressPreview() {
         ControlSize(ControlSize.Large) {
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 ProgressRing(progress = 0.75f)
-                ProgressRing(progress = 0.45f, color = Emerald500)
+                ProgressRing(progress = 0.45f, color = DarwinTheme.colorScheme.success)
                 ProgressRing()
             }
         }
@@ -117,7 +116,7 @@ fun ProgressCircularExample() {
     ControlSize(ControlSize.Large) {
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             ProgressRing(progress = 0.75f)
-            ProgressRing(progress = 0.45f, color = Emerald500)
+            ProgressRing(progress = 0.45f, color = DarwinTheme.colorScheme.success)
             ProgressRing()
         }
     }

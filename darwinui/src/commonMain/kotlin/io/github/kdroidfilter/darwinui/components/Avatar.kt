@@ -23,17 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import io.github.kdroidfilter.darwinui.components.Text
-import io.github.kdroidfilter.darwinui.theme.Blue500
-import io.github.kdroidfilter.darwinui.theme.Cyan500
+import io.github.kdroidfilter.darwinui.theme.AccentColor
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
-import io.github.kdroidfilter.darwinui.theme.Green500
-import io.github.kdroidfilter.darwinui.theme.Orange500
-import io.github.kdroidfilter.darwinui.theme.Pink500
-import io.github.kdroidfilter.darwinui.theme.Purple500
-import io.github.kdroidfilter.darwinui.theme.Red500
-import io.github.kdroidfilter.darwinui.theme.Teal500
-import io.github.kdroidfilter.darwinui.theme.Zinc800
-import io.github.kdroidfilter.darwinui.theme.Zinc900
 import kotlin.math.absoluteValue
 
 // ===========================================================================
@@ -42,10 +33,11 @@ import kotlin.math.absoluteValue
 
 /**
  * Avatar color palette used for deterministic background assignment.
+ * Uses Apple macOS 26 system accent colors.
  */
 private val AvatarColors = listOf(
-    Blue500, Green500, Purple500, Orange500,
-    Red500, Cyan500, Pink500, Teal500,
+    AccentColor.Blue.light, AccentColor.Green.light, AccentColor.Purple.light, AccentColor.Orange.light,
+    AccentColor.Red.light, AccentColor.Cyan.light, AccentColor.Pink.light, AccentColor.Teal.light,
 )
 
 /**
@@ -114,7 +106,7 @@ fun Avatar(
 ) {
     val colors = DarwinTheme.colorScheme
     val backgroundColor = hashColor(name)
-    val borderColor = if (colors.isDark) Zinc900 else Color.White
+    val borderColor = if (colors.isDark) Color(0xFF18181B) else Color.White
     val initials = extractInitials(name)
     val fontSize = (size.value * 0.4f).sp
 
@@ -197,7 +189,7 @@ fun AvatarGroup(
     size: Dp = 40.dp,
 ) {
     val colors = DarwinTheme.colorScheme
-    val borderColor = if (colors.isDark) Zinc900 else Color.White
+    val borderColor = if (colors.isDark) Color(0xFF18181B) else Color.White
     val overlapDp = 12.dp // how much each avatar overlaps the previous one
 
     val totalCount = avatars.size
@@ -235,7 +227,7 @@ fun AvatarGroup(
                     .zIndex(0f)
                     .size(size)
                     .clip(CircleShape)
-                    .background(Zinc800, CircleShape)
+                    .background(Color(0xFF27272A), CircleShape)
                     .border(width = 2.dp, color = borderColor, shape = CircleShape),
                 contentAlignment = Alignment.Center,
             ) {

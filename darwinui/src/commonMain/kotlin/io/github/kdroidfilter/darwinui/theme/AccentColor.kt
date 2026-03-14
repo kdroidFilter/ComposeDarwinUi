@@ -3,8 +3,10 @@ package io.github.kdroidfilter.darwinui.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * Predefined accent color palette inspired by macOS system accent colors.
+ * Predefined accent color palette matching macOS 26 system accent colors.
  * Each accent defines light and dark variants used to derive theme colors.
+ *
+ * Values extracted from Apple macOS 26 UI Kit (Sketch).
  */
 enum class AccentColor(
     /** Accent used in light theme. */
@@ -17,57 +19,81 @@ enum class AccentColor(
     val containerLight: Color,
 ) {
     Blue(
-        light = Color(0xFF2563EB),
-        dark = Color(0xFF3B82F6),
-        containerDark = Color(0xFF1E3A5F),
-        containerLight = Color(0xFFDBEAFE),
+        light = Color(0xFF0088FF),
+        dark = Color(0xFF0091FF),
+        containerDark = Color(0xFF003D73),
+        containerLight = Color(0xFFD6ECFF),
     ),
     Purple(
-        light = Color(0xFF7C3AED),
-        dark = Color(0xFF8B5CF6),
-        containerDark = Color(0xFF3B1F6E),
-        containerLight = Color(0xFFEDE9FE),
+        light = Color(0xFFCB30E0),
+        dark = Color(0xFFDB34F2),
+        containerDark = Color(0xFF5C1866),
+        containerLight = Color(0xFFF5D6FA),
+    ),
+    Indigo(
+        light = Color(0xFF6155F5),
+        dark = Color(0xFF6D7CFF),
+        containerDark = Color(0xFF2E276E),
+        containerLight = Color(0xFFE0DFFE),
     ),
     Pink(
-        light = Color(0xFFDB2777),
-        dark = Color(0xFFF472B6),
-        containerDark = Color(0xFF5C1A3D),
-        containerLight = Color(0xFFFCE7F3),
+        light = Color(0xFFFF2D55),
+        dark = Color(0xFFFF375F),
+        containerDark = Color(0xFF73142A),
+        containerLight = Color(0xFFFFD6DE),
     ),
     Red(
-        light = Color(0xFFDC2626),
-        dark = Color(0xFFEF4444),
-        containerDark = Color(0xFF5C1A1A),
-        containerLight = Color(0xFFFEE2E2),
+        light = Color(0xFFFF383C),
+        dark = Color(0xFFFF4245),
+        containerDark = Color(0xFF73191B),
+        containerLight = Color(0xFFFFD6D7),
     ),
     Orange(
-        light = Color(0xFFEA580C),
-        dark = Color(0xFFF97316),
-        containerDark = Color(0xFF5C2D0E),
-        containerLight = Color(0xFFFFF7ED),
+        light = Color(0xFFFF8D28),
+        dark = Color(0xFFFF9230),
+        containerDark = Color(0xFF734012),
+        containerLight = Color(0xFFFFE8D1),
     ),
     Yellow(
-        light = Color(0xFFCA8A04),
-        dark = Color(0xFFEAB308),
-        containerDark = Color(0xFF5C4A0E),
-        containerLight = Color(0xFFFEFCE8),
+        light = Color(0xFFFFCC00),
+        dark = Color(0xFFFFD600),
+        containerDark = Color(0xFF735C00),
+        containerLight = Color(0xFFFFF5CC),
     ),
     Green(
-        light = Color(0xFF16A34A),
-        dark = Color(0xFF22C55E),
-        containerDark = Color(0xFF14532D),
-        containerLight = Color(0xFFDCFCE7),
+        light = Color(0xFF34C759),
+        dark = Color(0xFF30D158),
+        containerDark = Color(0xFF175928),
+        containerLight = Color(0xFFD4F5DD),
     ),
     Teal(
-        light = Color(0xFF0D9488),
-        dark = Color(0xFF14B8A6),
-        containerDark = Color(0xFF134E4A),
-        containerLight = Color(0xFFCCFBF1),
+        light = Color(0xFF00C3D0),
+        dark = Color(0xFF00D2E0),
+        containerDark = Color(0xFF00585E),
+        containerLight = Color(0xFFCCF3F6),
+    ),
+    Cyan(
+        light = Color(0xFF00C0E8),
+        dark = Color(0xFF3CD3FE),
+        containerDark = Color(0xFF005668),
+        containerLight = Color(0xFFCCF2FB),
+    ),
+    Mint(
+        light = Color(0xFF00C8B3),
+        dark = Color(0xFF00DAC3),
+        containerDark = Color(0xFF005A50),
+        containerLight = Color(0xFFCCF4F0),
+    ),
+    Brown(
+        light = Color(0xFFAC7F5E),
+        dark = Color(0xFFB78A66),
+        containerDark = Color(0xFF4D392A),
+        containerLight = Color(0xFFF0E5DB),
     ),
     Graphite(
-        light = Color(0xFF52525B),
-        dark = Color(0xFF71717A),
-        containerDark = Color(0xFF3F3F46),
-        containerLight = Color(0xFFE4E4E7),
+        light = Color(0xFF8E8E93),
+        dark = Color(0xFF8E8E93),
+        containerDark = Color(0xFF3A3A3C),
+        containerLight = Color(0xFFE5E5EA),
     ),
 }

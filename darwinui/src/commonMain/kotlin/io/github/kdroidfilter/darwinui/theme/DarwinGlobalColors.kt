@@ -63,15 +63,15 @@ data class GlobalColors(
             ),
             outlines = Outlines(
                 focused = accent.copy(alpha = 0.35f),
-                focusedWarning = Color(0xFFCA8A04).copy(alpha = 0.35f),
-                focusedError = Color(0xFFEF4444).copy(alpha = 0.35f),
-                warning = Color(0xFFCA8A04),
-                error = Color(0xFFEF4444),
+                focusedWarning = Color(0xFFFFCC00).copy(alpha = 0.35f),
+                focusedError = Color(0xFFFF383C).copy(alpha = 0.35f),
+                warning = Color(0xFFFFCC00),
+                error = Color(0xFFFF383C),
             ),
             infoContent = accent,
-            successContent = Color(0xFF16A34A),
-            warningContent = Color(0xFFCA8A04),
-            errorContent = Color(0xFFEF4444),
+            successContent = Color(0xFF34C759),
+            warningContent = Color(0xFFFFCC00),
+            errorContent = Color(0xFFFF383C),
         )
 
         fun dark(accent: Color): GlobalColors = GlobalColors(
@@ -83,15 +83,15 @@ data class GlobalColors(
             ),
             outlines = Outlines(
                 focused = accent.copy(alpha = 0.45f),
-                focusedWarning = Color(0xFFFFD60A).copy(alpha = 0.45f),
-                focusedError = Color(0xFFFF453A).copy(alpha = 0.45f),
-                warning = Color(0xFFFFD60A),
-                error = Color(0xFFFF453A),
+                focusedWarning = Color(0xFFFFD600).copy(alpha = 0.45f),
+                focusedError = Color(0xFFFF4245).copy(alpha = 0.45f),
+                warning = Color(0xFFFFD600),
+                error = Color(0xFFFF4245),
             ),
             infoContent = accent,
             successContent = Color(0xFF30D158),
-            warningContent = Color(0xFFFFD60A),
-            errorContent = Color(0xFFFF453A),
+            warningContent = Color(0xFFFFD600),
+            errorContent = Color(0xFFFF4245),
         )
     }
 }

@@ -37,6 +37,7 @@ fun DarwinTheme(
     val liquidState = rememberLiquidState()
     val accentColorValue = if (darkTheme) accentColor.dark else accentColor.light
     val globalColors = if (darkTheme) GlobalColors.dark(accentColorValue) else GlobalColors.light(accentColorValue)
+    val vibrantColors = if (darkTheme) VibrantColors.dark() else VibrantColors.light()
 
     CompositionLocalProvider(
         LocalDarwinColors provides colorScheme,
@@ -44,6 +45,7 @@ fun DarwinTheme(
         LocalDarwinShapes provides shapes,
         LocalDarwinAnimations provides animations,
         LocalDarwinGlobalColors provides globalColors,
+        LocalDarwinVibrantColors provides vibrantColors,
         LocalDarwinGlobalMetrics provides globalMetrics,
         LocalDarwinComponentStyling provides componentStyling,
         LocalDarwinTextStyle provides resolvedTypography.body,
@@ -89,6 +91,12 @@ object DarwinTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalDarwinGlobalColors.current
+
+    /** Opaque vibrant colors for vibrancy surfaces (blend mode compositing). */
+    val vibrantColors: VibrantColors
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalDarwinVibrantColors.current
 
     /** Global sizing metrics shared across all components. */
     val globalMetrics: GlobalMetrics

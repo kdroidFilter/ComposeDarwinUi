@@ -36,14 +36,14 @@ enum class ProgressVariant {
 @Composable
 private fun variantColor(variant: ProgressVariant): Color = when (variant) {
     ProgressVariant.Default -> DarwinTheme.colorScheme.accent
-    ProgressVariant.Success -> Emerald500
-    ProgressVariant.Warning -> Amber500
-    ProgressVariant.Danger -> Red500
+    ProgressVariant.Success -> DarwinTheme.colorScheme.success
+    ProgressVariant.Warning -> DarwinTheme.colorScheme.warning
+    ProgressVariant.Danger -> DarwinTheme.colorScheme.destructive
     ProgressVariant.Gradient -> DarwinTheme.colorScheme.accent
 }
 
-private fun gradientBrush(width: Float): Brush = Brush.linearGradient(
-    colors = listOf(Blue500, Violet500, Red500),
+private fun gradientBrush(width: Float, gradientColors: List<Color>): Brush = Brush.linearGradient(
+    colors = gradientColors,
     start = Offset.Zero,
     end = Offset(width, 0f),
 )
@@ -67,6 +67,9 @@ fun LinearProgress(
 
     val fillColor = variantColor(variant)
     val useGradient = variant == ProgressVariant.Gradient
+    val gradientColors = if (useGradient) {
+        listOf(DarwinTheme.colorScheme.accent, DarwinTheme.colorScheme.info, DarwinTheme.colorScheme.destructive)
+    } else emptyList()
 
     val targetFraction = if (indeterminate) 0f else (value / max).coerceIn(0f, 1f)
     val animatedFraction by animateFloatAsState(
@@ -117,7 +120,7 @@ fun LinearProgress(
                 if (clippedWidth > 0f) {
                     if (useGradient) {
                         drawRoundRect(
-                            brush = gradientBrush(clippedWidth),
+                            brush = gradientBrush(clippedWidth, gradientColors),
                             topLeft = Offset(clippedStart, 0f),
                             size = Size(clippedWidth, this.size.height),
                             cornerRadius = cornerRadius,
@@ -136,7 +139,7 @@ fun LinearProgress(
                 if (fillWidth > 0f) {
                     if (useGradient) {
                         drawRoundRect(
-                            brush = gradientBrush(fillWidth),
+                            brush = gradientBrush(fillWidth, gradientColors),
                             cornerRadius = cornerRadius,
                             size = Size(fillWidth, this.size.height),
                         )
