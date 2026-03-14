@@ -22,8 +22,6 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -43,29 +41,12 @@ import kotlin.math.atan2
 
 @Immutable
 class CircularSliderColors(
-    val backgroundColor: Color,
-    val trackColor: Color,
-    val activeTrackColor: Color,
-    val indicatorColor: Color,
-    val disabledBackgroundColor: Color,
-    val disabledTrackColor: Color,
-    val disabledActiveTrackColor: Color,
-    val disabledIndicatorColor: Color,
-) {
-    fun copy(
-        backgroundColor: Color = this.backgroundColor,
-        trackColor: Color = this.trackColor,
-        activeTrackColor: Color = this.activeTrackColor,
-        indicatorColor: Color = this.indicatorColor,
-        disabledBackgroundColor: Color = this.disabledBackgroundColor,
-        disabledTrackColor: Color = this.disabledTrackColor,
-        disabledActiveTrackColor: Color = this.disabledActiveTrackColor,
-        disabledIndicatorColor: Color = this.disabledIndicatorColor,
-    ) = CircularSliderColors(
-        backgroundColor, trackColor, activeTrackColor, indicatorColor,
-        disabledBackgroundColor, disabledTrackColor, disabledActiveTrackColor, disabledIndicatorColor,
-    )
-}
+    val background: Color,
+    val backgroundPressed: Color,
+    val backgroundDisabled: Color,
+    val indicator: Color,
+    val indicatorDisabled: Color,
+)
 
 // ===========================================================================
 // CircularSliderDefaults
@@ -74,18 +55,12 @@ class CircularSliderColors(
 object CircularSliderDefaults {
     @Composable
     fun colors(
-        backgroundColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f),
-        trackColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
-        activeTrackColor: Color = DarwinTheme.colorScheme.accent,
-        indicatorColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.85f) else Color.Black.copy(alpha = 0.85f),
-        disabledBackgroundColor: Color = backgroundColor.copy(alpha = backgroundColor.alpha * 0.38f),
-        disabledTrackColor: Color = trackColor.copy(alpha = trackColor.alpha * 0.38f),
-        disabledActiveTrackColor: Color = activeTrackColor.copy(alpha = 0.38f),
-        disabledIndicatorColor: Color = indicatorColor.copy(alpha = indicatorColor.alpha * 0.38f),
-    ) = CircularSliderColors(
-        backgroundColor, trackColor, activeTrackColor, indicatorColor,
-        disabledBackgroundColor, disabledTrackColor, disabledActiveTrackColor, disabledIndicatorColor,
-    )
+        background: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f),
+        backgroundPressed: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.15f) else Color.Black.copy(alpha = 0.15f),
+        backgroundDisabled: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.04f) else Color.Black.copy(alpha = 0.04f),
+        indicator: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.85f) else Color.Black.copy(alpha = 0.85f),
+        indicatorDisabled: Color = indicator.copy(alpha = indicator.alpha * 0.38f),
+    ) = CircularSliderColors(background, backgroundPressed, backgroundDisabled, indicator, indicatorDisabled)
 }
 
 // ===========================================================================
@@ -110,10 +85,8 @@ fun circularSliderSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
 /**
  * macOS-style circular slider / knob control.
  *
- * Displays a circular track with an accent-colored arc showing the current
- * value and a rotating tick indicator. The user can tap or drag anywhere on
- * the control to change the value. The tick indicator follows the proportions
- * of a standard macOS knob indicator.
+ * A simple filled circle with a rotating tick indicator. The background
+ * darkens on press. The user can tap or drag anywhere to change the value.
  *
  * @param value Current value within [valueRange].
  * @param onValueChange Called when the value changes during interaction.
@@ -122,8 +95,7 @@ fun circularSliderSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
  * @param valueRange The range of valid values.
  * @param onValueChangeFinished Called once when the user finishes a gesture.
  * @param colors Color configuration via [CircularSliderDefaults.colors].
- * @param size Diameter of the control. See [CircularSliderSize] for presets.
- * @param trackWidth Width of the circular track stroke.
+ * @param size Diameter of the control, defaults to ControlSize-based sizing.
  * @param interactionSource Interaction source for hover/press tracking.
  */
 @Composable
@@ -136,7 +108,6 @@ fun CircularSlider(
     onValueChangeFinished: (() -> Unit)? = null,
     colors: CircularSliderColors = CircularSliderDefaults.colors(),
     size: Dp = circularSliderSizeFor(LocalControlSize.current),
-    trackWidth: Dp = size * 3 / 32,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val min = valueRange.start
@@ -156,10 +127,12 @@ fun CircularSlider(
         animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
     )
 
-    val bgColor = if (enabled) colors.backgroundColor else colors.disabledBackgroundColor
-    val trackColor = if (enabled) colors.trackColor else colors.disabledTrackColor
-    val activeColor = if (enabled) colors.activeTrackColor else colors.disabledActiveTrackColor
-    val indicatorColor = if (enabled) colors.indicatorColor else colors.disabledIndicatorColor
+    val bgColor = when {
+        !enabled -> colors.backgroundDisabled
+        isDragging -> colors.backgroundPressed
+        else -> colors.background
+    }
+    val indicatorColor = if (enabled) colors.indicator else colors.indicatorDisabled
 
     fun angleToValue(position: Offset, center: Offset): Float {
         val delta = position - center
@@ -226,37 +199,7 @@ fun CircularSlider(
             // Background circle
             drawCircle(color = bgColor, radius = radius, center = center)
 
-            // Track ring
-            val trackStroke = Stroke(width = trackWidth.toPx(), cap = StrokeCap.Round)
-            val arcDiameter = canvasSize.minDimension - trackStroke.width
-            val arcSize = Size(arcDiameter, arcDiameter)
-            val arcTopLeft = Offset(trackStroke.width / 2f, trackStroke.width / 2f)
-
-            drawArc(
-                color = trackColor,
-                startAngle = 0f,
-                sweepAngle = 360f,
-                useCenter = false,
-                topLeft = arcTopLeft,
-                size = arcSize,
-                style = trackStroke,
-            )
-
-            // Active arc (from top, clockwise)
-            val sweepAngle = animatedFraction * 360f
-            if (sweepAngle > 0f) {
-                drawArc(
-                    color = activeColor,
-                    startAngle = -90f,
-                    sweepAngle = sweepAngle,
-                    useCenter = false,
-                    topLeft = arcTopLeft,
-                    size = arcSize,
-                    style = trackStroke,
-                )
-            }
-
-            // Indicator tick — proportions from the SVG (2×6 in a 24×24 circle)
+            // Indicator tick — proportions from the SVG (2x6 in a 24x24 circle)
             val indicatorW = canvasSize.minDimension * (2f / 24f)
             val indicatorH = canvasSize.minDimension * (6f / 24f)
             val indicatorInset = canvasSize.minDimension * (3f / 24f)
