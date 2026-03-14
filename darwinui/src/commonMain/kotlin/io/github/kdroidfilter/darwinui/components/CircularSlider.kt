@@ -29,8 +29,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import kotlin.math.PI
 import kotlin.math.atan2
@@ -90,10 +92,15 @@ object CircularSliderDefaults {
 // CircularSliderSize
 // ===========================================================================
 
-object CircularSliderSize {
-    val Large = 64.dp
-    val Medium = 48.dp
-    val Small = 32.dp
+/**
+ * Resolves the circular slider diameter for the given [ControlSize].
+ */
+fun circularSliderSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
+    ControlSize.Mini -> 16.dp
+    ControlSize.Small -> 20.dp
+    ControlSize.Regular -> 24.dp
+    ControlSize.Large -> 28.dp
+    ControlSize.ExtraLarge -> 36.dp
 }
 
 // ===========================================================================
@@ -128,7 +135,7 @@ fun CircularSlider(
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     onValueChangeFinished: (() -> Unit)? = null,
     colors: CircularSliderColors = CircularSliderDefaults.colors(),
-    size: Dp = CircularSliderSize.Medium,
+    size: Dp = circularSliderSizeFor(LocalControlSize.current),
     trackWidth: Dp = size * 3 / 32,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
