@@ -1,5 +1,6 @@
 package io.github.kdroidfilter.darwinui.components
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -35,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -48,13 +51,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideCheck
-import io.github.kdroidfilter.darwinui.icons.LucideChevronsUpDown
+import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.icons.LucideX
+import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.LocalControlSize
+import io.github.kdroidfilter.darwinui.theme.Outline
 import io.github.kdroidfilter.darwinui.theme.darwinGlass
+import io.github.kdroidfilter.darwinui.theme.focusOrValidationOutline
 
 /**
  * A multi-select combo box with index-based selection.
@@ -66,6 +72,7 @@ import io.github.kdroidfilter.darwinui.theme.darwinGlass
  * @param header Optional header/label text above the component.
  * @param placeholder Optional placeholder text when nothing is selected.
  * @param disabled Whether the component is non-interactive.
+ * @param outline The validation outline state.
  * @param showTags Whether to show removable tag chips below the trigger.
  */
 @OptIn(ExperimentalLayoutApi::class)
@@ -76,13 +83,17 @@ fun MultiSelectComboBox(
     onSelectionChange: (List<Int>) -> Unit,
     modifier: Modifier = Modifier,
     header: String? = null,
-    placeholder: String = "Select...",
+    placeholder: String? = null,
     disabled: Boolean = false,
+    outline: Outline = Outline.None,
     showTags: Boolean = true,
 ) {
+    val controlSize = LocalControlSize.current
+    val comboMetrics = DarwinTheme.componentStyling.comboBox.metrics
     val colors = DarwinTheme.colorScheme
     val shapes = DarwinTheme.shapes
     val typography = DarwinTheme.typography
+    val outlines = DarwinTheme.globalColors.outlines
     val enabled = !disabled
 
     var expanded by remember { mutableStateOf(false) }
@@ -92,15 +103,37 @@ fun MultiSelectComboBox(
 
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
-    val isTriggerHovered by interactionSource.collectIsHoveredAsState()
     val focusRequester = remember { FocusRequester() }
 
-    val borderColor = colors.inputFocusBorder
-
+    val isDark = colors.isDark
     val backgroundColor = when {
-        isTriggerHovered -> if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.08f)
-        else -> if (colors.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f)
+        !enabled -> if (isDark) Color.White.copy(alpha = 0.04f) else Color.White.copy(alpha = 0.50f)
+        else -> if (isDark) Color.White.copy(alpha = 0.08f) else Color.White
     }
+    val borderColor = when {
+        !enabled -> if (isDark) Color.White.copy(alpha = 0.04f) else Color.Black.copy(alpha = 0.04f)
+        isFocused || expanded -> colors.inputFocusBorder
+        else -> if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.08f)
+    }
+    val borderWidth = if (enabled && (isFocused || expanded)) 2.dp else 1.dp
+    val chevronAlpha = when {
+        !enabled -> 0.06f
+        expanded -> 0.20f
+        else -> 0.13f
+    }
+    val chevronBg = if (isDark) Color.White.copy(alpha = chevronAlpha) else Color.Black.copy(alpha = chevronAlpha)
+    val chevronTintAlpha = if (enabled) 0.85f else 0.25f
+    val chevronTint = if (isDark) Color.White.copy(alpha = chevronTintAlpha) else Color.Black.copy(alpha = chevronTintAlpha)
+
+    val comboFontSize = when (controlSize) {
+        ControlSize.Mini -> 10.sp
+        ControlSize.Small, ControlSize.Regular -> 11.sp
+        ControlSize.Large, ControlSize.ExtraLarge -> 13.sp
+    }
+
+    val chevronRotation by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+    )
 
     LaunchedEffect(expanded) {
         if (expanded) {
@@ -134,87 +167,103 @@ fun MultiSelectComboBox(
         }
 
         Box {
-            Row(
+            Box(
                 modifier = Modifier
+                    .widthIn(min = comboMetrics.minWidth)
                     .fillMaxWidth()
-                    .height(24.dp)
-                    .onGloballyPositioned { coordinates ->
-                        triggerWidthPx = coordinates.size.width
-                        triggerHeightPx = coordinates.size.height
-                    }
-                    .clip(shapes.small)
-                    .background(backgroundColor)
-                    .then(
-                        if (isFocused || expanded) Modifier.border(2.dp, borderColor, shapes.small)
-                        else Modifier
-                    )
-                    .then(
-                        if (enabled) {
-                            Modifier
-                                .hoverable(interactionSource)
-                                .focusRequester(focusRequester)
-                                .focusable(interactionSource = interactionSource)
-                                .clickable(
-                                    interactionSource = interactionSource,
-                                    indication = null,
-                                ) {
-                                    expanded = !expanded
-                                }
-                                .onKeyEvent { event ->
-                                    if (event.type != KeyEventType.KeyDown) return@onKeyEvent false
-                                    when (event.key) {
-                                        Key.DirectionDown -> {
-                                            if (!expanded) {
-                                                expanded = true
-                                            } else {
-                                                highlightedIndex = (highlightedIndex + 1).coerceAtMost(items.size - 1)
-                                            }
-                                            true
-                                        }
-                                        Key.DirectionUp -> {
-                                            if (expanded) {
-                                                highlightedIndex = (highlightedIndex - 1).coerceAtLeast(0)
-                                            }
-                                            true
-                                        }
-                                        Key.Enter, Key.Spacebar -> {
-                                            if (expanded && highlightedIndex in items.indices) {
-                                                toggleIndex(highlightedIndex)
-                                            } else if (!expanded) {
-                                                expanded = true
-                                            }
-                                            true
-                                        }
-                                        Key.Escape -> {
-                                            expanded = false
-                                            true
-                                        }
-                                        else -> false
-                                    }
-                                }
-                        } else Modifier
-                    ),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
+                    .height(comboMetrics.minHeightFor(controlSize))
+                    .focusOrValidationOutline(isFocused || expanded, outline, shapes.small, outlines),
             ) {
-                Text(
-                    text = displayText ?: placeholder,
-                    style = typography.subheadline,
-                    color = if (displayText != null) colors.textPrimary else colors.textTertiary,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f).padding(start = 12.dp),
-                )
-
-                Box(
-                    modifier = Modifier.padding(end = 8.dp),
-                    contentAlignment = Alignment.Center,
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .onGloballyPositioned { coordinates ->
+                            triggerWidthPx = coordinates.size.width
+                            triggerHeightPx = coordinates.size.height
+                        }
+                        .clip(shapes.small)
+                        .background(backgroundColor)
+                        .border(
+                            width = borderWidth,
+                            color = borderColor,
+                            shape = shapes.small,
+                        )
+                        .then(
+                            if (enabled) {
+                                Modifier
+                                    .hoverable(interactionSource)
+                                    .focusRequester(focusRequester)
+                                    .focusable(interactionSource = interactionSource)
+                                    .clickable(
+                                        interactionSource = interactionSource,
+                                        indication = null,
+                                    ) {
+                                        expanded = !expanded
+                                    }
+                                    .onKeyEvent { event ->
+                                        if (event.type != KeyEventType.KeyDown) return@onKeyEvent false
+                                        when (event.key) {
+                                            Key.DirectionDown -> {
+                                                if (!expanded) {
+                                                    expanded = true
+                                                } else {
+                                                    highlightedIndex = (highlightedIndex + 1).coerceAtMost(items.size - 1)
+                                                }
+                                                true
+                                            }
+                                            Key.DirectionUp -> {
+                                                if (expanded) {
+                                                    highlightedIndex = (highlightedIndex - 1).coerceAtLeast(0)
+                                                }
+                                                true
+                                            }
+                                            Key.Enter, Key.Spacebar -> {
+                                                if (expanded && highlightedIndex in items.indices) {
+                                                    toggleIndex(highlightedIndex)
+                                                } else if (!expanded) {
+                                                    expanded = true
+                                                }
+                                                true
+                                            }
+                                            Key.Escape -> {
+                                                expanded = false
+                                                true
+                                            }
+                                            else -> false
+                                        }
+                                    }
+                            } else Modifier
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Icon(
-                        imageVector = LucideChevronsUpDown,
-                        tint = if (colors.isDark) Color.White.copy(alpha = 0.85f) else Color.Black.copy(alpha = 0.85f),
-                        modifier = Modifier.size(12.dp),
+                    Text(
+                        text = displayText ?: placeholder ?: "Select...",
+                        style = typography.subheadline,
+                        fontSize = comboFontSize,
+                        color = if (displayText != null) colors.textPrimary else colors.textTertiary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f).padding(start = 12.dp),
                     )
+
+                    Box(
+                        modifier = Modifier
+                            .padding(2.dp)
+                            .fillMaxHeight()
+                            .width(16.dp)
+                            .clip(RoundedCornerShape(3.dp))
+                            .background(chevronBg),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = LucideChevronDown,
+                            tint = chevronTint,
+                            modifier = Modifier
+                                .size(10.dp)
+                                .rotate(chevronRotation),
+                        )
+                    }
                 }
             }
 
@@ -227,11 +276,11 @@ fun MultiSelectComboBox(
                 modifier = Modifier
                     .darwinGlass(
                         shape = shapes.large,
-                        fallbackColor = if (colors.isDark) Color(0xFF171717) else Color.White,
+                        fallbackColor = if (isDark) Color(0xFF171717) else Color.White,
                     )
                     .border(
                         1.dp,
-                        if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+                        if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
                         shapes.large,
                     )
                     .heightIn(max = 280.dp),
@@ -251,7 +300,7 @@ fun MultiSelectComboBox(
 
                         val itemBackgroundColor = when {
                             isHighlighted || isItemHovered ->
-                                if (colors.isDark) Color.White.copy(alpha = 0.08f)
+                                if (isDark) Color.White.copy(alpha = 0.08f)
                                 else Color.Black.copy(alpha = 0.05f)
                             else -> Color.Transparent
                         }
@@ -259,7 +308,7 @@ fun MultiSelectComboBox(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(24.dp)
+                                .height(comboMetrics.minHeightFor(controlSize))
                                 .hoverable(itemInteractionSource)
                                 .clickable(
                                     interactionSource = itemInteractionSource,
@@ -290,6 +339,7 @@ fun MultiSelectComboBox(
                             Text(
                                 text = label,
                                 style = typography.subheadline,
+                                fontSize = comboFontSize,
                                 color = colors.textPrimary,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -315,11 +365,11 @@ fun MultiSelectComboBox(
                         modifier = Modifier
                             .clip(shapes.medium)
                             .background(
-                                if (colors.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f),
+                                if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f),
                             )
                             .border(
                                 1.dp,
-                                if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
+                                if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
                                 shapes.medium,
                             )
                             .padding(horizontal = 8.dp, vertical = 4.dp),
@@ -328,7 +378,7 @@ fun MultiSelectComboBox(
                         Text(
                             text = label,
                             style = typography.caption1.copy(fontSize = 12.sp),
-                            color = if (colors.isDark) Color(0xFFD4D4D8) else Color(0xFF3F3F46),
+                            color = if (isDark) Color(0xFFD4D4D8) else Color(0xFF3F3F46),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -344,7 +394,7 @@ fun MultiSelectComboBox(
                                     .hoverable(removeInteraction)
                                     .background(
                                         if (isRemoveHovered) {
-                                            if (colors.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.05f)
+                                            if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.05f)
                                         } else Color.Transparent,
                                     )
                                     .clickable(
@@ -358,9 +408,9 @@ fun MultiSelectComboBox(
                                 Icon(
                                     imageVector = LucideX,
                                     tint = if (isRemoveHovered) {
-                                        if (colors.isDark) Color(0xFFE4E4E7) else Color(0xFF3F3F46)
+                                        if (isDark) Color(0xFFE4E4E7) else Color(0xFF3F3F46)
                                     } else {
-                                        if (colors.isDark) Color(0xFF71717A) else Color(0xFFA1A1AA)
+                                        if (isDark) Color(0xFF71717A) else Color(0xFFA1A1AA)
                                     },
                                     modifier = Modifier.size(12.dp),
                                 )

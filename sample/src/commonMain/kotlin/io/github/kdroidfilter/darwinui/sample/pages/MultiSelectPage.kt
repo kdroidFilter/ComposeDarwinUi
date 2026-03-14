@@ -1,18 +1,56 @@
 package io.github.kdroidfilter.darwinui.sample.pages
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.MultiSelectComboBox
+import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
+import io.github.kdroidfilter.darwinui.theme.ControlSize
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+
+@GalleryExample("MultiSelect", "Sizes")
+@Composable
+fun MultiSelectSizesExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        for (size in ControlSize.entries) {
+            ControlSize(size) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = size.name,
+                        style = DarwinTheme.typography.caption1,
+                        color = DarwinTheme.colorScheme.textSecondary,
+                        modifier = Modifier.widthIn(min = 72.dp),
+                    )
+                    var selected by remember { mutableStateOf(listOf(0, 1)) }
+                    MultiSelectComboBox(
+                        items = listOf("React", "Vue", "Angular", "Svelte"),
+                        selectedIndices = selected,
+                        onSelectionChange = { selected = it },
+                        showTags = false,
+                    )
+                }
+            }
+        }
+    }
+}
 
 @GalleryExample("MultiSelect", "Default")
 @Composable
@@ -24,6 +62,7 @@ fun MultiSelectDefaultExample() {
         selectedIndices = selected,
         onSelectionChange = { selected = it },
         header = "Technologies",
+        placeholder = "Pick frameworks",
         modifier = Modifier.fillMaxWidth(0.5f),
     )
 }
@@ -42,11 +81,29 @@ fun MultiSelectPreselectedExample() {
     )
 }
 
+@GalleryExample("MultiSelect", "Disabled")
+@Composable
+fun MultiSelectDisabledExample() {
+    MultiSelectComboBox(
+        items = listOf("React", "Vue", "Angular", "Svelte"),
+        selectedIndices = listOf(0, 2),
+        onSelectionChange = {},
+        disabled = true,
+    )
+}
+
 @Composable
 internal fun MultiSelectPage() {
     GalleryPage("Multi Select", "Allows selecting multiple options from a list.") {
+        SectionHeader("Sizes")
+        ExampleCard(
+            title = "All Sizes",
+            description = "MultiSelect at each ControlSize level",
+            sourceCode = GallerySources.MultiSelectSizesExample,
+        ) { MultiSelectSizesExample() }
         SectionHeader("Examples")
         ExampleCard(title = "Default", sourceCode = GallerySources.MultiSelectDefaultExample) { MultiSelectDefaultExample() }
         ExampleCard(title = "Pre-selected", sourceCode = GallerySources.MultiSelectPreselectedExample) { MultiSelectPreselectedExample() }
+        ExampleCard(title = "Disabled", sourceCode = GallerySources.MultiSelectDisabledExample) { MultiSelectDisabledExample() }
     }
 }
