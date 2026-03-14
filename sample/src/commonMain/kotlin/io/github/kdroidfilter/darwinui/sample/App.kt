@@ -125,9 +125,12 @@ import io.github.kdroidfilter.darwinui.sample.pages.TextAreaPage
 import io.github.kdroidfilter.darwinui.sample.pages.TitleBarPage
 import io.github.kdroidfilter.darwinui.sample.pages.ToastPage
 import io.github.kdroidfilter.darwinui.sample.pages.TooltipPage
+import io.github.kdroidfilter.darwinui.components.Switch
 import io.github.kdroidfilter.darwinui.theme.AccentColor
 import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+import io.github.kdroidfilter.darwinui.theme.VibrantColors
+import io.github.kdroidfilter.darwinui.theme.vibrant
 
 // Navigation data
 private data class SidebarEntryDef(val id: String, val label: String, val group: String, val icon: ImageVector)
@@ -179,8 +182,21 @@ fun App() {
     var isDark by remember { mutableStateOf(systemTheme) }
     var accentColor by remember { mutableStateOf(AccentColor.Blue) }
     var sidebarControlSize by remember { mutableStateOf(ControlSize.Regular) }
+    var isVibrant by remember { mutableStateOf(false) }
 
-    DarwinTheme(darkTheme = isDark, accentColor = accentColor) {
+    val baseColorScheme = if (isDark) {
+        io.github.kdroidfilter.darwinui.theme.darkColorScheme(accentColor)
+    } else {
+        io.github.kdroidfilter.darwinui.theme.lightColorScheme(accentColor)
+    }
+    val colorScheme = if (isVibrant) {
+        val vibrant = if (isDark) VibrantColors.dark() else VibrantColors.light()
+        baseColorScheme.vibrant(vibrant)
+    } else {
+        baseColorScheme
+    }
+
+    DarwinTheme(darkTheme = isDark, accentColor = accentColor, colorScheme = colorScheme) {
         val toastState = rememberToastState()
         var selectedPage by remember { mutableStateOf("button") }
         var searchQuery by remember { mutableStateOf("") }
@@ -296,6 +312,24 @@ fun App() {
                                         selected = accentColor,
                                         onSelect = { accentColor = it },
                                     )
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Text(
+                                            text = "Vibrant",
+                                            style = DarwinTheme.typography.caption1,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = DarwinTheme.colorScheme.textSecondary,
+                                        )
+                                        ControlSize(ControlSize.Mini) {
+                                            Switch(
+                                                checked = isVibrant,
+                                                onCheckedChange = { isVibrant = it },
+                                            )
+                                        }
+                                    }
                                     Text(
                                         text = "Sidebar Icon Size",
                                         style = DarwinTheme.typography.caption1,

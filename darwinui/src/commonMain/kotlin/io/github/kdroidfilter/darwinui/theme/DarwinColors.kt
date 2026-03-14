@@ -357,4 +357,27 @@ fun lightColorScheme(accentColor: AccentColor = AccentColor.Blue): ColorScheme {
     )
 }
 
+/**
+ * Applies vibrant (opaque) label and fill overrides to the given [ColorScheme].
+ *
+ * On macOS, vibrant colors are used on vibrancy surfaces with "plus lighter"
+ * (dark) or "plus darker" (light) blend modes. When true blend modes aren't
+ * available (Compose), these opaque values still provide a distinct visual style
+ * that approximates the vibrant appearance.
+ */
+fun ColorScheme.vibrant(vibrantColors: VibrantColors): ColorScheme = copy(
+    // Labels → vibrant opaque equivalents
+    textPrimary = vibrantColors.labels.primary,
+    textSecondary = vibrantColors.labels.secondary,
+    textTertiary = vibrantColors.labels.tertiary,
+    textQuaternary = vibrantColors.labels.quaternary,
+    // Fills → vibrant opaque equivalents
+    inputBackground = vibrantColors.fills.primary,
+    inputBorder = vibrantColors.fills.secondary,
+    // Surface variant uses a vibrant fill for subtle backgrounds
+    onSurfaceVariant = vibrantColors.labels.secondary,
+    outlineVariant = vibrantColors.fills.secondary,
+    mutedForeground = vibrantColors.labels.secondary,
+)
+
 val LocalDarwinColors = staticCompositionLocalOf { darkColorScheme() }
