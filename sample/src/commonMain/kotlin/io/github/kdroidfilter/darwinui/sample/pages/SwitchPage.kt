@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.kdroidfilter.darwinui.components.Switch
 import io.github.kdroidfilter.darwinui.components.Switcher
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.theme.ControlSize
@@ -98,6 +99,23 @@ fun SwitchStatesExample() {
     }
 }
 
+@GalleryExample("Switch", "No Indicators")
+@Composable
+fun SwitchNoIndicatorsExample() {
+    var s1 by remember { mutableStateOf(true) }
+    var s2 by remember { mutableStateOf(false) }
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Switch(checked = s1, onCheckedChange = { s1 = it }, showStateIndicators = false)
+            Text("On — no indicator", style = DarwinTheme.typography.caption1, color = DarwinTheme.colorScheme.textSecondary)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Switch(checked = s2, onCheckedChange = { s2 = it }, showStateIndicators = false)
+            Text("Off — no indicator", style = DarwinTheme.typography.caption1, color = DarwinTheme.colorScheme.textSecondary)
+        }
+    }
+}
+
 @GalleryExample("Switch", "Surface")
 @Composable
 fun SwitchSurfaceExample() {
@@ -164,5 +182,10 @@ internal fun SwitchPage() {
 
         SectionHeader("Examples")
         ExampleCard(title = "States", sourceCode = GallerySources.SwitchStatesExample) { SwitchStatesExample() }
+        ExampleCard(
+            title = "No Indicators",
+            description = "Switch without on/off state indicators",
+            sourceCode = GallerySources.SwitchNoIndicatorsExample,
+        ) { SwitchNoIndicatorsExample() }
     }
 }

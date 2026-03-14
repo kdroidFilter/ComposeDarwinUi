@@ -127,6 +127,7 @@ fun Switch(
     modifier: Modifier = Modifier,
     thumbContent: (@Composable () -> Unit)? = null,
     enabled: Boolean = true,
+    showStateIndicators: Boolean = true,
     colors: SwitchColors = SwitchDefaults.colors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
@@ -138,6 +139,7 @@ fun Switch(
         modifier = modifier,
         thumbContent = thumbContent,
         enabled = enabled,
+        showStateIndicators = showStateIndicators,
         colors = colors,
         interactionSource = interactionSource,
     )
@@ -154,6 +156,7 @@ fun TriStateSwitch(
     modifier: Modifier = Modifier,
     thumbContent: (@Composable () -> Unit)? = null,
     enabled: Boolean = true,
+    showStateIndicators: Boolean = true,
     colors: SwitchColors = SwitchDefaults.colors(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
@@ -244,37 +247,39 @@ fun TriStateSwitch(
             )
         }
 
-        // On-state indicator "|" on the left
-        if (state == ToggleableState.On) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .offset(x = indicatorCenterOffset - indicatorBarThickness / 2)
-                    .size(width = indicatorBarThickness, height = onIndicatorHeight)
-                    .background(colors.onIndicatorColor, pillShape),
-            )
-        }
+        if (showStateIndicators) {
+            // On-state indicator "|" on the left
+            if (state == ToggleableState.On) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .offset(x = indicatorCenterOffset - indicatorBarThickness / 2)
+                        .size(width = indicatorBarThickness, height = onIndicatorHeight)
+                        .background(colors.onIndicatorColor, pillShape),
+                )
+            }
 
-        // Mixed-state indicator "|" (shorter) on the left
-        if (state == ToggleableState.Indeterminate) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .offset(x = indicatorCenterOffset - indicatorBarThickness / 2)
-                    .size(width = indicatorBarThickness, height = mixedIndicatorHeight)
-                    .background(colors.mixedIndicatorColor, pillShape),
-            )
-        }
+            // Mixed-state indicator "|" (shorter) on the left
+            if (state == ToggleableState.Indeterminate) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .offset(x = indicatorCenterOffset - indicatorBarThickness / 2)
+                        .size(width = indicatorBarThickness, height = mixedIndicatorHeight)
+                        .background(colors.mixedIndicatorColor, pillShape),
+                )
+            }
 
-        // Off-state indicator "○" on the right
-        if (state == ToggleableState.Off) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .offset(x = -(indicatorCenterOffset - offIndicatorSize / 2))
-                    .size(offIndicatorSize)
-                    .border(indicatorBarThickness, colors.offIndicatorColor, CircleShape),
-            )
+            // Off-state indicator "○" on the right
+            if (state == ToggleableState.Off) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .offset(x = -(indicatorCenterOffset - offIndicatorSize / 2))
+                        .size(offIndicatorSize)
+                        .border(indicatorBarThickness, colors.offIndicatorColor, CircleShape),
+                )
+            }
         }
 
         // Pill-shaped thumb (macOS 26: wider than tall)
