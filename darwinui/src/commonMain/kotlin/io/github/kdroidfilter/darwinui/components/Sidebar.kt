@@ -60,7 +60,6 @@ import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.LocalSidebarResize
 import io.github.kdroidfilter.darwinui.theme.SidebarStyle
-import io.github.kdroidfilter.darwinui.theme.labelStyle
 import io.github.kdroidfilter.darwinui.theme.LocalSidebarWidth
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import androidx.compose.foundation.gestures.Orientation
@@ -203,15 +202,18 @@ fun Sidebar(
         animationSpec = sidebarSpring(),
     )
 
-    // Animated padding: collapsed=4dp, expanded=6dp (macOS-like tight padding)
+    // Animated padding: collapsed=4dp, expanded=4dp
     val animatedPadding by animateDpAsState(
-        targetValue = if (collapsed) 4.dp else 6.dp,
+        targetValue = if (collapsed) 4.dp else 4.dp,
         animationSpec = sidebarSpring(),
     )
 
-    // Scrollbar track padding: reduced in collapsed mode so icons have more room
-    val animatedTrackPadding by animateDpAsState(
-        targetValue = if (collapsed) 4.dp else TRACK_BREADTH,
+    val animatedTrackStartPadding by animateDpAsState(
+        targetValue = if (collapsed) 4.dp else 9.dp,
+        animationSpec = sidebarSpring(),
+    )
+    val animatedTrackEndPadding by animateDpAsState(
+        targetValue = if (collapsed) 4.dp else 9.dp,
         animationSpec = sidebarSpring(),
     )
 
@@ -288,7 +290,7 @@ fun Sidebar(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(itemsScrollState)
-                        .padding(start = animatedTrackPadding, end = animatedTrackPadding, top = 2.dp, bottom = 2.dp),
+                        .padding(start = animatedTrackStartPadding, end = animatedTrackEndPadding, top = 2.dp, bottom = 2.dp),
                     verticalArrangement = Arrangement.spacedBy(sidebarMetrics.itemSpacingFor(controlSize)),
                 ) {
                     if (hasGroups && groupedItems != null) {
@@ -444,7 +446,7 @@ private fun SidebarItemWithVisibility(
         return
     }
 
-    val indentPadding = (indentLevel * 16).dp
+    val indentPadding = sidebarMetrics.indentFor(indentLevel)
 
     if (item.icon != null) {
         SidebarItemRow(
@@ -506,7 +508,7 @@ private fun DisclosureItem(
         animationSpec = sidebarSpring(),
     )
 
-    val indentPadding = (indentLevel * 16).dp
+    val indentPadding = sidebarMetrics.indentFor(indentLevel)
 
     // Parent item row with chevron
     Row(
@@ -539,10 +541,11 @@ private fun DisclosureItem(
                 ) { expanded = !expanded },
             contentAlignment = Alignment.Center,
         ) {
+            // Sketch: disclosure chevron 11sp, #00000040
             Icon(
                 LucideChevronRight,
                 modifier = Modifier.size(12.dp),
-                tint = DarwinTheme.colorScheme.textTertiary,
+                tint = Color.Black.copy(alpha = 0.25f),
             )
         }
 
@@ -610,28 +613,38 @@ private fun DisclosureItem(
 @Composable
 private fun GroupHeader(text: String, isCollapsed: Boolean, controlSize: ControlSize, sidebarMetrics: SidebarStyle.Metrics) {
     val typography = DarwinTheme.typography
-    val colors = DarwinTheme.colorScheme
 
     val alpha by animateFloatAsState(
         targetValue = if (isCollapsed) 0f else 1f,
         animationSpec = sidebarSpring(),
     )
+    val targetHeight = sidebarMetrics.groupHeaderHeightFor(controlSize)
     val maxHeight by animateDpAsState(
-        targetValue = if (isCollapsed) 0.dp else sidebarMetrics.groupHeaderMaxHeightFor(controlSize),
+        targetValue = if (isCollapsed) 0.dp else targetHeight,
         animationSpec = sidebarSpring(),
     )
 
+    // Sketch: header text color = #00000080
+    val headerColor = Color.Black.copy(alpha = 0.50f)
+    // Sketch: Large=13sp, Medium/Small=11sp
+    val headerStyle = when (controlSize) {
+        ControlSize.Large, ControlSize.ExtraLarge -> typography.caption1
+        else -> typography.caption2
+    }
+
     Box(
         modifier = Modifier
+            .fillMaxWidth()
             .heightIn(max = maxHeight)
             .clipToBounds()
             .graphicsLayer { this.alpha = alpha },
+        contentAlignment = Alignment.BottomStart,
     ) {
         Text(
             text = text,
-            style = typography.caption2,
-            color = colors.textTertiary,
-            modifier = Modifier.padding(start = sidebarMetrics.hPaddingFor(controlSize), end = 8.dp, top = 12.dp, bottom = 2.dp),
+            style = headerStyle,
+            color = headerColor,
+            modifier = Modifier.padding(start = sidebarMetrics.hPaddingFor(controlSize) + 8.dp, end = 8.dp, bottom = 4.dp),
         )
     }
 }
@@ -663,9 +676,14 @@ private fun SidebarItemRow(
 
     val interactionSource = remember { MutableInteractionSource() }
 
-    // macOS Finder style: subtle translucent background + accent text/icon when active
+    val isDark = colors.isDark
+    // Sketch: selected background — light: #0000001c, dark: use white overlay
     val backgroundColor by animateColorAsState(
-        targetValue = if (active) colors.textPrimary.copy(alpha = 0.11f) else Color.Transparent,
+        targetValue = if (active) {
+            if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.11f)
+        } else {
+            Color.Transparent
+        },
         animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
     )
     val contentColor by animateColorAsState(
@@ -692,7 +710,13 @@ private fun SidebarItemRow(
     val iconLabelGap = lerp(sidebarMetrics.iconGapFor(controlSize), 0.dp, collapseFraction)
     val labelAlpha = 1f - collapseFraction
 
-    val textStyle = controlSize.labelStyle()
+    // Sketch: Large=15sp (body), Medium=13sp (caption1), Small=11sp (caption2)
+    val typography = DarwinTheme.typography
+    val textStyle = when (controlSize) {
+        ControlSize.Large, ControlSize.ExtraLarge -> typography.body
+        ControlSize.Regular -> typography.caption1
+        else -> typography.caption2
+    }
 
     Row(
         modifier = modifier

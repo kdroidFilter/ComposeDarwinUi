@@ -646,15 +646,17 @@ data class SidebarStyle(
 ) {
     @Immutable
     data class Metrics(
-        val iconDpSm: Dp = 14.dp,
-        val iconDpMd: Dp = 16.dp,
-        val iconDpLg: Dp = 22.dp,
-        val itemHeightSm: Dp = 26.dp,
-        val itemHeightMd: Dp = 30.dp,
-        val itemHeightLg: Dp = 36.dp,
+        /** Sketch: Small=18dp, Medium=22dp, Large=24dp */
+        val iconDpSm: Dp = 18.dp,
+        val iconDpMd: Dp = 22.dp,
+        val iconDpLg: Dp = 24.dp,
+        /** Sketch: Small=24dp, Medium=32dp, Large=40dp */
+        val itemHeightSm: Dp = 24.dp,
+        val itemHeightMd: Dp = 32.dp,
+        val itemHeightLg: Dp = 40.dp,
     ) {
         fun iconDpFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 12.dp
+            ControlSize.Mini -> 14.dp
             ControlSize.Small -> iconDpSm
             ControlSize.Regular -> iconDpMd
             ControlSize.Large -> iconDpLg
@@ -662,43 +664,65 @@ data class SidebarStyle(
         }
 
         fun itemHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 22.dp
+            ControlSize.Mini -> 20.dp
             ControlSize.Small -> itemHeightSm
             ControlSize.Regular -> itemHeightMd
             ControlSize.Large -> itemHeightLg
-            ControlSize.ExtraLarge -> 42.dp
+            ControlSize.ExtraLarge -> 44.dp
         }
 
+        /** Sketch: content starts at 16dp from sidebar edge for all sizes */
         fun hPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 4.dp
-            ControlSize.Small -> 6.dp
-            ControlSize.Regular -> 8.dp
+            ControlSize.Mini -> 8.dp
+            ControlSize.Small -> 10.dp
+            ControlSize.Regular -> 10.dp
             ControlSize.Large -> 10.dp
             ControlSize.ExtraLarge -> 12.dp
         }
 
-        fun iconGapFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 4.dp
-            ControlSize.Small -> 5.dp
-            ControlSize.Regular -> 6.dp
-            ControlSize.Large -> 8.dp
-            ControlSize.ExtraLarge -> 10.dp
-        }
+        /** Sketch: 4dp gap between icon and label for all sizes */
+        fun iconGapFor(controlSize: ControlSize): Dp = 4.dp
 
         fun itemSpacingFor(controlSize: ControlSize): Dp = when (controlSize) {
             ControlSize.Mini -> 0.dp
             ControlSize.Small -> 0.dp
-            ControlSize.Regular -> 1.dp
-            ControlSize.Large -> 2.dp
-            ControlSize.ExtraLarge -> 3.dp
+            ControlSize.Regular -> 0.dp
+            ControlSize.Large -> 0.dp
+            ControlSize.ExtraLarge -> 0.dp
         }
 
-        fun groupHeaderMaxHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 24.dp
-            ControlSize.Small -> 30.dp
-            ControlSize.Regular -> 32.dp
-            ControlSize.Large -> 30.dp
-            ControlSize.ExtraLarge -> 34.dp
+        /** Sketch: Large=43dp, Medium=39dp, Small=34dp */
+        fun groupHeaderHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 28.dp
+            ControlSize.Small -> 34.dp
+            ControlSize.Regular -> 39.dp
+            ControlSize.Large -> 43.dp
+            ControlSize.ExtraLarge -> 48.dp
+        }
+
+        /** Sketch: Large=13sp, Medium=11sp, Small=11sp */
+        fun headerFontSizeFor(controlSize: ControlSize): Int = when (controlSize) {
+            ControlSize.Mini -> 10
+            ControlSize.Small -> 11
+            ControlSize.Regular -> 11
+            ControlSize.Large -> 13
+            ControlSize.ExtraLarge -> 14
+        }
+
+        /** Sketch: Large=15sp, Medium=13sp, Small=11sp */
+        fun itemFontSizeFor(controlSize: ControlSize): Int = when (controlSize) {
+            ControlSize.Mini -> 10
+            ControlSize.Small -> 11
+            ControlSize.Regular -> 13
+            ControlSize.Large -> 15
+            ControlSize.ExtraLarge -> 17
+        }
+
+        /** Sketch: Level 0 indent=0, Level 1=10dp, Level 2+=12dp per level */
+        fun indentFor(level: Int): Dp = when (level) {
+            0 -> 0.dp
+            1 -> 10.dp
+            else -> (10 + (level - 1) * 12).dp
         }
     }
 }
