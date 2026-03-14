@@ -804,6 +804,12 @@ data class StepperStyle(
             ControlSize.Large -> 7.dp
             ControlSize.ExtraLarge -> 9.dp
         }
+
+        // Sketch: TextField width in StepperField composites is always 60dp
+        val fieldWidth: Dp = 60.dp
+
+        // Gap between TextField and Stepper in Outside layout
+        val fieldGap: Dp = 4.dp
     }
 }
 

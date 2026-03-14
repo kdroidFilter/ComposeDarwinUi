@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -194,8 +195,7 @@ fun StepperField(
 ) {
     val controlSize = LocalControlSize.current
     val stepperMetrics = DarwinTheme.componentStyling.stepper.metrics
-    val tfMetrics = DarwinTheme.componentStyling.textField.metrics
-    val cornerRadius = tfMetrics.cornerRadiusFor(controlSize)
+    val cornerRadius = DarwinTheme.componentStyling.textField.metrics.cornerRadiusFor(controlSize)
 
     when (layout) {
         StepperFieldLayout.Outside -> {
@@ -206,14 +206,14 @@ fun StepperField(
                 TextField(
                     value = value,
                     onValueChange = onValueChange,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.width(stepperMetrics.fieldWidth),
                     enabled = enabled,
                     singleLine = true,
                     placeholder = placeholder,
                     keyboardOptions = keyboardOptions,
                     keyboardActions = keyboardActions,
                 )
-                Spacer(Modifier.width(4.dp))
+                Spacer(Modifier.width(stepperMetrics.fieldGap))
                 Stepper(
                     onIncrement = onIncrement,
                     onDecrement = onDecrement,
@@ -223,7 +223,13 @@ fun StepperField(
         }
 
         StepperFieldLayout.Inside -> {
-            Box(modifier = modifier) {
+            val totalWidth = stepperMetrics.fieldWidth + stepperMetrics.fieldGap + stepperMetrics.widthFor(controlSize)
+            val shape = RoundedCornerShape(cornerRadius)
+            Box(
+                modifier = modifier
+                    .width(totalWidth)
+                    .clip(shape),
+            ) {
                 TextField(
                     value = value,
                     onValueChange = onValueChange,
@@ -233,13 +239,12 @@ fun StepperField(
                     placeholder = placeholder,
                     keyboardOptions = keyboardOptions,
                     keyboardActions = keyboardActions,
-                    trailingIcon = {
-                        Stepper(
-                            onIncrement = onIncrement,
-                            onDecrement = onDecrement,
-                            enabled = enabled,
-                        )
-                    },
+                )
+                Stepper(
+                    onIncrement = onIncrement,
+                    onDecrement = onDecrement,
+                    enabled = enabled,
+                    modifier = Modifier.align(Alignment.CenterEnd),
                 )
             }
         }
