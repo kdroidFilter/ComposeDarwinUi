@@ -639,19 +639,19 @@ data class ProgressStyle(
 ) {
     @Immutable
     data class Metrics(
-        val heightSm: Dp = 4.dp,
-        val heightMd: Dp = 8.dp,
-        val heightLg: Dp = 12.dp,
+        val heightSm: Dp = 6.dp,
+        val heightMd: Dp = 10.dp,
+        val heightLg: Dp = 14.dp,
         val ringSizeSm: Dp = 16.dp,
         val ringSizeMd: Dp = 32.dp,
         val ringSizeLg: Dp = 64.dp,
     ) {
         fun heightFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 2.dp
+            ControlSize.Mini -> 4.dp
             ControlSize.Small -> heightSm
             ControlSize.Regular -> heightMd
             ControlSize.Large -> heightLg
-            ControlSize.ExtraLarge -> 16.dp
+            ControlSize.ExtraLarge -> 18.dp
         }
 
         fun ringSizeFor(controlSize: ControlSize): Dp = when (controlSize) {

@@ -1,169 +1,180 @@
 package io.github.kdroidfilter.darwinui.components
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.darwinui.components.Text
-import io.github.kdroidfilter.darwinui.theme.*
+import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
-
-// ==================== Enums ====================
-
-enum class ProgressVariant {
-    Default,
-    Success,
-    Warning,
-    Danger,
-    Gradient,
-}
-
-// ==================== Color Helpers ====================
-
-@Composable
-private fun variantColor(variant: ProgressVariant): Color = when (variant) {
-    ProgressVariant.Default -> DarwinTheme.colorScheme.accent
-    ProgressVariant.Success -> DarwinTheme.colorScheme.success
-    ProgressVariant.Warning -> DarwinTheme.colorScheme.warning
-    ProgressVariant.Danger -> DarwinTheme.colorScheme.destructive
-    ProgressVariant.Gradient -> DarwinTheme.colorScheme.accent
-}
-
-private fun gradientBrush(width: Float, gradientColors: List<Color>): Brush = Brush.linearGradient(
-    colors = gradientColors,
-    start = Offset.Zero,
-    end = Offset(width, 0f),
-)
 
 // ==================== Linear Progress ====================
 
+/**
+ * macOS-style linear progress indicator.
+ *
+ * @param value Current progress value.
+ * @param max Maximum progress value.
+ * @param enabled Active (accent colored) or inactive (gray).
+ * @param indeterminate Whether to display the looping indeterminate animation.
+ * @param modifier Modifier applied to the component.
+ */
 @Composable
 fun LinearProgress(
     value: Float = 0f,
     max: Float = 100f,
-    variant: ProgressVariant = ProgressVariant.Default,
+    enabled: Boolean = true,
     indeterminate: Boolean = false,
-    showValue: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val controlSize = LocalControlSize.current
-    val metrics = DarwinTheme.componentStyling.progress.metrics
-    val isDark = DarwinTheme.colorScheme.isDark
+    val height = DarwinTheme.componentStyling.progress.metrics.heightFor(controlSize)
+    val accentColor = DarwinTheme.colorScheme.accent
 
-    val trackColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
-
-    val fillColor = variantColor(variant)
-    val useGradient = variant == ProgressVariant.Gradient
-    val gradientColors = if (useGradient) {
-        listOf(DarwinTheme.colorScheme.accent, DarwinTheme.colorScheme.info, DarwinTheme.colorScheme.destructive)
-    } else emptyList()
-
+    // Determinate animation
     val targetFraction = if (indeterminate) 0f else (value / max).coerceIn(0f, 1f)
     val animatedFraction by animateFloatAsState(
         targetValue = targetFraction,
-        animationSpec = tween(
-            durationMillis = 400,
-            easing = CubicBezierEasing(0f, 0f, 0.58f, 1f),
-        ),
+        animationSpec = tween(400, easing = CubicBezierEasing(0f, 0f, 0.58f, 1f)),
     )
 
+    // Indeterminate: continuous sweep 0→1, bar slides from off-left to off-right
     val infiniteTransition = rememberInfiniteTransition(label = "progress_indeterminate")
-    val indeterminateOffset by infiniteTransition.animateFloat(
-        initialValue = -1f,
-        targetValue = 4f,
+    val phase by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 1500,
-                easing = FastOutSlowInEasing,
-            ),
+            animation = tween(1500, easing = CubicBezierEasing(0.4f, 0f, 0.6f, 1f)),
             repeatMode = RepeatMode.Restart,
         ),
-        label = "indeterminate_offset",
+        label = "indeterminate_phase",
     )
 
-    val percentage = ((value / max) * 100f).coerceIn(0f, 100f).toInt()
+    Canvas(
+        modifier = modifier.fillMaxWidth().height(height),
+    ) {
+        val trackCornerRadius = CornerRadius(size.height / 2f)
 
-    Column(modifier = modifier) {
-        Canvas(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(metrics.heightFor(controlSize)),
-        ) {
-            val cornerRadius = CornerRadius(this.size.height / 2f)
+        // Track fill
+        drawRoundRect(
+            color = Color.Black.copy(alpha = 0.06f),
+            cornerRadius = trackCornerRadius,
+            size = size,
+        )
 
-            drawRoundRect(
-                color = trackColor,
-                cornerRadius = cornerRadius,
-                size = this.size,
-            )
+        // Inner shadow approximation
+        drawRoundRect(
+            color = Color.Black.copy(alpha = 0.04f),
+            cornerRadius = trackCornerRadius,
+            size = size,
+            style = Stroke(width = 1f),
+        )
 
-            if (indeterminate) {
-                val barWidth = this.size.width / 3f
-                val startX = indeterminateOffset * barWidth
-                val clippedStart = startX.coerceAtLeast(0f)
-                val clippedEnd = (startX + barWidth).coerceAtMost(this.size.width)
-                val clippedWidth = (clippedEnd - clippedStart).coerceAtLeast(0f)
-
-                if (clippedWidth > 0f) {
-                    if (useGradient) {
-                        drawRoundRect(
-                            brush = gradientBrush(clippedWidth, gradientColors),
-                            topLeft = Offset(clippedStart, 0f),
-                            size = Size(clippedWidth, this.size.height),
-                            cornerRadius = cornerRadius,
-                        )
-                    } else {
-                        drawRoundRect(
-                            color = fillColor,
-                            topLeft = Offset(clippedStart, 0f),
-                            size = Size(clippedWidth, this.size.height),
-                            cornerRadius = cornerRadius,
-                        )
-                    }
-                }
-            } else {
-                val fillWidth = animatedFraction * this.size.width
-                if (fillWidth > 0f) {
-                    if (useGradient) {
-                        drawRoundRect(
-                            brush = gradientBrush(fillWidth, gradientColors),
-                            cornerRadius = cornerRadius,
-                            size = Size(fillWidth, this.size.height),
-                        )
-                    } else {
-                        drawRoundRect(
-                            color = fillColor,
-                            cornerRadius = cornerRadius,
-                            size = Size(fillWidth, this.size.height),
-                        )
-                    }
-                }
+        if (indeterminate) {
+            drawIndeterminateBar(phase, accentColor, enabled)
+        } else {
+            val fillWidth = animatedFraction * size.width
+            if (fillWidth > 0f) {
+                drawDeterminateBar(fillWidth, accentColor, enabled)
             }
         }
+    }
+}
 
-        if (showValue && !indeterminate) {
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "$percentage%",
-                style = DarwinTheme.typography.caption2,
-                color = if (isDark) Zinc400 else Zinc600,
-                textAlign = TextAlign.End,
-                modifier = Modifier.fillMaxWidth(),
+private fun DrawScope.drawDeterminateBar(
+    width: Float,
+    accentColor: Color,
+    enabled: Boolean,
+) {
+    val cr = CornerRadius(size.height / 2f)
+    val barSize = Size(width, size.height)
+
+    if (enabled) {
+        // 4 layered fills matching macOS (bottom to top)
+        drawRoundRect(color = accentColor, cornerRadius = cr, size = barSize)
+        drawRoundRect(color = Color.Black.copy(alpha = 0.10f), cornerRadius = cr, size = barSize)
+        drawRoundRect(color = accentColor.copy(alpha = 0.50f), cornerRadius = cr, size = barSize)
+        drawRoundRect(color = accentColor.copy(alpha = 0.50f), cornerRadius = cr, size = barSize)
+    } else {
+        drawRoundRect(color = Color.Black.copy(alpha = 0.06f), cornerRadius = cr, size = barSize)
+        drawRoundRect(color = Color.Black.copy(alpha = 0.05f), cornerRadius = cr, size = barSize)
+    }
+}
+
+private fun DrawScope.drawIndeterminateBar(
+    phase: Float,
+    accentColor: Color,
+    enabled: Boolean,
+) {
+    val barFraction = 0.34f
+    val barWidth = size.width * barFraction
+    // Bar travels from fully off-left to fully off-right
+    val totalTravel = size.width + barWidth
+    val barX = -barWidth + phase * totalTravel
+
+    // Clip to track shape so the bar merges with rounded edges naturally
+    val trackPath = Path().apply {
+        addRoundRect(
+            RoundRect(
+                left = 0f,
+                top = 0f,
+                right = size.width,
+                bottom = size.height,
+                cornerRadius = CornerRadius(size.height / 2f),
             )
-        }
+        )
+    }
+
+    val baseColor = if (enabled) accentColor else Color.Black.copy(alpha = 0.08f)
+
+    // Gradient: transparent on trailing (left) edge, solid on leading (right) edge
+    val colorStops = arrayOf(
+        0.00f to baseColor.copy(alpha = 0f),
+        0.30f to baseColor.copy(alpha = 0.20f),
+        0.60f to baseColor.copy(alpha = 0.55f),
+        0.85f to baseColor.copy(alpha = 0.85f),
+        1.00f to baseColor,
+    )
+
+    clipPath(trackPath) {
+        drawRect(
+            brush = Brush.linearGradient(
+                colorStops = colorStops,
+                start = Offset(barX, 0f),
+                end = Offset(barX + barWidth, 0f),
+            ),
+            topLeft = Offset(barX, 0f),
+            size = Size(barWidth, size.height),
+        )
     }
 }
 
@@ -186,16 +197,16 @@ fun ProgressRing(
     width: Dp = size * 3 / 32,
     color: Color = DarwinTheme.colorScheme.accent,
 ) {
-    val isDark = DarwinTheme.colorScheme.isDark
-    val trackColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
+    val trackColor = if (DarwinTheme.colorScheme.isDark) {
+        Color.White.copy(alpha = 0.10f)
+    } else {
+        Color.Black.copy(alpha = 0.06f)
+    }
 
     val targetFraction = progress.coerceIn(0f, 1f)
     val animatedFraction by animateFloatAsState(
         targetValue = targetFraction,
-        animationSpec = tween(
-            durationMillis = 400,
-            easing = CubicBezierEasing(0f, 0f, 0.58f, 1f),
-        ),
+        animationSpec = tween(400, easing = CubicBezierEasing(0f, 0f, 0.58f, 1f)),
     )
 
     Box(
@@ -251,8 +262,11 @@ fun ProgressRing(
     width: Dp = size * 3 / 32,
     color: Color = DarwinTheme.colorScheme.accent,
 ) {
-    val isDark = DarwinTheme.colorScheme.isDark
-    val trackColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
+    val trackColor = if (DarwinTheme.colorScheme.isDark) {
+        Color.White.copy(alpha = 0.10f)
+    } else {
+        Color.Black.copy(alpha = 0.06f)
+    }
 
     val infiniteTransition = rememberInfiniteTransition(label = "circular_indeterminate")
     val indeterminateProgress by infiniteTransition.animateFloat(
@@ -311,76 +325,14 @@ fun ProgressRing(
     }
 }
 
-// ===========================================================================
-// M3-named aliases
-// ===========================================================================
-
-/**
- * Determinate linear progress indicator — mirrors M3's LinearProgressIndicator.
- */
-@Composable
-fun LinearProgressIndicator(
-    progress: () -> Float,
-    modifier: Modifier = Modifier,
-    color: Color = DarwinTheme.colorScheme.accent,
-    trackColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
-    strokeCap: androidx.compose.ui.graphics.StrokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
-) {
-    LinearProgress(
-        value = progress() * 100f,
-        max = 100f,
-        modifier = modifier,
-    )
-}
-
-/**
- * Indeterminate linear progress indicator — mirrors M3's LinearProgressIndicator.
- */
-@Composable
-fun LinearProgressIndicator(
-    modifier: Modifier = Modifier,
-    color: Color = DarwinTheme.colorScheme.accent,
-    trackColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
-    strokeCap: androidx.compose.ui.graphics.StrokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
-) {
-    LinearProgress(indeterminate = true, modifier = modifier)
-}
-
-/**
- * Determinate circular progress indicator — mirrors M3's CircularProgressIndicator.
- */
-@Composable
-fun CircularProgressIndicator(
-    progress: () -> Float,
-    modifier: Modifier = Modifier,
-    color: Color = DarwinTheme.colorScheme.accent,
-    strokeWidth: Dp = 4.dp,
-    trackColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
-    strokeCap: androidx.compose.ui.graphics.StrokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
-) {
-    ProgressRing(progress = progress(), color = color, modifier = modifier)
-}
-
-/**
- * Indeterminate circular progress indicator — mirrors M3's CircularProgressIndicator.
- */
-@Composable
-fun CircularProgressIndicator(
-    modifier: Modifier = Modifier,
-    color: Color = DarwinTheme.colorScheme.accent,
-    strokeWidth: Dp = 4.dp,
-    trackColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f),
-    strokeCap: androidx.compose.ui.graphics.StrokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
-) {
-    ProgressRing(color = color, modifier = modifier)
-}
-
 @Preview
 @Composable
 private fun ProgressPreview() {
     DarwinTheme {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             LinearProgress(value = 60f)
+            LinearProgress(value = 60f, enabled = false)
+            LinearProgress(indeterminate = true)
             ProgressRing(progress = 0.75f)
             ProgressRing()
         }

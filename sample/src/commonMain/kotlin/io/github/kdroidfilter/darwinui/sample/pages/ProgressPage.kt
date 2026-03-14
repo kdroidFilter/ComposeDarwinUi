@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.LinearProgress
-import io.github.kdroidfilter.darwinui.components.ProgressVariant
 import io.github.kdroidfilter.darwinui.components.ProgressRing
 import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
@@ -29,10 +28,10 @@ private fun ProgressPreview() {
         modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        LinearProgress(value = 65f, max = 100f, showValue = true)
-        LinearProgress(value = 40f, max = 100f, variant = ProgressVariant.Success)
-        LinearProgress(value = 80f, max = 100f, variant = ProgressVariant.Gradient)
+        LinearProgress(value = 65f, max = 100f)
+        LinearProgress(value = 65f, max = 100f, enabled = false)
         LinearProgress(indeterminate = true)
+        LinearProgress(indeterminate = true, enabled = false)
         ControlSize(ControlSize.Large) {
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 ProgressRing(progress = 0.75f)
@@ -68,46 +67,28 @@ fun ProgressSizesExample() {
     }
 }
 
-@GalleryExample("Progress", "Linear Default")
+@GalleryExample("Progress", "Determinate")
 @Composable
-fun ProgressLinearDefaultExample() {
-    LinearProgress(
-        value = 65f,
-        max = 100f,
-        showValue = true,
+fun ProgressDeterminateExample() {
+    Column(
         modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
-    )
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        LinearProgress(value = 65f, max = 100f)
+        LinearProgress(value = 65f, max = 100f, enabled = false)
+    }
 }
 
-@GalleryExample("Progress", "Linear Success")
+@GalleryExample("Progress", "Indeterminate")
 @Composable
-fun ProgressLinearSuccessExample() {
-    LinearProgress(
-        value = 40f,
-        max = 100f,
-        variant = ProgressVariant.Success,
+fun ProgressIndeterminateExample() {
+    Column(
         modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
-    )
-}
-
-@GalleryExample("Progress", "Linear Gradient")
-@Composable
-fun ProgressLinearGradientExample() {
-    LinearProgress(
-        value = 80f,
-        max = 100f,
-        variant = ProgressVariant.Gradient,
-        modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
-    )
-}
-
-@GalleryExample("Progress", "Linear Indeterminate")
-@Composable
-fun ProgressLinearIndeterminateExample() {
-    LinearProgress(
-        indeterminate = true,
-        modifier = Modifier.widthIn(max = 448.dp).fillMaxWidth(),
-    )
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        LinearProgress(indeterminate = true)
+        LinearProgress(indeterminate = true, enabled = false)
+    }
 }
 
 @GalleryExample("Progress", "Circular")
@@ -128,7 +109,8 @@ internal fun ProgressPage() {
         PreviewContainer { ProgressPreview() }
 
         SectionHeader("Usage")
-        CodeBlock("""LinearProgress(value = 65f, max = 100f, showValue = true)
+        CodeBlock("""LinearProgress(value = 65f, max = 100f)
+LinearProgress(indeterminate = true)
 ProgressRing(progress = 0.75f)""")
 
         SectionHeader("Sizes")
@@ -139,16 +121,19 @@ ProgressRing(progress = 0.75f)""")
         ) { ProgressSizesExample() }
 
         SectionHeader("Examples")
-        ExampleCard(title = "Linear - Default", sourceCode = GallerySources.ProgressLinearDefaultExample) { ProgressLinearDefaultExample() }
-        ExampleCard(title = "Linear - Success", sourceCode = GallerySources.ProgressLinearSuccessExample) { ProgressLinearSuccessExample() }
         ExampleCard(
-            title = "Linear - Gradient",
-            sourceCode = GallerySources.ProgressLinearGradientExample,
-        ) { ProgressLinearGradientExample() }
+            title = "Determinate",
+            description = "Active and inactive determinate progress bars",
+            sourceCode = GallerySources.ProgressDeterminateExample,
+        ) { ProgressDeterminateExample() }
         ExampleCard(
-            title = "Linear - Indeterminate",
-            sourceCode = GallerySources.ProgressLinearIndeterminateExample,
-        ) { ProgressLinearIndeterminateExample() }
-        ExampleCard(title = "Circular", sourceCode = GallerySources.ProgressCircularExample) { ProgressCircularExample() }
+            title = "Indeterminate",
+            description = "Active and inactive indeterminate progress bars",
+            sourceCode = GallerySources.ProgressIndeterminateExample,
+        ) { ProgressIndeterminateExample() }
+        ExampleCard(
+            title = "Circular",
+            sourceCode = GallerySources.ProgressCircularExample,
+        ) { ProgressCircularExample() }
     }
 }
