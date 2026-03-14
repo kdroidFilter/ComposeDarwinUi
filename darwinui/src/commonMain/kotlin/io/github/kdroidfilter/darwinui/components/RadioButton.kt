@@ -214,7 +214,7 @@ fun RadioButton(
     } else {
         RadioButton(
             selected = selected,
-            onClick = onClick,
+            onClick = onClick as (() -> Unit)?,
             modifier = modifier,
             enabled = enabled,
         )
