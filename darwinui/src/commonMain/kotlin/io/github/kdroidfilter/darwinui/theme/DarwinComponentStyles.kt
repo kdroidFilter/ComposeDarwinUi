@@ -48,13 +48,13 @@ data class ButtonStyle(
     @Immutable
     data class Metrics(
         /** Minimum height for the regular (default) size. */
-        val minHeight: Dp = 22.dp,
+        val minHeight: Dp = 24.dp,
         /** Minimum height for the small size variant. */
-        val minHeightSmall: Dp = 18.dp,
+        val minHeightSmall: Dp = 20.dp,
         /** Minimum height for the large size variant. */
         val minHeightLarge: Dp = 28.dp,
         val horizontalPadding: Dp = 12.dp,
-        val cornerSize: Dp = 5.dp,
+        val cornerSize: Dp = 6.dp,
         val borderWidth: Dp = 1.dp,
     ) {
         fun minHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
@@ -62,7 +62,7 @@ data class ButtonStyle(
             ControlSize.Small -> minHeightSmall
             ControlSize.Regular -> minHeight
             ControlSize.Large -> minHeightLarge
-            ControlSize.ExtraLarge -> 34.dp
+            ControlSize.ExtraLarge -> 36.dp
         }
 
         fun horizontalPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
@@ -74,11 +74,11 @@ data class ButtonStyle(
         }
 
         fun cornerSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 3.dp
-            ControlSize.Small -> 4.dp
+            ControlSize.Mini -> 4.dp
+            ControlSize.Small -> 5.dp
             ControlSize.Regular -> cornerSize
-            ControlSize.Large -> 7.dp
-            ControlSize.ExtraLarge -> 9.dp
+            ControlSize.Large -> 14.dp
+            ControlSize.ExtraLarge -> 18.dp
         }
     }
 }

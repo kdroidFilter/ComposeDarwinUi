@@ -298,10 +298,10 @@ fun FormTrailingAccessoryExample() {
                             modifier = Modifier.width(64.dp),
                         )
                     }
-                    ArrowButton(
-                        onIncrement = { stepperValue++ },
-                        onDecrement = { if (stepperValue > 0) stepperValue-- },
-                    )
+//                    ArrowButton(
+//                        onIncrement = { stepperValue++ },
+//                        onDecrement = { if (stepperValue > 0) stepperValue-- },
+//                    )
                 }
             },
         ) {
@@ -323,10 +323,10 @@ fun FormTrailingAccessoryExample() {
                             modifier = Modifier.width(64.dp),
                         )
                     }
-                    ArrowButton(
-                        onIncrement = { stepperValue++ },
-                        onDecrement = { if (stepperValue > 0) stepperValue-- },
-                    )
+//                    ArrowButton(
+//                        onIncrement = { stepperValue++ },
+//                        onDecrement = { if (stepperValue > 0) stepperValue-- },
+//                    )
                     Text("seconds", style = typography.caption1, color = colors.textSecondary)
                 }
             },

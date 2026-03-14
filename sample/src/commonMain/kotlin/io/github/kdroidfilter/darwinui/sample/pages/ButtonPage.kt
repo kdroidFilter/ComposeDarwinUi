@@ -5,34 +5,58 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.ArrowButton
-import io.github.kdroidfilter.darwinui.components.DisclosureButton
-import io.github.kdroidfilter.darwinui.components.MacNativeAccentButton
-import io.github.kdroidfilter.darwinui.components.MacNativeDestructiveButton
-import io.github.kdroidfilter.darwinui.components.MacNativeSecondaryButton
-import io.github.kdroidfilter.darwinui.components.PanelAccentButton
-import io.github.kdroidfilter.darwinui.components.PanelDestructiveButton
-import io.github.kdroidfilter.darwinui.components.PanelSecondaryButton
-import io.github.kdroidfilter.darwinui.components.PulldownButton
 import io.github.kdroidfilter.darwinui.components.PushButton
+import io.github.kdroidfilter.darwinui.components.PushButtonStyle
 import io.github.kdroidfilter.darwinui.components.Text
+import io.github.kdroidfilter.darwinui.icons.LucideDownload
+import io.github.kdroidfilter.darwinui.icons.LucideHeart
+import io.github.kdroidfilter.darwinui.icons.LucideShare2
+import io.github.kdroidfilter.darwinui.icons.LucideTrash2
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
-import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
+import io.github.kdroidfilter.darwinui.sample.gallery.PreviewContainer
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 import io.github.kdroidfilter.darwinui.theme.ControlSize
+import io.github.kdroidfilter.darwinui.theme.DarwinSurface
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
+
+// ===========================================================================
+// Preview
+// ===========================================================================
+
+@Composable
+private fun ButtonPreview() {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            PushButton(text = "Default", onClick = {}, style = PushButtonStyle.Default)
+            PushButton(text = "Secondary", onClick = {}, style = PushButtonStyle.Secondary)
+            PushButton(text = "Destructive", onClick = {}, style = PushButtonStyle.Destructive)
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            PushButton(text = "Neutral", onClick = {}, style = PushButtonStyle.Neutral)
+            PushButton(text = "Borderless", onClick = {}, style = PushButtonStyle.Borderless)
+            PushButton(text = "Bezel", onClick = {}, style = PushButtonStyle.BorderlessBezel)
+            ArrowButton(onClick = {})
+        }
+    }
+}
+
+// ===========================================================================
+// Sizes
+// ===========================================================================
 
 @GalleryExample("Button", "Sizes")
 @Composable
@@ -42,7 +66,7 @@ fun ButtonSizesExample() {
             ControlSize(size) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = size.name,
@@ -58,125 +82,362 @@ fun ButtonSizesExample() {
     }
 }
 
+// ===========================================================================
+// Push Button — Bordered Default
+// ===========================================================================
+
 @OptIn(ExperimentalLayoutApi::class)
-@GalleryExample("Button", "Pulldown")
+@GalleryExample("Button", "Bordered Default")
 @Composable
-fun ButtonPulldownExample() {
+fun ButtonBorderedDefaultExample() {
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        PulldownButton(text = "Sort by", onClick = {})
-        PulldownButton(text = "View", onClick = {})
+        PushButton(text = "Label", onClick = {}, style = PushButtonStyle.Default)
+        PushButton(text = "Disabled", onClick = {}, style = PushButtonStyle.Default, enabled = false)
     }
 }
 
-@GalleryExample("Button", "Disclosure")
+// ===========================================================================
+// Push Button — Bordered Colored (toggleable accent)
+// ===========================================================================
+
+@OptIn(ExperimentalLayoutApi::class)
+@GalleryExample("Button", "Bordered Colored")
 @Composable
-fun ButtonDisclosureExample() {
-    var expanded by remember { mutableStateOf(false) }
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Row(
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+fun ButtonBorderedColoredExample() {
+    var selected by remember { mutableStateOf(false) }
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        PushButton(
+            text = if (selected) "On" else "Off",
+            onClick = { selected = !selected },
+            style = PushButtonStyle.Accent,
+            selected = selected,
+        )
+        PushButton(text = "Disabled", onClick = {}, style = PushButtonStyle.Accent, enabled = false)
+    }
+}
+
+// ===========================================================================
+// Push Button — Bordered Destructive
+// ===========================================================================
+
+@OptIn(ExperimentalLayoutApi::class)
+@GalleryExample("Button", "Bordered Destructive")
+@Composable
+fun ButtonBorderedDestructiveExample() {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        PushButton(text = "Delete", onClick = {}, style = PushButtonStyle.Destructive)
+        PushButton(text = "Disabled", onClick = {}, style = PushButtonStyle.Destructive, enabled = false)
+    }
+}
+
+// ===========================================================================
+// Push Button — Bordered Secondary
+// ===========================================================================
+
+@OptIn(ExperimentalLayoutApi::class)
+@GalleryExample("Button", "Bordered Secondary")
+@Composable
+fun ButtonBorderedSecondaryExample() {
+    var selected by remember { mutableStateOf(false) }
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        PushButton(
+            text = if (selected) "On" else "Off",
+            onClick = { selected = !selected },
+            style = PushButtonStyle.Secondary,
+            selected = selected,
+        )
+        PushButton(text = "Label", onClick = {}, style = PushButtonStyle.Secondary)
+        PushButton(text = "Disabled", onClick = {}, style = PushButtonStyle.Secondary, enabled = false)
+    }
+}
+
+// ===========================================================================
+// Push Button — Borderless (On state shown by label change)
+// ===========================================================================
+
+@OptIn(ExperimentalLayoutApi::class)
+@GalleryExample("Button", "Borderless")
+@Composable
+fun ButtonBorderlessExample() {
+    var selected by remember { mutableStateOf(false) }
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        PushButton(
+            text = if (selected) "On" else "Off",
+            onClick = { selected = !selected },
+            style = PushButtonStyle.Borderless,
+            selected = selected,
+        )
+        PushButton(text = "Label", onClick = {}, style = PushButtonStyle.Borderless)
+        PushButton(text = "Disabled", onClick = {}, style = PushButtonStyle.Borderless, enabled = false)
+    }
+}
+
+// ===========================================================================
+// Push Button — Borderless (On state shown by bezel)
+// ===========================================================================
+
+@OptIn(ExperimentalLayoutApi::class)
+@GalleryExample("Button", "Borderless Bezel")
+@Composable
+fun ButtonBorderlessBezelExample() {
+    var selected by remember { mutableStateOf(false) }
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        PushButton(
+            text = if (selected) "On" else "Off",
+            onClick = { selected = !selected },
+            style = PushButtonStyle.BorderlessBezel,
+            selected = selected,
+        )
+        PushButton(text = "Label", onClick = {}, style = PushButtonStyle.BorderlessBezel)
+        PushButton(text = "Disabled", onClick = {}, style = PushButtonStyle.BorderlessBezel, enabled = false)
+        PushButton(
+            text = "Disabled On",
+            onClick = {},
+            style = PushButtonStyle.BorderlessBezel,
+            selected = true,
+            enabled = false,
+        )
+    }
+}
+
+// ===========================================================================
+// Push Button — Neutral
+// ===========================================================================
+
+@OptIn(ExperimentalLayoutApi::class)
+@GalleryExample("Button", "Neutral")
+@Composable
+fun ButtonNeutralExample() {
+    var selected by remember { mutableStateOf(false) }
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        PushButton(
+            text = if (selected) "On" else "Off",
+            onClick = { selected = !selected },
+            style = PushButtonStyle.Neutral,
+            selected = selected,
+        )
+        PushButton(text = "Label", onClick = {}, style = PushButtonStyle.Neutral)
+        PushButton(text = "Disabled", onClick = {}, style = PushButtonStyle.Neutral, enabled = false)
+    }
+}
+
+// ===========================================================================
+// Push Button — Icon + Text / Icon Only
+// ===========================================================================
+
+@OptIn(ExperimentalLayoutApi::class)
+@GalleryExample("Button", "Icon")
+@Composable
+fun ButtonIconExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        for (size in ControlSize.entries) {
+            ControlSize(size) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        text = size.name,
+                        style = DarwinTheme.typography.caption1,
+                        color = DarwinTheme.colorScheme.textSecondary,
+                        modifier = Modifier.widthIn(min = 72.dp).align(Alignment.CenterVertically),
+                    )
+                    PushButton(
+                        text = "Download",
+                        icon = LucideDownload,
+                        onClick = {},
+                        style = PushButtonStyle.Default,
+                    )
+                    PushButton(
+                        text = "Share",
+                        icon = LucideShare2,
+                        onClick = {},
+                        style = PushButtonStyle.Secondary,
+                    )
+                    PushButton(
+                        icon = LucideHeart,
+                        onClick = {},
+                        style = PushButtonStyle.BorderlessBezel,
+                    )
+                    PushButton(
+                        text = "Delete",
+                        icon = LucideTrash2,
+                        onClick = {},
+                        style = PushButtonStyle.Destructive,
+                    )
+                }
+            }
+        }
+    }
+}
+
+// ===========================================================================
+// Surface Appearance — Content Area vs Over Glass
+// ===========================================================================
+
+@GalleryExample("Button", "Surface")
+@Composable
+fun ButtonSurfaceExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
         ) {
-            DisclosureButton(expanded = expanded, onToggle = { expanded = !expanded })
-            Text(if (expanded) "Collapse" else "Expand")
+            Text(
+                text = "Content Area",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.ContentArea) {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    PushButton(text = "Default", onClick = {}, style = PushButtonStyle.Default)
+                    PushButton(text = "Secondary", onClick = {}, style = PushButtonStyle.Secondary)
+                    PushButton(text = "Destructive", onClick = {}, style = PushButtonStyle.Destructive)
+                    PushButton(text = "Neutral", onClick = {}, style = PushButtonStyle.Neutral)
+                    PushButton(text = "Borderless", onClick = {}, style = PushButtonStyle.Borderless)
+                    PushButton(text = "Bezel", onClick = {}, style = PushButtonStyle.BorderlessBezel)
+                    PushButton(text = "Disabled", onClick = {}, style = PushButtonStyle.Default, enabled = false)
+                }
+            }
         }
-        if (expanded) {
-            Text("Hidden content revealed after toggle.", color = DarwinTheme.colorScheme.textSecondary)
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Over Glass",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.OverGlass) {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    PushButton(text = "Default", onClick = {}, style = PushButtonStyle.Default)
+                    PushButton(text = "Secondary", onClick = {}, style = PushButtonStyle.Secondary)
+                    PushButton(text = "Destructive", onClick = {}, style = PushButtonStyle.Destructive)
+                    PushButton(text = "Neutral", onClick = {}, style = PushButtonStyle.Neutral)
+                    PushButton(text = "Borderless", onClick = {}, style = PushButtonStyle.Borderless)
+                    PushButton(text = "Bezel", onClick = {}, style = PushButtonStyle.BorderlessBezel)
+                    PushButton(text = "Disabled", onClick = {}, style = PushButtonStyle.Default, enabled = false)
+                }
+            }
         }
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
-@GalleryExample("Button", "Push")
-@Composable
-fun ButtonPushExample() {
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        PushButton(text = "Label", onClick = {})
-        PushButton(text = "Cancel", onClick = {})
-        PushButton(text = "Apply", onClick = {})
-        PushButton(text = "Disabled", onClick = {}, enabled = false)
-    }
-}
+// ===========================================================================
+// Arrow Button — Sizes
+// ===========================================================================
 
 @GalleryExample("Button", "Arrow")
 @Composable
 fun ButtonArrowExample() {
-    var value by remember { mutableStateOf(0) }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        for (size in ControlSize.entries) {
+            ControlSize(size) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = size.name,
+                        style = DarwinTheme.typography.caption1,
+                        color = DarwinTheme.colorScheme.textSecondary,
+                        modifier = Modifier.widthIn(min = 72.dp),
+                    )
+                    ArrowButton(onClick = {})
+                    ArrowButton(onClick = {}, enabled = false)
+                }
+            }
+        }
+    }
+}
+
+// ===========================================================================
+// Arrow Button — Surface Appearance (Content Area vs Over Glass)
+// ===========================================================================
+
+@GalleryExample("Button", "Arrow Surface")
+@Composable
+fun ButtonArrowSurfaceExample() {
     Row(
-        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = Modifier.fillMaxWidth(),
     ) {
-        ArrowButton(
-            onIncrement = { value++ },
-            onDecrement = { value-- },
-        )
-        Text("Value: $value")
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Content Area",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.ContentArea) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ArrowButton(onClick = {})
+                    ArrowButton(onClick = {}, enabled = false)
+                }
+            }
+        }
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Over Glass",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.OverGlass) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ArrowButton(onClick = {})
+                    ArrowButton(onClick = {}, enabled = false)
+                }
+            }
+        }
     }
 }
 
-@GalleryExample("Button", "Compact")
-@Composable
-fun ButtonAlertSheetExample() {
-    Column(
-        modifier = Modifier.widthIn(max = 260.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        MacNativeAccentButton(text = "Save", onClick = {})
-        MacNativeDestructiveButton(text = "Don't Save", onClick = {})
-        MacNativeSecondaryButton(text = "Cancel", onClick = {})
-    }
-}
-
-@GalleryExample("Button", "Compact Footer")
-@Composable
-fun ButtonAlertSheetFooterExample() {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-    ) {
-        MacNativeDestructiveButton(text = "Delete", onClick = {}, fillWidth = false)
-        Spacer(modifier = Modifier.weight(1f))
-        MacNativeSecondaryButton(text = "Cancel", onClick = {}, fillWidth = false)
-        MacNativeAccentButton(text = "Save", onClick = {}, fillWidth = false)
-    }
-}
-
-@GalleryExample("Button", "Panel")
-@Composable
-fun ButtonPanelExample() {
-    Column(
-        modifier = Modifier.widthIn(max = 260.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        PanelAccentButton(text = "Save", onClick = {}, fillWidth = true)
-        PanelDestructiveButton(text = "Delete", onClick = {}, fillWidth = true)
-        PanelSecondaryButton(text = "Cancel", onClick = {}, fillWidth = true)
-    }
-}
-
-@GalleryExample("Button", "Panel Footer")
-@Composable
-fun ButtonPanelFooterExample() {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
-    ) {
-        PanelDestructiveButton(text = "Delete", onClick = {})
-        Spacer(modifier = Modifier.weight(1f))
-        PanelSecondaryButton(text = "Cancel", onClick = {})
-        PanelAccentButton(text = "Save", onClick = {})
-    }
-}
+// ===========================================================================
+// ButtonPage — organized exactly like Sketch Buttons page
+// ===========================================================================
 
 @Composable
 internal fun ButtonPage() {
-    GalleryPage("Button", "Native macOS button controls with idiomatic Compose APIs.") {
+    GalleryPage("Button", "Push buttons and arrow buttons — macOS 26 Liquid Glass style.") {
+        PreviewContainer { ButtonPreview() }
+
         SectionHeader("Sizes")
         ExampleCard(
             title = "All Sizes",
@@ -184,50 +445,80 @@ internal fun ButtonPage() {
             sourceCode = GallerySources.ButtonSizesExample,
         ) { ButtonSizesExample() }
 
-        SectionHeader("Examples")
+        SectionHeader("Bordered Default")
         ExampleCard(
-            title = "Pulldown",
-            description = "macOS-native pulldown button with glass appearance",
-            sourceCode = GallerySources.ButtonPulldownExample,
-        ) { ButtonPulldownExample() }
+            title = "Bordered Default",
+            description = "Solid accent-filled button — primary action",
+            sourceCode = GallerySources.ButtonBorderedDefaultExample,
+        ) { ButtonBorderedDefaultExample() }
+
+        SectionHeader("Bordered Colored")
         ExampleCard(
-            title = "Disclosure",
-            description = "Circular toggle button that reveals or hides content",
-            sourceCode = GallerySources.ButtonDisclosureExample,
-        ) { ButtonDisclosureExample() }
+            title = "Bordered Colored",
+            description = "Solid accent-filled toggle button",
+            sourceCode = GallerySources.ButtonBorderedColoredExample,
+        ) { ButtonBorderedColoredExample() }
+
+        SectionHeader("Bordered Destructive")
         ExampleCard(
-            title = "Push",
-            description = "macOS-native compact push button (bezel/rounded style)",
-            sourceCode = GallerySources.ButtonPushExample,
-        ) { ButtonPushExample() }
+            title = "Bordered Destructive",
+            description = "Red-tinted background for destructive actions",
+            sourceCode = GallerySources.ButtonBorderedDestructiveExample,
+        ) { ButtonBorderedDestructiveExample() }
+
+        SectionHeader("Bordered Secondary")
         ExampleCard(
-            title = "Arrow",
-            description = "Circular stepper button with up/down increment zones",
+            title = "Bordered Secondary",
+            description = "Accent-tinted background with accent text",
+            sourceCode = GallerySources.ButtonBorderedSecondaryExample,
+        ) { ButtonBorderedSecondaryExample() }
+
+        SectionHeader("Borderless (Label Change)")
+        ExampleCard(
+            title = "Borderless — Label Change",
+            description = "Transparent background, on/off only changes the label text",
+            sourceCode = GallerySources.ButtonBorderlessExample,
+        ) { ButtonBorderlessExample() }
+
+        SectionHeader("Borderless (Bezel)")
+        ExampleCard(
+            title = "Borderless — Bezel",
+            description = "Transparent when off, accent-filled bezel when on, hover/press overlays",
+            sourceCode = GallerySources.ButtonBorderlessBezelExample,
+        ) { ButtonBorderlessBezelExample() }
+
+        SectionHeader("Neutral")
+        ExampleCard(
+            title = "Neutral",
+            description = "Gray background, neutral text, darker fill on toggle",
+            sourceCode = GallerySources.ButtonNeutralExample,
+        ) { ButtonNeutralExample() }
+
+        SectionHeader("Icon + Text")
+        ExampleCard(
+            title = "Icon Buttons",
+            description = "Leading icon with text, or icon-only — sizing adapts to ControlSize",
+            sourceCode = GallerySources.ButtonIconExample,
+        ) { ButtonIconExample() }
+
+        SectionHeader("Surface Appearance")
+        ExampleCard(
+            title = "Content Area vs Over Glass",
+            description = "Buttons adapt their press overlay and disabled opacity per surface",
+            sourceCode = GallerySources.ButtonSurfaceExample,
+        ) { ButtonSurfaceExample() }
+
+        SectionHeader("Arrow Button")
+        ExampleCard(
+            title = "Arrow Button — Sizes",
+            description = "Circular popup chevron button at each ControlSize",
             sourceCode = GallerySources.ButtonArrowExample,
         ) { ButtonArrowExample() }
 
-        SectionHeader("Compact")
         ExampleCard(
-            title = "Compact",
-            description = "Pill-shaped compact buttons for dialogs and panels",
-            sourceCode = GallerySources.ButtonAlertSheetExample,
-        ) { ButtonAlertSheetExample() }
-        ExampleCard(
-            title = "Compact Footer",
-            description = "Horizontal layout: destructive left, cancel + confirm right",
-            sourceCode = GallerySources.ButtonAlertSheetFooterExample,
-        ) { ButtonAlertSheetFooterExample() }
-
-        SectionHeader("Panel")
-        ExampleCard(
-            title = "Panel",
-            description = "NSSavePanel-style buttons with squarish rounded corners",
-            sourceCode = GallerySources.ButtonPanelExample,
-        ) { ButtonPanelExample() }
-        ExampleCard(
-            title = "Panel Footer",
-            description = "Horizontal panel footer: delete left, cancel + save right",
-            sourceCode = GallerySources.ButtonPanelFooterExample,
-        ) { ButtonPanelFooterExample() }
+            title = "Arrow Button — Surface",
+            description = "Arrow button adapts disabled opacity per surface",
+            sourceCode = GallerySources.ButtonArrowSurfaceExample,
+        ) { ButtonArrowSurfaceExample() }
     }
 }

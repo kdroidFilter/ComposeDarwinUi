@@ -5,6 +5,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 /**
  * Control size presets inspired by SwiftUI's `.controlSize()`.
@@ -50,4 +52,27 @@ fun ControlSize.labelStyle(): TextStyle = when (this) {
     ControlSize.Regular -> DarwinTheme.typography.footnote
     ControlSize.Large -> DarwinTheme.typography.subheadline
     ControlSize.ExtraLarge -> DarwinTheme.typography.callout
+}
+
+/**
+ * Returns the inline icon size for this control size, matching the SF Pro
+ * glyph size at the corresponding font size.
+ */
+fun ControlSize.iconSize(): Dp = when (this) {
+    ControlSize.Mini -> 10.dp
+    ControlSize.Small -> 11.dp
+    ControlSize.Regular -> 13.dp
+    ControlSize.Large -> 13.dp
+    ControlSize.ExtraLarge -> 13.dp
+}
+
+/**
+ * Returns the gap between an inline icon and its adjacent text label.
+ */
+fun ControlSize.iconGap(): Dp = when (this) {
+    ControlSize.Mini -> 2.dp
+    ControlSize.Small -> 3.dp
+    ControlSize.Regular -> 4.dp
+    ControlSize.Large -> 4.dp
+    ControlSize.ExtraLarge -> 4.dp
 }
