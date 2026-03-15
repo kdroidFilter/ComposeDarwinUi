@@ -91,6 +91,10 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideMoon
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSettings
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSun
+import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.extended.ExternalLink
+import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.extended.IconsExtended
+import androidx.compose.ui.platform.LocalUriHandler
+import com.composables.icons.lucide.Github
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AddressBarPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AccordionPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AlertPage
@@ -370,6 +374,14 @@ fun App() {
                                             onSelectedIndexChange = { sidebarControlSize = sizeOptions[it] },
                                         )
                                     }
+                                }
+                            }
+                            val uriHandler = LocalUriHandler.current
+                            TitleBarButtonGroup {
+                                TitleBarGroupButton(onClick = {
+                                    uriHandler.openUri("https://github.com/kdroidFilter/compose-macos-26-ui")
+                                }) {
+                                    Icon(Lucide.Github, modifier = Modifier.size(14.dp))
                                 }
                             }
                             TitleBarButtonGroup {
