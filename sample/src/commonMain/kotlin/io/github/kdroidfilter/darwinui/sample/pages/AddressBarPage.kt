@@ -2,15 +2,18 @@ package io.github.kdroidfilter.darwinui.sample.pages
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.components.AddressBar
@@ -26,6 +29,9 @@ import io.github.kdroidfilter.darwinui.sample.gallery.ExampleCard
 import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
+import io.github.kdroidfilter.darwinui.components.LocalTitleBarStyle
+import io.github.kdroidfilter.darwinui.components.TitleBarStyle
+import io.github.kdroidfilter.darwinui.theme.DarwinSurface
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
 @GalleryExample("AddressBar", "Safari Style")
@@ -83,6 +89,65 @@ fun AddressBarStandaloneExample() {
     )
 }
 
+@GalleryExample("AddressBar", "Surface Variants")
+@Composable
+fun AddressBarSurfaceVariantsExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        // Content Area (default)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Content Area",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.ContentArea) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    for (style in listOf(TitleBarStyle.Unified, TitleBarStyle.UnifiedCompact)) {
+                        CompositionLocalProvider(LocalTitleBarStyle provides style) {
+                            var url by remember { mutableStateOf("") }
+                            AddressBar(value = url, onValueChange = { url = it }, onGo = {})
+                        }
+                    }
+                    AddressBar(value = "apple.com", onValueChange = {}, onGo = {})
+                    AddressBar(value = "", onValueChange = {}, enabled = false, onGo = {})
+                }
+            }
+        }
+
+        // Over Glass
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Over Glass",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.OverGlass) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    for (style in listOf(TitleBarStyle.Unified, TitleBarStyle.UnifiedCompact)) {
+                        CompositionLocalProvider(LocalTitleBarStyle provides style) {
+                            var url by remember { mutableStateOf("") }
+                            AddressBar(value = url, onValueChange = { url = it }, onGo = {})
+                        }
+                    }
+                    AddressBar(value = "apple.com", onValueChange = {}, onGo = {})
+                    AddressBar(value = "", onValueChange = {}, enabled = false, onGo = {})
+                }
+            }
+        }
+    }
+}
+
 @Composable
 internal fun AddressBarPage() {
     GalleryPage("Address Bar", "macOS Safari-style address bar with pill shape.") {
@@ -97,5 +162,12 @@ internal fun AddressBarPage() {
             description = "Address bar used outside of a title bar",
             sourceCode = GallerySources.AddressBarStandaloneExample,
         ) { AddressBarStandaloneExample() }
+
+        SectionHeader("Surface Variants")
+        ExampleCard(
+            title = "Content Area vs Over Glass",
+            description = "AddressBar adapts its appearance based on DarwinSurface",
+            sourceCode = GallerySources.AddressBarSurfaceVariantsExample,
+        ) { AddressBarSurfaceVariantsExample() }
     }
 }

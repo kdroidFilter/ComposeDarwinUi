@@ -115,8 +115,12 @@ fun SearchInputSurfaceVariantsExample() {
             )
             DarwinSurface(DarwinSurface.ContentArea) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    var text by remember { mutableStateOf("") }
-                    SearchField(value = text, onValueChange = { text = it })
+                    for (size in ControlSize.entries) {
+                        ControlSize(size) {
+                            var text by remember { mutableStateOf("") }
+                            SearchField(value = text, onValueChange = { text = it })
+                        }
+                    }
                     SearchField(value = "With value", onValueChange = {})
                     SearchField(value = "", onValueChange = {}, enabled = false)
                 }
@@ -136,8 +140,12 @@ fun SearchInputSurfaceVariantsExample() {
             )
             DarwinSurface(DarwinSurface.OverGlass) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    var text by remember { mutableStateOf("") }
-                    SearchField(value = text, onValueChange = { text = it })
+                    for (size in ControlSize.entries) {
+                        ControlSize(size) {
+                            var text by remember { mutableStateOf("") }
+                            SearchField(value = text, onValueChange = { text = it })
+                        }
+                    }
                     SearchField(value = "With value", onValueChange = {})
                     SearchField(value = "", onValueChange = {}, enabled = false)
                 }

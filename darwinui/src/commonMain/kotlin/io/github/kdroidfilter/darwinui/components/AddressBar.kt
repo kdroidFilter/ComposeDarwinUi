@@ -27,12 +27,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -40,16 +44,20 @@ import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
+import io.github.kdroidfilter.darwinui.theme.DarwinSurface
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
+import io.github.kdroidfilter.darwinui.theme.LocalDarwinSurface
 import io.github.kdroidfilter.darwinui.theme.darwinTween
 
 /**
  * macOS Safari-style address bar.
  *
- * Uses the same pill background as [TitleBarButtonGroup]. The URL/query text is
- * centered. An optional leading icon (e.g. lock, reader mode) and a trailing
- * "Go" button (shown when [onGo] is provided) complete the layout.
+ * Uses a pill background that adapts to [DarwinSurface.ContentArea] (white with
+ * border) and [DarwinSurface.OverGlass] (translucent with drop shadow).
+ * The URL/query text is centered. An optional leading icon (e.g. lock, reader
+ * mode) and a trailing "Go" button (shown when [onGo] is provided) complete
+ * the layout.
  *
  * @param value Current text value.
  * @param onValueChange Called when the text changes.
@@ -72,54 +80,95 @@ fun AddressBar(
     leadingIcon: @Composable (() -> Unit)? = null,
     focusRequester: FocusRequester = remember { FocusRequester() },
 ) {
+    val tfColors = DarwinTheme.componentStyling.textField.colors
     val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
+    val accent = colors.accent
     val isDark = colors.isDark
-    val accentColor = colors.accent
+    val surface = LocalDarwinSurface.current
+    val isOverGlass = surface == DarwinSurface.OverGlass
+
+    val titleBarStyle = LocalTitleBarStyle.current
 
     var isFocused by remember { mutableStateOf(false) }
 
     val shape = DarwinTheme.shapes.full
+    val fieldHeight = titleBarStyle.buttonHeight
+    val pillCornerRadius = fieldHeight / 2
 
+    // Icon/button sizes adapt to toolbar style
+    val iconSlotSize = fieldHeight - (titleBarStyle.buttonPadding * 2)
+    val goIconSize = titleBarStyle.iconSize
+
+    // Background — same logic as SearchField
     val bgColor by animateColorAsState(
         targetValue = when {
-            isFocused -> if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.03f)
-            else -> if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.055f)
+            !enabled -> if (isOverGlass) tfColors.overGlassDisabledBackground else tfColors.backgroundDisabled
+            isFocused && isOverGlass -> tfColors.overGlassFocusedBackground
+            isOverGlass -> tfColors.overGlassBackground
+            else -> tfColors.background
         },
-        animationSpec = darwinTween(DarwinDuration.Normal),
+        animationSpec = darwinTween(DarwinDuration.Fast),
         label = "address_bg",
     )
 
-    val ringColor by animateColorAsState(
-        targetValue = if (isFocused) accentColor.copy(alpha = 0.4f) else Color.Transparent,
-        animationSpec = darwinTween(DarwinDuration.Normal),
-        label = "address_ring",
+    // Border — Content Area only; Over-glass has no border
+    val borderColor by animateColorAsState(
+        targetValue = when {
+            !enabled -> if (isOverGlass) Color.Transparent else tfColors.borderDisabled
+            isOverGlass -> Color.Transparent
+            else -> tfColors.border
+        },
+        animationSpec = darwinTween(DarwinDuration.Fast),
+        label = "address_border",
     )
 
     val textColor = colors.textPrimary
-    val placeholderColor = colors.textTertiary
-    val iconColor = colors.textTertiary
+    val placeholderColor = colors.textSecondary
+    val iconColor = colors.textSecondary
 
     Row(
         modifier = modifier
             .onFocusChanged { isFocused = it.hasFocus }
-            .height(30.dp)
-            .shadow(
-                elevation = if (isFocused) 4.dp else 0.dp,
-                shape = shape,
-                clip = false,
-                ambientColor = accentColor.copy(alpha = 0.25f),
-                spotColor = accentColor.copy(alpha = 0.25f),
+            .height(fieldHeight)
+            // Focus ring
+            .then(
+                if (isFocused && enabled) {
+                    Modifier.addressBarFocusRing(
+                        cornerRadius = pillCornerRadius,
+                        outerColor = accent.copy(alpha = 0.25f),
+                        innerColor = accent.copy(alpha = 0.15f),
+                    )
+                } else {
+                    Modifier
+                },
+            )
+            // Over-glass shadow
+            .then(
+                if (isOverGlass) {
+                    Modifier.addressBarShadow(
+                        cornerRadius = pillCornerRadius,
+                        shadowAlpha = if (enabled) 0.03f else 0.015f,
+                    )
+                } else {
+                    Modifier
+                },
             )
             .clip(shape)
             .background(bgColor, shape)
-            .border(1.5.dp, ringColor, shape)
-            .padding(horizontal = 10.dp),
+            .then(
+                if (borderColor != Color.Transparent) {
+                    Modifier.border(1.dp, borderColor, shape)
+                } else {
+                    Modifier
+                },
+            )
+            .padding(horizontal = titleBarStyle.buttonPadding + 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Leading icon — fixed width to keep text centered
         Box(
-            modifier = Modifier.size(18.dp),
+            modifier = Modifier.size(iconSlotSize),
             contentAlignment = Alignment.Center,
         ) {
             if (leadingIcon != null) {
@@ -143,11 +192,11 @@ fun AddressBar(
 
         // Trailing Go button — mirrors leading size to keep text centered
         Box(
-            modifier = Modifier.size(18.dp),
+            modifier = Modifier.size(iconSlotSize),
             contentAlignment = Alignment.Center,
         ) {
             if (onGo != null) {
-                GoButton(onClick = onGo, enabled = enabled, isDark = isDark)
+                GoButton(onClick = onGo, enabled = enabled, isDark = isDark, iconSize = goIconSize)
             }
         }
     }
@@ -203,6 +252,7 @@ private fun GoButton(
     onClick: () -> Unit,
     enabled: Boolean,
     isDark: Boolean,
+    iconSize: androidx.compose.ui.unit.Dp = 11.dp,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -227,9 +277,10 @@ private fun GoButton(
         label = "go_btn_icon",
     )
 
+    val buttonSize = iconSize + 7.dp
     Box(
         modifier = Modifier
-            .size(18.dp)
+            .size(buttonSize)
             .clip(CircleShape)
             .background(bgColor, CircleShape)
             .hoverable(interactionSource = interactionSource)
@@ -245,7 +296,53 @@ private fun GoButton(
         Icon(
             imageVector = LucideChevronRight,
             tint = iconColor,
-            modifier = Modifier.size(11.dp),
+            modifier = Modifier.size(iconSize),
         )
     }
+}
+
+// macOS-style dual focus ring for pill shape
+private fun Modifier.addressBarFocusRing(
+    cornerRadius: androidx.compose.ui.unit.Dp,
+    outerColor: Color,
+    innerColor: Color,
+): Modifier = drawBehind {
+    val outerStrokePx = 3.5.dp.toPx()
+    val innerStrokePx = 1.dp.toPx()
+    val cornerPx = cornerRadius.toPx()
+
+    val outerHalf = outerStrokePx / 2f
+    drawRoundRect(
+        color = outerColor,
+        topLeft = Offset(-outerHalf, -outerHalf),
+        size = Size(size.width + outerStrokePx, size.height + outerStrokePx),
+        cornerRadius = CornerRadius(cornerPx + outerHalf),
+        style = Stroke(width = outerStrokePx),
+    )
+
+    val innerHalf = innerStrokePx / 2f
+    drawRoundRect(
+        color = innerColor,
+        topLeft = Offset(-innerHalf, -innerHalf),
+        size = Size(size.width + innerStrokePx, size.height + innerStrokePx),
+        cornerRadius = CornerRadius(cornerPx + innerHalf),
+        style = Stroke(width = innerStrokePx),
+    )
+}
+
+// Over-glass subtle drop shadow
+private fun Modifier.addressBarShadow(
+    cornerRadius: androidx.compose.ui.unit.Dp,
+    shadowAlpha: Float,
+): Modifier = drawBehind {
+    val cornerPx = cornerRadius.toPx()
+    val blurPx = 6.dp.toPx()
+    val halfBlur = blurPx / 2f
+
+    drawRoundRect(
+        color = Color.Black.copy(alpha = shadowAlpha),
+        topLeft = Offset(-halfBlur, -halfBlur),
+        size = Size(size.width + blurPx, size.height + blurPx),
+        cornerRadius = CornerRadius(cornerPx + halfBlur),
+    )
 }
