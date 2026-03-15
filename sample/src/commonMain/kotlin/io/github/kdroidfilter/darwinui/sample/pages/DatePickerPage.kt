@@ -132,6 +132,24 @@ fun TimePickerButtonExample() {
     }
 }
 
+@GalleryExample("DatePicker", "Time Button 24h")
+@Composable
+fun TimePickerButton24hExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        var time by remember { mutableStateOf(LocalTime(14, 45)) }
+        TimePickerButton(
+            value = time,
+            onValueChange = { time = it },
+            is24Hour = true,
+        )
+        Text(
+            text = "Selected: $time",
+            style = DarwinTheme.typography.caption1,
+            color = DarwinTheme.colorScheme.textSecondary,
+        )
+    }
+}
+
 @GalleryExample("DatePicker", "DateTime Buttons")
 @Composable
 fun DateTimePickerButtonExample() {
@@ -195,6 +213,9 @@ internal fun DatePickerPage() {
         }
         ExampleCard(title = "Time Button", sourceCode = GallerySources.TimePickerButtonExample) {
             TimePickerButtonExample()
+        }
+        ExampleCard(title = "Time Button 24h", sourceCode = GallerySources.TimePickerButton24hExample) {
+            TimePickerButton24hExample()
         }
         ExampleCard(title = "Date & Time Buttons", sourceCode = GallerySources.DateTimePickerButtonExample) {
             DateTimePickerButtonExample()
