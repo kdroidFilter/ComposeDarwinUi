@@ -22,6 +22,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -148,9 +150,9 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.VibrantColors
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.vibrant
 
 // Navigation data
-private data class SidebarEntryDef(val id: String, val label: String, val group: String, val icon: ImageVector)
+internal data class SidebarEntryDef(val id: String, val label: String, val group: String, val icon: ImageVector)
 
-private val sidebarEntryDefs = listOf(
+internal val sidebarEntryDefs = listOf(
     SidebarEntryDef("button", "Button", "FORM CONTROLS", Lucide.MousePointerClick),
     SidebarEntryDef("iconbutton", "Icon Button", "FORM CONTROLS", Lucide.CircleDot),
     SidebarEntryDef("input", "Input", "FORM CONTROLS", Lucide.TextCursorInput),
@@ -198,7 +200,7 @@ private val sidebarEntryDefs = listOf(
 )
 
 @Composable
-fun App() {
+fun App(deeplinkService: DeeplinkService = DeeplinkService()) {
     val systemTheme = isSystemInDarkTheme()
     var isDark by remember { mutableStateOf(systemTheme) }
     var accentColor by remember { mutableStateOf(AccentColor.Blue) }
@@ -220,7 +222,16 @@ fun App() {
 
     MacosTheme(darkTheme = isDark, accentColor = accentColor, colorScheme = colorScheme, glassType = glassType) {
         val toastState = rememberToastState()
-        var selectedPage by remember { mutableStateOf("button") }
+        val deepLink by deeplinkService.deepLink.collectAsState()
+        var selectedPage by remember { mutableStateOf(DeeplinkService.urlToPage(deepLink)) }
+
+        LaunchedEffect(deepLink) {
+            val page = DeeplinkService.urlToPage(deepLink)
+            if (page != selectedPage) selectedPage = page
+        }
+
+        BrowserNavigation(selectedPage)
+
         var searchQuery by remember { mutableStateOf("") }
         var searchExpanded by remember { mutableStateOf(false) }
         var columnVisibility by remember { mutableStateOf(ColumnVisibility.All) }
@@ -533,3 +544,5 @@ private fun AccentColorPicker(
     }
 }
 
+@Composable
+internal expect fun BrowserNavigation(currentPage: String)
