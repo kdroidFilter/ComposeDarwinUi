@@ -1,5 +1,6 @@
 package io.github.kdroidfilter.darwinui.components
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -893,72 +895,103 @@ private fun AmPmSegmentedControl(
     val isDark = DarwinTheme.colorScheme.isDark
     val textPrimary = DarwinTheme.colorScheme.textPrimary
     val activeBg = if (isDark) Color(0xFF6C6C71) else Color.White
-    val activeShape = RoundedCornerShape(20.dp)
+    val pillShape = RoundedCornerShape(20.dp)
     val containerShape = RoundedCornerShape(22.dp)
+    val density = androidx.compose.ui.platform.LocalDensity.current
 
-    Row(
+    val segmentWidthPx = remember { mutableStateOf(0f) }
+    val indicatorOffset = remember { Animatable(0f) }
+    var hasInitialized by remember { mutableStateOf(false) }
+    val springSpec = darwinSpring<Float>(DarwinSpringPreset.Snappy)
+
+    val targetOffsetPx = if (isPm) segmentWidthPx.value else 0f
+
+    LaunchedEffect(isPm, segmentWidthPx.value) {
+        if (segmentWidthPx.value <= 0f) return@LaunchedEffect
+        if (!hasInitialized) {
+            indicatorOffset.snapTo(targetOffsetPx)
+            hasInitialized = true
+        } else {
+            indicatorOffset.animateTo(targetOffsetPx, springSpec)
+        }
+    }
+
+    Box(
         modifier = Modifier
             .width(100.dp)
             .height(36.dp)
             .clip(containerShape)
             .background(bgColor, containerShape)
             .padding(4.dp),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
-        // AM button
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(28.dp)
-                .clip(activeShape)
-                .background(if (!isPm) activeBg else Color.Transparent, activeShape)
-                .then(
-                    if (enabled) {
-                        Modifier.clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = { if (isPm) onToggle() },
-                        )
-                    } else {
-                        Modifier
-                    },
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "AM",
-                color = textPrimary,
-                fontSize = 14.sp,
-                fontWeight = if (!isPm) FontWeight.Bold else FontWeight.SemiBold,
+        // Sliding indicator pill
+        if (segmentWidthPx.value > 0f) {
+            Box(
+                modifier = Modifier
+                    .offset(x = with(density) { indicatorOffset.value.toDp() })
+                    .size(
+                        width = with(density) { segmentWidthPx.value.toDp() },
+                        height = 28.dp,
+                    )
+                    .background(activeBg, pillShape),
             )
         }
 
-        // PM button
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(28.dp)
-                .clip(activeShape)
-                .background(if (isPm) activeBg else Color.Transparent, activeShape)
-                .then(
-                    if (enabled) {
-                        Modifier.clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                            onClick = { if (!isPm) onToggle() },
-                        )
-                    } else {
-                        Modifier
-                    },
-                ),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(
-                text = "PM",
-                color = textPrimary,
-                fontSize = 14.sp,
-                fontWeight = if (isPm) FontWeight.Bold else FontWeight.SemiBold,
-            )
+        Row(modifier = Modifier.matchParentSize()) {
+            // AM button
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(28.dp)
+                    .onSizeChanged { segmentWidthPx.value = it.width.toFloat() }
+                    .clip(pillShape)
+                    .then(
+                        if (enabled) {
+                            Modifier.clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = { if (isPm) onToggle() },
+                            )
+                        } else {
+                            Modifier
+                        },
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "AM",
+                    color = textPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = if (!isPm) FontWeight.Bold else FontWeight.SemiBold,
+                )
+            }
+
+            // PM button
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(28.dp)
+                    .clip(pillShape)
+                    .then(
+                        if (enabled) {
+                            Modifier.clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = { if (!isPm) onToggle() },
+                            )
+                        } else {
+                            Modifier
+                        },
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "PM",
+                    color = textPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = if (isPm) FontWeight.Bold else FontWeight.SemiBold,
+                )
+            }
         }
     }
 }
