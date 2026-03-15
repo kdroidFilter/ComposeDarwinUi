@@ -51,6 +51,7 @@ import com.composables.icons.lucide.CreditCard
 import com.composables.icons.lucide.Ellipsis
 import com.composables.icons.lucide.Github
 import com.composables.icons.lucide.GripVertical
+import com.composables.icons.lucide.Layers
 import com.composables.icons.lucide.LayoutList
 import com.composables.icons.lucide.ListChecks
 import com.composables.icons.lucide.Loader
@@ -141,6 +142,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.SearchInputPag
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.SegmentedControlPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.SidebarPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.SkeletonPage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.SurfacePage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.SliderPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.StepperPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.SwitchPage
@@ -186,6 +188,7 @@ internal val sidebarEntryDefs = listOf(
     SidebarEntryDef("form", "Form", "DATA DISPLAY", Lucide.LayoutList),
     SidebarEntryDef("badge", "Badge", "DATA DISPLAY", Lucide.Tag),
     SidebarEntryDef("avatar", "Avatar", "DATA DISPLAY", Lucide.CircleUser),
+    SidebarEntryDef("surface", "Surface", "DATA DISPLAY", Lucide.Layers),
     SidebarEntryDef("card", "Card", "DATA DISPLAY", Lucide.CreditCard),
     SidebarEntryDef("table", "Table", "DATA DISPLAY", Lucide.Table),
     SidebarEntryDef("pagecontrol", "Page Control", "DATA DISPLAY", Lucide.CircleDot),
@@ -532,6 +535,7 @@ private fun PageContent(
         "form" -> FormPage()
         "badge" -> BadgePage()
         "avatar" -> AvatarPage()
+        "surface" -> SurfacePage()
         "card" -> CardPage()
         "table" -> TablePage()
         "pagecontrol" -> PageControlPage()

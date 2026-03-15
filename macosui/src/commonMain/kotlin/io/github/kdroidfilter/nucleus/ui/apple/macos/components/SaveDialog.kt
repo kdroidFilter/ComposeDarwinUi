@@ -42,6 +42,7 @@ import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.ControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosDuration
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.PlatformContextMenuOverride
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosGlass
 import kotlinx.coroutines.delay
 
@@ -112,6 +113,7 @@ fun SaveDialog(
             onDismissRequest = onDismissRequest,
             properties = PopupProperties(focusable = true),
         ) {
+            PlatformContextMenuOverride {
             val colors = MacosTheme.colorScheme
             val isDark = colors.isDark
             val scrimColor = if (isDark) Color.Black.copy(alpha = 0.50f) else Color.Black.copy(alpha = 0.30f)
@@ -179,6 +181,7 @@ fun SaveDialog(
                         modifier = modifier,
                     )
                 }
+            }
             }
         }
     }

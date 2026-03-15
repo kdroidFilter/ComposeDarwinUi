@@ -44,6 +44,7 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.PlatformContextMenuOverride
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosGlassMaterial
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.GlassMaterialSize
 import kotlinx.coroutines.delay
@@ -246,6 +247,7 @@ fun AlertDialog(
             onDismissRequest = onDismissRequest,
             properties = PopupProperties(focusable = true),
         ) {
+            PlatformContextMenuOverride {
             val colors = MacosTheme.colorScheme
 
             // Scrim with fade animation
@@ -305,6 +307,7 @@ fun AlertDialog(
                         buttonLayout = buttonLayout,
                     )
                 }
+            }
             }
         }
     }
@@ -561,6 +564,7 @@ fun AlertDialog(
         onDismissRequest = onDismissRequest,
         properties = PopupProperties(focusable = true),
     ) {
+        PlatformContextMenuOverride {
         val colors = MacosTheme.colorScheme
         val isDark = colors.isDark
 
@@ -638,6 +642,7 @@ fun AlertDialog(
                     dismissButton?.invoke()
                 }
             }
+        }
         }
     }
 }
