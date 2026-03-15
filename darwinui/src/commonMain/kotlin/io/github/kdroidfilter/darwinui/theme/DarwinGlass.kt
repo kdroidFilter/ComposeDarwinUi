@@ -237,6 +237,9 @@ fun Modifier.darwinGlass(
             this.frost = frost
             this.shape = shape
             this.tint = tint
+            refraction = 0.10f
+            curve = 0.15f
+            edge = 0f
             saturation = 1.15f
         }
     } else {
