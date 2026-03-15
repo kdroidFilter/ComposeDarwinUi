@@ -95,6 +95,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.AlertPage
 import io.github.kdroidfilter.darwinui.sample.pages.AvatarPage
 import io.github.kdroidfilter.darwinui.sample.pages.BadgePage
 import io.github.kdroidfilter.darwinui.sample.pages.ButtonPage
+import io.github.kdroidfilter.darwinui.sample.pages.IconButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.CardPage
 import io.github.kdroidfilter.darwinui.sample.pages.CheckboxPage
 import io.github.kdroidfilter.darwinui.sample.pages.CircularSliderPage
@@ -111,6 +112,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.FormPage
 import io.github.kdroidfilter.darwinui.sample.pages.GroupedListPage
 import io.github.kdroidfilter.darwinui.sample.pages.InputPage
 import io.github.kdroidfilter.darwinui.sample.pages.MultiSelectPage
+import io.github.kdroidfilter.darwinui.sample.pages.PageControlPage
 import io.github.kdroidfilter.darwinui.sample.pages.PopoverPage
 import io.github.kdroidfilter.darwinui.sample.pages.PopupButtonPage
 import io.github.kdroidfilter.darwinui.sample.pages.ProgressPage
@@ -143,6 +145,7 @@ private data class SidebarEntryDef(val id: String, val label: String, val group:
 
 private val sidebarEntryDefs = listOf(
     SidebarEntryDef("button", "Button", "FORM CONTROLS", Lucide.MousePointerClick),
+    SidebarEntryDef("iconbutton", "Icon Button", "FORM CONTROLS", Lucide.CircleDot),
     SidebarEntryDef("input", "Input", "FORM CONTROLS", Lucide.TextCursorInput),
     SidebarEntryDef("textarea", "Textarea", "FORM CONTROLS", Lucide.TextAlignStart),
     SidebarEntryDef("checkbox", "Checkbox", "FORM CONTROLS", Lucide.SquareCheck),
@@ -165,6 +168,7 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("avatar", "Avatar", "DATA DISPLAY", Lucide.CircleUser),
     SidebarEntryDef("card", "Card", "DATA DISPLAY", Lucide.CreditCard),
     SidebarEntryDef("table", "Table", "DATA DISPLAY", Lucide.Table),
+    SidebarEntryDef("pagecontrol", "Page Control", "DATA DISPLAY", Lucide.CircleDot),
     SidebarEntryDef("progress", "Progress", "DATA DISPLAY", Lucide.Loader),
     SidebarEntryDef("skeleton", "Skeleton", "DATA DISPLAY", Lucide.Scan),
     SidebarEntryDef("alert", "Alert", "FEEDBACK", Lucide.TriangleAlert),
@@ -429,6 +433,7 @@ fun App() {
                 ) {
                     when (selectedPage) {
                         "button" -> ButtonPage()
+                        "iconbutton" -> IconButtonPage()
                         "input" -> InputPage()
                         "searchinput" -> SearchInputPage()
                         "textarea" -> TextAreaPage()
@@ -448,6 +453,7 @@ fun App() {
                         "avatar" -> AvatarPage()
                         "card" -> CardPage()
                         "table" -> TablePage()
+                        "pagecontrol" -> PageControlPage()
                         "progress" -> ProgressPage()
                         "skeleton" -> SkeletonPage()
                         "alert" -> AlertPage()
