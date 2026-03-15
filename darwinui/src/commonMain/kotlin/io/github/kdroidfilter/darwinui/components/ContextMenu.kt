@@ -478,6 +478,16 @@ fun ContextMenuShortcut(
     )
 }
 
+private fun String.webKeyLabel(): String = when (this) {
+    "⌫" -> "Del"
+    "⌦" -> "Fwd Del"
+    "⏎", "↩" -> "Return"
+    "⇥" -> "Tab"
+    "⎋" -> "Esc"
+    "␣" -> "Space"
+    else -> this
+}
+
 private fun buildShortcutText(
     key: String,
     command: Boolean,
@@ -493,23 +503,25 @@ private fun buildShortcutText(
         append(key)
     }
 } else if (isApplePlatform) {
+    val webKey = key.webKeyLabel()
     val modifiers = buildList {
         if (control) add("Ctrl")
         if (option) add("Opt")
         if (shift) add("Shift")
         if (command) add("Cmd")
     }
-    if (modifiers.isEmpty()) key
-    else modifiers.joinToString("+", postfix = "+$key")
+    if (modifiers.isEmpty()) webKey
+    else modifiers.joinToString("+", postfix = "+$webKey")
 } else {
+    val webKey = key.webKeyLabel()
     val modifiers = buildList {
         if (control) add("Ctrl")
         if (command) add("Ctrl")
         if (option) add("Alt")
         if (shift) add("Shift")
     }
-    if (modifiers.isEmpty()) key
-    else modifiers.joinToString("+", postfix = "+$key")
+    if (modifiers.isEmpty()) webKey
+    else modifiers.joinToString("+", postfix = "+$webKey")
 }
 
 @Preview
