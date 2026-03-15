@@ -1,5 +1,6 @@
 [versions]
 agp = "8.12.0"
+kotlinMath = "1.7.0"
 liquid = "1.1.1"
 android-compileSdk = "36"
 android-minSdk = "24"
@@ -24,6 +25,7 @@ kotlinx-datetime = "0.7.1"
 ksp = "2.3.1"
 
 [libraries]
+kotlin-math = { module = "dev.romainguy:kotlin-math", version.ref = "kotlinMath" }
 liquid = { module = "io.github.fletchmckee.liquid:liquid", version.ref = "liquid" }
 highlights = { module = "dev.snipme:highlights", version.ref = "highlights" }
 icons-lucide-cmp = { module = "com.composables:icons-lucide-cmp", version.ref = "iconsLucideCmp" }

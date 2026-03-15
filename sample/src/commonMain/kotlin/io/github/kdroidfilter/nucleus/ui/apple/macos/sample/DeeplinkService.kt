@@ -20,7 +20,7 @@ class DeeplinkService {
 
         fun urlToPage(url: String): String {
             val hash = url.substringAfter("#/", "")
-            return if (hash in validPages) hash else "button"
+            return if (hash in validPages) hash else "home"
         }
     }
 }

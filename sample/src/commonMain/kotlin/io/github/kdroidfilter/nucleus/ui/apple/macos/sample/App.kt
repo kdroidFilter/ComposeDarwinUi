@@ -90,6 +90,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ToolbarSearchFie
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.rememberToastState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
+import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideHome
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideMoon
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSettings
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSun
@@ -98,6 +99,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.extended.IconsExtende
 import androidx.compose.ui.platform.LocalUriHandler
 import com.composables.icons.lucide.Github
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AddressBarPage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.HomePage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AccordionPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AlertPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AvatarPage
@@ -153,6 +155,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.vibrant
 internal data class SidebarEntryDef(val id: String, val label: String, val group: String, val icon: ImageVector)
 
 internal val sidebarEntryDefs = listOf(
+    SidebarEntryDef("home", "Home", "GENERAL", LucideHome),
     SidebarEntryDef("button", "Button", "FORM CONTROLS", Lucide.MousePointerClick),
     SidebarEntryDef("iconbutton", "Icon Button", "FORM CONTROLS", Lucide.CircleDot),
     SidebarEntryDef("input", "Input", "FORM CONTROLS", Lucide.TextCursorInput),
@@ -242,7 +245,7 @@ fun App(deeplinkService: DeeplinkService = DeeplinkService()) {
         val currentIndex = sidebarEntryDefs.indexOfFirst { it.id == selectedPage }
         val canGoBack = currentIndex > 0
         val canGoForward = currentIndex < sidebarEntryDefs.lastIndex
-        val currentPageLabel = sidebarEntryDefs.getOrNull(currentIndex)?.label ?: ""
+        val currentPageLabel = if (selectedPage == "home") "Home" else sidebarEntryDefs.getOrNull(currentIndex)?.label ?: ""
 
         val sidebarItems = sidebarEntryDefs.map { def ->
             SidebarItem(
@@ -452,6 +455,7 @@ fun App(deeplinkService: DeeplinkService = DeeplinkService()) {
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                 ) {
                     when (selectedPage) {
+                        "home" -> HomePage(onNavigate = { selectedPage = it })
                         "button" -> ButtonPage()
                         "iconbutton" -> IconButtonPage()
                         "input" -> InputPage()
