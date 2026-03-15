@@ -246,8 +246,9 @@ fun Sidebar(
                     for (i in 1..steps) {
                         val expand = maxExpand * (i.toFloat() / steps)
                         val alpha = baseAlpha * ((steps - i + 1).toFloat() / steps)
+                        val shadowBase = if (isDark) Color.White else Color.Black
                         drawRoundRect(
-                            color = Color.Black.copy(alpha = alpha),
+                            color = shadowBase.copy(alpha = alpha),
                             topLeft = Offset(-expand, -expand),
                             size = Size(size.width + expand * 2, size.height + expand * 2),
                             cornerRadius = CornerRadius(cornerRad + expand),
@@ -546,11 +547,11 @@ private fun DisclosureItem(
                 ) { expanded = !expanded },
             contentAlignment = Alignment.Center,
         ) {
-            // Sketch: disclosure chevron 11sp, #00000040
             Icon(
                 LucideChevronRight,
                 modifier = Modifier.size(12.dp),
-                tint = Color.Black.copy(alpha = 0.25f),
+                tint = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.25f)
+                    else Color.Black.copy(alpha = 0.25f),
             )
         }
 
@@ -629,8 +630,8 @@ private fun GroupHeader(text: String, isCollapsed: Boolean, controlSize: Control
         animationSpec = sidebarSpring(),
     )
 
-    // Sketch: header text color = #00000080
-    val headerColor = Color.Black.copy(alpha = 0.50f)
+    val headerColor = if (DarwinTheme.colorScheme.isDark) Color.White.copy(alpha = 0.50f)
+        else Color.Black.copy(alpha = 0.50f)
     // Sketch: Large=13sp, Medium/Small=11sp
     val headerStyle = when (controlSize) {
         ControlSize.Large, ControlSize.ExtraLarge -> typography.caption1
