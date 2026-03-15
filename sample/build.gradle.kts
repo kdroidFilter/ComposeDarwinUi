@@ -58,6 +58,8 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.compose.nav3)
+            implementation(libs.androidx.lifecycle.viewmodel.nav3)
             implementation(libs.kotlinx.datetime)
             implementation(libs.highlights)
             implementation(libs.icons.lucide.cmp)
@@ -71,6 +73,9 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.kotlinx.datetime)
+        }
+        webMain.dependencies {
+            implementation(libs.navigation3.browser)
         }
     }
 }

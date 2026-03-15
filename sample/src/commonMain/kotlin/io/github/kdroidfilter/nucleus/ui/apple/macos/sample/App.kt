@@ -3,6 +3,7 @@ package io.github.kdroidfilter.nucleus.ui.apple.macos.sample
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,41 +23,42 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.composables.icons.lucide.Calendar
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
 import com.composables.icons.lucide.Bell
+import com.composables.icons.lucide.Calendar
 import com.composables.icons.lucide.ChevronsUpDown
 import com.composables.icons.lucide.CircleDot
 import com.composables.icons.lucide.CircleUser
 import com.composables.icons.lucide.Columns3
 import com.composables.icons.lucide.CreditCard
 import com.composables.icons.lucide.Ellipsis
-import com.composables.icons.lucide.ListChecks
+import com.composables.icons.lucide.Github
+import com.composables.icons.lucide.GripVertical
 import com.composables.icons.lucide.LayoutList
+import com.composables.icons.lucide.ListChecks
 import com.composables.icons.lucide.Loader
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Menu
 import com.composables.icons.lucide.MessageCircle
 import com.composables.icons.lucide.MessageSquare
 import com.composables.icons.lucide.MousePointerClick
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucidePanelLeft
 import com.composables.icons.lucide.PanelTopOpen
 import com.composables.icons.lucide.Scan
 import com.composables.icons.lucide.Search
-import com.composables.icons.lucide.GripVertical
 import com.composables.icons.lucide.SlidersHorizontal
 import com.composables.icons.lucide.SquareCheck
 import com.composables.icons.lucide.SquareDashed
@@ -67,62 +69,63 @@ import com.composables.icons.lucide.TextCursorInput
 import com.composables.icons.lucide.ToggleLeft
 import com.composables.icons.lucide.TriangleAlert
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ColumnVisibility
-import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Scaffold
-import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TrackClickBehavior
-import io.github.kdroidfilter.nucleus.ui.apple.macos.components.VerticalScrollbar
-import io.github.kdroidfilter.nucleus.ui.apple.macos.components.rememberScrollbarState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.NavigationButtons
-import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SidebarButton
-import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TitleBarButtonGroup
-import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TitleBarGroupButton
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Popover
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.PopoverPlacement
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Scaffold
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchSuggestionHeader
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchSuggestionItem
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchSuggestionSeparator
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SegmentedControl
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Sidebar
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SidebarButton
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SidebarItem
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Switch
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TitleBar
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TitleBarButtonGroup
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TitleBarGroupButton
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ToastHost
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ToolbarSearchField
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TrackClickBehavior
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.VerticalScrollbar
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.rememberScrollbarState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.rememberToastState
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
+import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideHome
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideMoon
+import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucidePanelLeft
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSettings
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSun
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.extended.ExternalLink
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.extended.IconsExtended
-import androidx.compose.ui.platform.LocalUriHandler
-import com.composables.icons.lucide.Github
-import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AddressBarPage
-import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.HomePage
-import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.GettingStartedPage
-import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.LicensePage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AccordionPage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AddressBarPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AlertPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AvatarPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.BadgePage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.ButtonPage
-import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.IconButtonPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.CardPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.CheckboxPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.CircularSliderPage
-import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.ComboBoxPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.ColorWellPage
-import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.DatePickerPage
-import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.ControlSizePage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.ComboBoxPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.ContextMenuPage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.ControlSizePage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.DatePickerPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.DialogPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.DropdownMenuPage
-import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.MaterialPage
-import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.GroupBoxPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.FormPage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.GettingStartedPage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.GroupBoxPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.GroupedListPage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.HomePage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.IconButtonPage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.IconsPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.InputPage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.LicensePage
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.MaterialPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.MultiSelectPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.PageControlPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.PopoverPage
@@ -144,12 +147,10 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.TextAreaPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.TitleBarPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.ToastPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.TooltipPage
-import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.IconsPage
-import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Switch
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.AccentColor
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.ControlSize
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.GlassType
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.VibrantColors
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.vibrant
 
@@ -207,7 +208,7 @@ internal val sidebarEntryDefs = listOf(
 )
 
 @Composable
-fun App(deeplinkService: DeeplinkService = DeeplinkService()) {
+fun App() {
     val systemTheme = isSystemInDarkTheme()
     var isDark by remember { mutableStateOf(systemTheme) }
     var accentColor by remember { mutableStateOf(AccentColor.Blue) }
@@ -229,15 +230,15 @@ fun App(deeplinkService: DeeplinkService = DeeplinkService()) {
 
     MacosTheme(darkTheme = isDark, accentColor = accentColor, colorScheme = colorScheme, glassType = glassType) {
         val toastState = rememberToastState()
-        val deepLink by deeplinkService.deepLink.collectAsState()
-        var selectedPage by remember { mutableStateOf(DeeplinkService.urlToPage(deepLink)) }
 
-        LaunchedEffect(deepLink) {
-            val page = DeeplinkService.urlToPage(deepLink)
-            if (page != selectedPage) selectedPage = page
-        }
+        // Navigation state — back stack + forward stack for browser-like history
+        val backStack = remember { mutableStateListOf<AppNavKey>(HomeScreen) }
+        val forwardStack = remember { mutableStateListOf<AppNavKey>() }
+        val nav = remember { NavigationState(backStack, forwardStack) }
 
-        BrowserNavigation(selectedPage)
+        // On web, ChronologicalBrowserNavigation syncs URL ↔ back stack
+        // On other platforms, this is a no-op
+        BrowserNavigation(backStack)
 
         var searchQuery by remember { mutableStateOf("") }
         var searchExpanded by remember { mutableStateOf(false) }
@@ -246,15 +247,12 @@ fun App(deeplinkService: DeeplinkService = DeeplinkService()) {
         var settingsExpanded by remember { mutableStateOf(false) }
 
         // Navigation helpers
-        val currentIndex = sidebarEntryDefs.indexOfFirst { it.id == selectedPage }
-        val canGoBack = currentIndex > 0
-        val canGoForward = currentIndex < sidebarEntryDefs.lastIndex
-        val currentPageLabel = if (selectedPage == "home") "Home" else sidebarEntryDefs.getOrNull(currentIndex)?.label ?: ""
+        val currentPageLabel = sidebarEntryDefs.firstOrNull { it.id == nav.currentPageId }?.label ?: ""
 
         val sidebarItems = sidebarEntryDefs.map { def ->
             SidebarItem(
                 label = def.label,
-                onClick = { selectedPage = def.id },
+                onClick = { nav.navigateTo(def.id) },
                 icon = def.icon,
                 group = def.group,
                 id = def.id,
@@ -269,7 +267,7 @@ fun App(deeplinkService: DeeplinkService = DeeplinkService()) {
                     ControlSize(sidebarControlSize) {
                         Sidebar(
                             items = sidebarItems,
-                            activeItem = selectedPage,
+                            activeItem = nav.currentPageId,
                             showBorder = false,
                             collapsed = sidebarCollapsed,
                             onCollapsedChange = { sidebarCollapsed = it },
@@ -309,14 +307,10 @@ fun App(deeplinkService: DeeplinkService = DeeplinkService()) {
                         glass = true,
                         navigationActions = {
                             NavigationButtons(
-                                onBack = {
-                                    if (canGoBack) selectedPage = sidebarEntryDefs[currentIndex - 1].id
-                                },
-                                onForward = {
-                                    if (canGoForward) selectedPage = sidebarEntryDefs[currentIndex + 1].id
-                                },
-                                backEnabled = canGoBack,
-                                forwardEnabled = canGoForward,
+                                onBack = { nav.goBack() },
+                                onForward = { nav.goForward() },
+                                backEnabled = nav.canGoBack,
+                                forwardEnabled = nav.canGoForward,
                             )
                         },
                         title = { Text(currentPageLabel) },
@@ -419,7 +413,7 @@ fun App(deeplinkService: DeeplinkService = DeeplinkService()) {
                                         it.label.lowercase().contains(query.lowercase().trim())
                                     }
                                     if (match != null) {
-                                        selectedPage = match.id
+                                        nav.navigateTo(match.id)
                                         searchQuery = ""
                                         searchExpanded = false
                                     }
@@ -434,7 +428,7 @@ fun App(deeplinkService: DeeplinkService = DeeplinkService()) {
                                         SearchSuggestionHeader(group)
                                         items.forEach { def ->
                                             SearchSuggestionItem(onClick = {
-                                                selectedPage = def.id
+                                                nav.navigateTo(def.id)
                                                 searchQuery = ""
                                                 searchExpanded = false
                                             }) {
@@ -448,78 +442,111 @@ fun App(deeplinkService: DeeplinkService = DeeplinkService()) {
                     )
                 },
             ) { contentPadding ->
-                val contentScrollState = rememberScrollState()
-                Box(modifier = Modifier.fillMaxSize()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(contentScrollState)
-                        .padding(contentPadding)
-                        .padding(horizontal = 40.dp, vertical = 40.dp),
-                    verticalArrangement = Arrangement.spacedBy(24.dp),
-                ) {
-                    when (selectedPage) {
-                        "home" -> HomePage(onNavigate = { selectedPage = it })
-                        "getting-started" -> GettingStartedPage()
-                        "license" -> LicensePage()
-                        "button" -> ButtonPage()
-                        "iconbutton" -> IconButtonPage()
-                        "input" -> InputPage()
-                        "searchinput" -> SearchInputPage()
-                        "textarea" -> TextAreaPage()
-                        "checkbox" -> CheckboxPage()
-                        "radiobutton" -> RadioButtonPage()
-                        "switch" -> SwitchPage()
-                        "combobox" -> ComboBoxPage()
-                        "multiselect" -> MultiSelectPage()
-                        "slider" -> SliderPage()
-                        "circularslider" -> CircularSliderPage()
-                        "stepper" -> StepperPage()
-                        "scrollbar" -> ScrollbarPage()
-                        "groupbox" -> GroupBoxPage()
-                        "groupedlist" -> GroupedListPage()
-                        "form" -> FormPage()
-                        "badge" -> BadgePage()
-                        "avatar" -> AvatarPage()
-                        "card" -> CardPage()
-                        "table" -> TablePage()
-                        "pagecontrol" -> PageControlPage()
-                        "progress" -> ProgressPage()
-                        "skeleton" -> SkeletonPage()
-                        "alert" -> AlertPage()
-                        "toast" -> ToastPage(toastState)
-                        "dialog" -> DialogPage()
-                        "tooltip" -> TooltipPage()
-                        "popover" -> PopoverPage()
-                        "dropdown" -> DropdownMenuPage()
-                        "contextmenu" -> ContextMenuPage()
-                        "tabs" -> TabsPage()
-                        "accordion" -> AccordionPage()
-                        "sidebar" -> SidebarPage()
-                        "segmentedcontrol" -> SegmentedControlPage()
-                        "titlebar" -> TitleBarPage()
-                        "addressbar" -> AddressBarPage()
-                        "scaffold" -> ScaffoldPage()
-                        "popupbutton" -> PopupButtonPage()
-                        "datepicker" -> DatePickerPage()
-                        "colorwell" -> ColorWellPage()
-                        "icons" -> IconsPage()
-                        "material" -> MaterialPage()
-                        "controlsize" -> ControlSizePage()
-                    }
-                    Spacer(modifier = Modifier.height(48.dp))
-                }
-                VerticalScrollbar(
-                    state = rememberScrollbarState(contentScrollState),
-                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-                    showOnEdgeHover = true,
-                    trackClickBehavior = TrackClickBehavior.Jump,
+                // NavDisplay renders the current page from the back stack
+                NavDisplay(
+                    backStack = backStack,
+                    modifier = Modifier.fillMaxSize(),
+                    onBack = { nav.goBack() },
+                    entryProvider = entryProvider {
+                        entry<HomeScreen> {
+                            ScrollablePageContent(contentPadding) {
+                                HomePage(onNavigate = { nav.navigateTo(it) })
+                            }
+                        }
+
+                        entry<PageScreen> { screen ->
+                            ScrollablePageContent(contentPadding) {
+                                PageContent(screen.id, toastState)
+                            }
+                        }
+                    },
                 )
-                } // Box
             }
 
             ToastHost(state = toastState)
         }
+    }
+}
+
+@Composable
+private fun ScrollablePageContent(
+    contentPadding: androidx.compose.foundation.layout.PaddingValues,
+    content: @Composable () -> Unit,
+) {
+    val contentScrollState = rememberScrollState()
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(contentScrollState)
+                .padding(contentPadding)
+                .padding(horizontal = 40.dp, vertical = 40.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+        ) {
+            content()
+            Spacer(modifier = Modifier.height(48.dp))
+        }
+        VerticalScrollbar(
+            state = rememberScrollbarState(contentScrollState),
+            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+            showOnEdgeHover = true,
+            trackClickBehavior = TrackClickBehavior.Jump,
+        )
+    }
+}
+
+@Composable
+private fun PageContent(
+    pageId: String,
+    toastState: io.github.kdroidfilter.nucleus.ui.apple.macos.components.ToastState,
+) {
+    when (pageId) {
+        "getting-started" -> GettingStartedPage()
+        "license" -> LicensePage()
+        "button" -> ButtonPage()
+        "iconbutton" -> IconButtonPage()
+        "input" -> InputPage()
+        "searchinput" -> SearchInputPage()
+        "textarea" -> TextAreaPage()
+        "checkbox" -> CheckboxPage()
+        "radiobutton" -> RadioButtonPage()
+        "switch" -> SwitchPage()
+        "combobox" -> ComboBoxPage()
+        "multiselect" -> MultiSelectPage()
+        "slider" -> SliderPage()
+        "circularslider" -> CircularSliderPage()
+        "stepper" -> StepperPage()
+        "scrollbar" -> ScrollbarPage()
+        "groupbox" -> GroupBoxPage()
+        "groupedlist" -> GroupedListPage()
+        "form" -> FormPage()
+        "badge" -> BadgePage()
+        "avatar" -> AvatarPage()
+        "card" -> CardPage()
+        "table" -> TablePage()
+        "pagecontrol" -> PageControlPage()
+        "progress" -> ProgressPage()
+        "skeleton" -> SkeletonPage()
+        "alert" -> AlertPage()
+        "toast" -> ToastPage(toastState)
+        "dialog" -> DialogPage()
+        "tooltip" -> TooltipPage()
+        "popover" -> PopoverPage()
+        "dropdown" -> DropdownMenuPage()
+        "contextmenu" -> ContextMenuPage()
+        "tabs" -> TabsPage()
+        "accordion" -> AccordionPage()
+        "sidebar" -> SidebarPage()
+        "segmentedcontrol" -> SegmentedControlPage()
+        "titlebar" -> TitleBarPage()
+        "addressbar" -> AddressBarPage()
+        "scaffold" -> ScaffoldPage()
+        "popupbutton" -> PopupButtonPage()
+        "datepicker" -> DatePickerPage()
+        "colorwell" -> ColorWellPage()
+        "icons" -> IconsPage()
+        "material" -> MaterialPage()
+        "controlsize" -> ControlSizePage()
     }
 }
 
@@ -555,4 +582,4 @@ private fun AccentColorPicker(
 }
 
 @Composable
-internal expect fun BrowserNavigation(currentPage: String)
+internal expect fun BrowserNavigation(backStack: androidx.compose.runtime.snapshots.SnapshotStateList<AppNavKey>)
