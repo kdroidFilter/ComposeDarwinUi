@@ -1077,3 +1077,200 @@ data class TimePickerStyle(
         }
     }
 }
+
+// ===========================================================================
+// DatePickerStyle — calendar date picker sizing
+// ===========================================================================
+
+@Immutable
+data class DatePickerStyle(
+    val metrics: Metrics = Metrics(),
+) {
+    @Immutable
+    data class Metrics(
+        val disabledAlpha: Float = 0.45f,
+    ) {
+        // -- Container --------------------------------------------------------
+
+        /** Width of the calendar container */
+        fun containerWidthFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 230.dp
+            ControlSize.Small -> 290.dp
+            ControlSize.Regular -> 370.dp
+            ControlSize.Large -> 430.dp
+            ControlSize.ExtraLarge -> 510.dp
+        }
+
+        /** Horizontal padding inside the container */
+        fun containerPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 8.dp
+            ControlSize.Small -> 12.dp
+            ControlSize.Regular -> 16.dp
+            ControlSize.Large -> 20.dp
+            ControlSize.ExtraLarge -> 24.dp
+        }
+
+        /** Corner radius of the container */
+        fun containerCornerRadiusFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 8.dp
+            ControlSize.Small -> 10.dp
+            ControlSize.Regular -> 13.dp
+            ControlSize.Large -> 16.dp
+            ControlSize.ExtraLarge -> 18.dp
+        }
+
+        // -- Calendar header --------------------------------------------------
+
+        /** Height of the header row */
+        fun headerHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 26.dp
+            ControlSize.Small -> 32.dp
+            ControlSize.Regular -> 40.dp
+            ControlSize.Large -> 48.dp
+            ControlSize.ExtraLarge -> 56.dp
+        }
+
+        /** Font size for the month/year title */
+        fun headerTitleFontSizeFor(controlSize: ControlSize): TextUnit = when (controlSize) {
+            ControlSize.Mini -> 11.sp
+            ControlSize.Small -> 14.sp
+            ControlSize.Regular -> 17.sp
+            ControlSize.Large -> 20.sp
+            ControlSize.ExtraLarge -> 24.sp
+        }
+
+        /** Size of the title chevron icon */
+        fun headerChevronSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 9.dp
+            ControlSize.Small -> 11.dp
+            ControlSize.Regular -> 13.dp
+            ControlSize.Large -> 16.dp
+            ControlSize.ExtraLarge -> 18.dp
+        }
+
+        /** Size of the navigation arrow icons */
+        fun navArrowSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 14.dp
+            ControlSize.Small -> 16.dp
+            ControlSize.Regular -> 20.dp
+            ControlSize.Large -> 24.dp
+            ControlSize.ExtraLarge -> 28.dp
+        }
+
+        /** Spacing between navigation arrows */
+        fun navArrowSpacingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 10.dp
+            ControlSize.Small -> 12.dp
+            ControlSize.Regular -> 16.dp
+            ControlSize.Large -> 20.dp
+            ControlSize.ExtraLarge -> 24.dp
+        }
+
+        // -- Day cells --------------------------------------------------------
+
+        /** Size of each day cell (square) */
+        fun dayCellSizeFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 26.dp
+            ControlSize.Small -> 34.dp
+            ControlSize.Regular -> 44.dp
+            ControlSize.Large -> 52.dp
+            ControlSize.ExtraLarge -> 62.dp
+        }
+
+        /** Font size for unselected day numbers */
+        fun dayFontSizeFor(controlSize: ControlSize): TextUnit = when (controlSize) {
+            ControlSize.Mini -> 12.sp
+            ControlSize.Small -> 16.sp
+            ControlSize.Regular -> 20.sp
+            ControlSize.Large -> 24.sp
+            ControlSize.ExtraLarge -> 28.sp
+        }
+
+        /** Font size for the selected day number */
+        fun daySelectedFontSizeFor(controlSize: ControlSize): TextUnit = when (controlSize) {
+            ControlSize.Mini -> 14.sp
+            ControlSize.Small -> 18.sp
+            ControlSize.Regular -> 24.sp
+            ControlSize.Large -> 28.sp
+            ControlSize.ExtraLarge -> 32.sp
+        }
+
+        // -- Day-of-week headers ----------------------------------------------
+
+        /** Height of the day-of-week header row cells */
+        fun dayHeaderHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 12.dp
+            ControlSize.Small -> 14.dp
+            ControlSize.Regular -> 18.dp
+            ControlSize.Large -> 22.dp
+            ControlSize.ExtraLarge -> 26.dp
+        }
+
+        /** Font size for day-of-week labels */
+        fun dayHeaderFontSizeFor(controlSize: ControlSize): TextUnit = when (controlSize) {
+            ControlSize.Mini -> 8.sp
+            ControlSize.Small -> 10.sp
+            ControlSize.Regular -> 13.sp
+            ControlSize.Large -> 15.sp
+            ControlSize.ExtraLarge -> 18.sp
+        }
+
+        // -- Month / Year grid ------------------------------------------------
+
+        /** Width of month/year grid cells */
+        fun gridCellWidthFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 44.dp
+            ControlSize.Small -> 56.dp
+            ControlSize.Regular -> 72.dp
+            ControlSize.Large -> 84.dp
+            ControlSize.ExtraLarge -> 100.dp
+        }
+
+        /** Height of month/year grid cells */
+        fun gridCellHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 26.dp
+            ControlSize.Small -> 32.dp
+            ControlSize.Regular -> 40.dp
+            ControlSize.Large -> 48.dp
+            ControlSize.ExtraLarge -> 56.dp
+        }
+
+        /** Font size for month/year grid cell text */
+        fun gridCellFontSizeFor(controlSize: ControlSize): TextUnit = when (controlSize) {
+            ControlSize.Mini -> 10.sp
+            ControlSize.Small -> 12.sp
+            ControlSize.Regular -> 14.sp
+            ControlSize.Large -> 17.sp
+            ControlSize.ExtraLarge -> 20.sp
+        }
+
+        /** Corner radius of month/year grid cells */
+        fun gridCellCornerRadiusFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 5.dp
+            ControlSize.Small -> 6.dp
+            ControlSize.Regular -> 8.dp
+            ControlSize.Large -> 10.dp
+            ControlSize.ExtraLarge -> 12.dp
+        }
+
+        /** Vertical spacing between grid rows */
+        fun gridRowSpacingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 4.dp
+            ControlSize.Small -> 6.dp
+            ControlSize.Regular -> 8.dp
+            ControlSize.Large -> 10.dp
+            ControlSize.ExtraLarge -> 12.dp
+        }
+
+        // -- Calendar grid spacing --------------------------------------------
+
+        /** Vertical spacing between calendar day rows */
+        fun calendarRowSpacingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 1.dp
+            ControlSize.Small -> 1.dp
+            ControlSize.Regular -> 2.dp
+            ControlSize.Large -> 3.dp
+            ControlSize.ExtraLarge -> 4.dp
+        }
+    }
+}

@@ -48,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
@@ -59,6 +60,8 @@ import io.github.kdroidfilter.darwinui.icons.LucideChevronLeft
 import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
 import io.github.kdroidfilter.darwinui.theme.darwinGlass
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
+import io.github.kdroidfilter.darwinui.theme.ControlSize
+import io.github.kdroidfilter.darwinui.theme.DatePickerStyle
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinLiquidState
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
@@ -100,16 +103,28 @@ fun DatePicker(
     enabled: Boolean = true,
     useGlass: Boolean = false,
 ) {
+    val controlSize = LocalControlSize.current
+    val metrics = DarwinTheme.componentStyling.datePicker.metrics
+
     var displayedYear by remember(value) { mutableStateOf(value.year) }
     var displayedMonth by remember(value) { mutableStateOf(value.month) }
     var calendarView by remember { mutableStateOf(CalendarView.Calendar) }
 
-    PickerContainer(modifier = modifier.width(370.dp).then(if (!enabled) Modifier.alpha(0.45f) else Modifier), useGlass = useGlass) {
+    PickerContainer(
+        modifier = modifier
+            .width(metrics.containerWidthFor(controlSize))
+            .then(if (!enabled) Modifier.alpha(metrics.disabledAlpha) else Modifier),
+        useGlass = useGlass,
+        cornerRadius = metrics.containerCornerRadiusFor(controlSize),
+        horizontalPadding = metrics.containerPaddingFor(controlSize),
+    ) {
         CalendarHeader(
             year = displayedYear,
             month = displayedMonth,
             enabled = enabled,
             calendarView = calendarView,
+            metrics = metrics,
+            controlSize = controlSize,
             onTitleClick = {
                 if (enabled) calendarView = when (calendarView) {
                     CalendarView.Calendar -> CalendarView.MonthGrid
@@ -142,6 +157,8 @@ fun DatePicker(
             CalendarView.YearGrid -> YearGrid(
                 centerYear = displayedYear,
                 selectedYear = displayedYear,
+                metrics = metrics,
+                controlSize = controlSize,
                 onYearSelected = { year ->
                     displayedYear = year
                     calendarView = CalendarView.MonthGrid
@@ -149,6 +166,8 @@ fun DatePicker(
             )
             CalendarView.MonthGrid -> MonthYearGrid(
                 selectedMonth = displayedMonth,
+                metrics = metrics,
+                controlSize = controlSize,
                 onMonthSelected = { month ->
                     displayedMonth = month
                     calendarView = CalendarView.Calendar
@@ -159,6 +178,8 @@ fun DatePicker(
                 month = displayedMonth,
                 selectedDate = value,
                 enabled = enabled,
+                metrics = metrics,
+                controlSize = controlSize,
                 onDateSelected = onValueChange,
             )
         }
@@ -231,17 +252,27 @@ fun DateTimePicker(
     is24Hour: Boolean = false,
     timeLabel: String = "Time",
 ) {
+    val controlSize = LocalControlSize.current
+    val dateMetrics = DarwinTheme.componentStyling.datePicker.metrics
+
     var displayedYear by remember(value) { mutableStateOf(value.date.year) }
     var displayedMonth by remember(value) { mutableStateOf(value.date.month) }
     var calendarView by remember { mutableStateOf(CalendarView.Calendar) }
-    val disabledAlpha = DarwinTheme.componentStyling.timePicker.metrics.disabledAlpha
 
-    PickerContainer(modifier = modifier.width(370.dp).then(if (!enabled) Modifier.alpha(disabledAlpha) else Modifier)) {
+    PickerContainer(
+        modifier = modifier
+            .width(dateMetrics.containerWidthFor(controlSize))
+            .then(if (!enabled) Modifier.alpha(dateMetrics.disabledAlpha) else Modifier),
+        cornerRadius = dateMetrics.containerCornerRadiusFor(controlSize),
+        horizontalPadding = dateMetrics.containerPaddingFor(controlSize),
+    ) {
         CalendarHeader(
             year = displayedYear,
             month = displayedMonth,
             enabled = enabled,
             calendarView = calendarView,
+            metrics = dateMetrics,
+            controlSize = controlSize,
             onTitleClick = {
                 if (enabled) calendarView = when (calendarView) {
                     CalendarView.Calendar -> CalendarView.MonthGrid
@@ -274,6 +305,8 @@ fun DateTimePicker(
             CalendarView.YearGrid -> YearGrid(
                 centerYear = displayedYear,
                 selectedYear = displayedYear,
+                metrics = dateMetrics,
+                controlSize = controlSize,
                 onYearSelected = { year ->
                     displayedYear = year
                     calendarView = CalendarView.MonthGrid
@@ -281,6 +314,8 @@ fun DateTimePicker(
             )
             CalendarView.MonthGrid -> MonthYearGrid(
                 selectedMonth = displayedMonth,
+                metrics = dateMetrics,
+                controlSize = controlSize,
                 onMonthSelected = { month ->
                     displayedMonth = month
                     calendarView = CalendarView.Calendar
@@ -291,6 +326,8 @@ fun DateTimePicker(
                 month = displayedMonth,
                 selectedDate = value.date,
                 enabled = enabled,
+                metrics = dateMetrics,
+                controlSize = controlSize,
                 onDateSelected = { date -> onValueChange(LocalDateTime(date, value.time)) },
             )
         }
@@ -322,10 +359,12 @@ fun DateTimePicker(
 private fun PickerContainer(
     modifier: Modifier = Modifier,
     useGlass: Boolean = false,
+    cornerRadius: Dp = 13.dp,
+    horizontalPadding: Dp = 16.dp,
     content: @Composable () -> Unit,
 ) {
     val isDark = DarwinTheme.colorScheme.isDark
-    val shape = RoundedCornerShape(13.dp)
+    val shape = RoundedCornerShape(cornerRadius)
     val fallbackBg = if (isDark) Color(0xFF121212) else Color(0xFFFAFAFA)
     val shadowColor = if (isDark) Color.Black.copy(alpha = 0.16f) else Color.Black.copy(alpha = 0.12f)
     val borderColor = if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.08f)
@@ -349,7 +388,7 @@ private fun PickerContainer(
                         .background(fallbackBg, shape)
                 },
             )
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = horizontalPadding),
     ) {
         content()
     }
@@ -369,6 +408,8 @@ private fun CalendarHeader(
     month: Month,
     enabled: Boolean,
     calendarView: CalendarView,
+    metrics: DatePickerStyle.Metrics,
+    controlSize: ControlSize,
     onTitleClick: () -> Unit,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
@@ -388,7 +429,7 @@ private fun CalendarHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(40.dp),
+            .height(metrics.headerHeightFor(controlSize)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Title — clickable to cycle views: Calendar → MonthGrid → YearGrid
@@ -407,13 +448,13 @@ private fun CalendarHeader(
             Text(
                 text = titleText,
                 color = textPrimary,
-                fontSize = 17.sp,
+                fontSize = metrics.headerTitleFontSizeFor(controlSize),
                 fontWeight = FontWeight.Bold,
             )
             Spacer(Modifier.width(4.dp))
             Icon(
                 imageVector = if (calendarView != CalendarView.Calendar) LucideChevronDown else LucideChevronRight,
-                modifier = Modifier.size(13.dp),
+                modifier = Modifier.size(metrics.headerChevronSizeFor(controlSize)),
                 tint = accent,
             )
         }
@@ -422,11 +463,11 @@ private fun CalendarHeader(
 
         // Navigation arrows
         if (enabled) {
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(metrics.navArrowSpacingFor(controlSize))) {
                 Icon(
                     imageVector = LucideChevronLeft,
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(metrics.navArrowSizeFor(controlSize))
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -437,7 +478,7 @@ private fun CalendarHeader(
                 Icon(
                     imageVector = LucideChevronRight,
                     modifier = Modifier
-                        .size(20.dp)
+                        .size(metrics.navArrowSizeFor(controlSize))
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
@@ -459,14 +500,16 @@ private const val YEAR_PAGE_SIZE = 12
 @Composable
 private fun MonthYearGrid(
     selectedMonth: Month,
+    metrics: DatePickerStyle.Metrics,
+    controlSize: ControlSize,
     onMonthSelected: (Month) -> Unit,
 ) {
     val accent = DarwinTheme.colorScheme.accent
     val textPrimary = DarwinTheme.colorScheme.textPrimary
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = metrics.gridRowSpacingFor(controlSize)),
+        verticalArrangement = Arrangement.spacedBy(metrics.gridRowSpacingFor(controlSize)),
     ) {
         for (row in 0 until 3) {
             Row(
@@ -477,11 +520,14 @@ private fun MonthYearGrid(
                     val monthIndex = row * 4 + col
                     val month = Month.entries[monthIndex]
                     val isSelected = month == selectedMonth
-                    val cellShape = RoundedCornerShape(8.dp)
+                    val cellShape = RoundedCornerShape(metrics.gridCellCornerRadiusFor(controlSize))
 
                     Box(
                         modifier = Modifier
-                            .size(width = 72.dp, height = 40.dp)
+                            .size(
+                                width = metrics.gridCellWidthFor(controlSize),
+                                height = metrics.gridCellHeightFor(controlSize),
+                            )
                             .clip(cellShape)
                             .background(if (isSelected) accent else Color.Transparent, cellShape)
                             .clickable(
@@ -494,7 +540,7 @@ private fun MonthYearGrid(
                         Text(
                             text = monthShortName(month),
                             color = if (isSelected) Color.White else textPrimary,
-                            fontSize = 14.sp,
+                            fontSize = metrics.gridCellFontSizeFor(controlSize),
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                         )
                     }
@@ -512,6 +558,8 @@ private fun MonthYearGrid(
 private fun YearGrid(
     centerYear: Int,
     selectedYear: Int,
+    metrics: DatePickerStyle.Metrics,
+    controlSize: ControlSize,
     onYearSelected: (Int) -> Unit,
 ) {
     val accent = DarwinTheme.colorScheme.accent
@@ -519,8 +567,8 @@ private fun YearGrid(
     val startYear = centerYear - centerYear.mod(YEAR_PAGE_SIZE)
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = metrics.gridRowSpacingFor(controlSize)),
+        verticalArrangement = Arrangement.spacedBy(metrics.gridRowSpacingFor(controlSize)),
     ) {
         for (row in 0 until 3) {
             Row(
@@ -530,11 +578,14 @@ private fun YearGrid(
                 for (col in 0 until 4) {
                     val year = startYear + row * 4 + col
                     val isSelected = year == selectedYear
-                    val cellShape = RoundedCornerShape(8.dp)
+                    val cellShape = RoundedCornerShape(metrics.gridCellCornerRadiusFor(controlSize))
 
                     Box(
                         modifier = Modifier
-                            .size(width = 72.dp, height = 40.dp)
+                            .size(
+                                width = metrics.gridCellWidthFor(controlSize),
+                                height = metrics.gridCellHeightFor(controlSize),
+                            )
                             .clip(cellShape)
                             .background(if (isSelected) accent else Color.Transparent, cellShape)
                             .clickable(
@@ -547,7 +598,7 @@ private fun YearGrid(
                         Text(
                             text = "$year",
                             color = if (isSelected) Color.White else textPrimary,
-                            fontSize = 14.sp,
+                            fontSize = metrics.gridCellFontSizeFor(controlSize),
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                         )
                     }
@@ -571,20 +622,22 @@ private fun CalendarMonth(
     month: Month,
     selectedDate: LocalDate,
     enabled: Boolean,
+    metrics: DatePickerStyle.Metrics,
+    controlSize: ControlSize,
     onDateSelected: (LocalDate) -> Unit,
 ) {
     Column {
-        // Week day headers
-        DayOfWeekHeaders()
+        DayOfWeekHeaders(metrics = metrics, controlSize = controlSize)
 
         Spacer(Modifier.height(4.dp))
 
-        // Calendar grid
         CalendarGrid(
             year = year,
             month = month,
             selectedDate = selectedDate,
             enabled = enabled,
+            metrics = metrics,
+            controlSize = controlSize,
             onDateSelected = onDateSelected,
         )
 
@@ -593,7 +646,10 @@ private fun CalendarMonth(
 }
 
 @Composable
-private fun DayOfWeekHeaders() {
+private fun DayOfWeekHeaders(
+    metrics: DatePickerStyle.Metrics,
+    controlSize: ControlSize,
+) {
     val headerColor = DarwinTheme.colorScheme.textTertiary
     val dayLabels = listOf("SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT")
 
@@ -603,13 +659,16 @@ private fun DayOfWeekHeaders() {
     ) {
         dayLabels.forEach { label ->
             Box(
-                modifier = Modifier.size(width = 44.dp, height = 18.dp),
+                modifier = Modifier.size(
+                    width = metrics.dayCellSizeFor(controlSize),
+                    height = metrics.dayHeaderHeightFor(controlSize),
+                ),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = label,
                     color = headerColor,
-                    fontSize = 13.sp,
+                    fontSize = metrics.dayHeaderFontSizeFor(controlSize),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                 )
@@ -624,6 +683,8 @@ private fun CalendarGrid(
     month: Month,
     selectedDate: LocalDate,
     enabled: Boolean,
+    metrics: DatePickerStyle.Metrics,
+    controlSize: ControlSize,
     onDateSelected: (LocalDate) -> Unit,
 ) {
     val today = rememberToday()
@@ -632,8 +693,9 @@ private fun CalendarGrid(
     val daysCount = daysInMonth(month.number, year)
     val totalCells = startDayOfWeek + daysCount
     val weeksCount = (totalCells + 6) / 7
+    val cellSize = metrics.dayCellSizeFor(controlSize)
 
-    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(metrics.calendarRowSpacingFor(controlSize))) {
         for (week in 0 until weeksCount) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -650,11 +712,13 @@ private fun CalendarGrid(
                             isSelected = date == selectedDate,
                             isToday = date == today,
                             enabled = enabled,
+                            cellSize = cellSize,
+                            metrics = metrics,
+                            controlSize = controlSize,
                             onClick = { onDateSelected(date) },
                         )
                     } else {
-                        // Empty cell placeholder
-                        Box(Modifier.size(44.dp))
+                        Box(Modifier.size(cellSize))
                     }
                 }
             }
@@ -678,6 +742,9 @@ private fun DateCell(
     isSelected: Boolean,
     isToday: Boolean,
     enabled: Boolean,
+    cellSize: Dp,
+    metrics: DatePickerStyle.Metrics,
+    controlSize: ControlSize,
     onClick: () -> Unit,
 ) {
     val accent = DarwinTheme.colorScheme.accent
@@ -705,12 +772,12 @@ private fun DateCell(
         else -> textPrimary
     }
 
-    val fontSize = if (isSelected) 24.sp else 20.sp
+    val fontSize = if (isSelected) metrics.daySelectedFontSizeFor(controlSize) else metrics.dayFontSizeFor(controlSize)
     val fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium
 
     Box(
         modifier = Modifier
-            .size(44.dp)
+            .size(cellSize)
             .clip(CircleShape)
             .background(bgColor, CircleShape)
             .then(
