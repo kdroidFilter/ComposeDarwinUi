@@ -36,6 +36,9 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.composables.icons.lucide.Bell
@@ -443,10 +446,17 @@ fun App() {
                 },
             ) { contentPadding ->
                 // NavDisplay renders the current page from the back stack
+                val noAnimation = ContentTransform(
+                    targetContentEnter = EnterTransition.None,
+                    initialContentExit = ExitTransition.None,
+                )
                 NavDisplay(
                     backStack = backStack,
                     modifier = Modifier.fillMaxSize(),
                     onBack = { nav.goBack() },
+                    transitionSpec = { noAnimation },
+                    popTransitionSpec = { noAnimation },
+                    predictivePopTransitionSpec = { noAnimation },
                     entryProvider = entryProvider {
                         entry<HomeScreen> {
                             ScrollablePageContent(contentPadding) {
