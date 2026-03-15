@@ -64,6 +64,9 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.todayIn
 
+// Calendar navigation view state
+private enum class CalendarView { Calendar, MonthGrid, YearGrid }
+
 // ===========================================================================
 // DatePicker — macOS inline compact date picker (calendar panel)
 //
@@ -91,38 +94,59 @@ fun DatePicker(
 ) {
     var displayedYear by remember(value) { mutableStateOf(value.year) }
     var displayedMonth by remember(value) { mutableStateOf(value.month) }
-    var showMonthGrid by remember { mutableStateOf(false) }
+    var calendarView by remember { mutableStateOf(CalendarView.Calendar) }
 
     PickerContainer(modifier = modifier.then(if (!enabled) Modifier.alpha(0.45f) else Modifier)) {
         CalendarHeader(
             year = displayedYear,
             month = displayedMonth,
             enabled = enabled,
-            showMonthGrid = showMonthGrid,
-            onTitleClick = { if (enabled) showMonthGrid = !showMonthGrid },
-            onPreviousMonth = {
-                if (showMonthGrid) displayedYear-- else {
-                    val (y, m) = previousMonth(displayedYear, displayedMonth)
-                    displayedYear = y; displayedMonth = m
+            calendarView = calendarView,
+            onTitleClick = {
+                if (enabled) calendarView = when (calendarView) {
+                    CalendarView.Calendar -> CalendarView.MonthGrid
+                    CalendarView.MonthGrid -> CalendarView.YearGrid
+                    CalendarView.YearGrid -> CalendarView.Calendar
                 }
             },
-            onNextMonth = {
-                if (showMonthGrid) displayedYear++ else {
-                    val (y, m) = nextMonth(displayedYear, displayedMonth)
-                    displayedYear = y; displayedMonth = m
+            onPrevious = {
+                when (calendarView) {
+                    CalendarView.YearGrid -> displayedYear -= YEAR_PAGE_SIZE
+                    CalendarView.MonthGrid -> displayedYear--
+                    CalendarView.Calendar -> {
+                        val (y, m) = previousMonth(displayedYear, displayedMonth)
+                        displayedYear = y; displayedMonth = m
+                    }
+                }
+            },
+            onNext = {
+                when (calendarView) {
+                    CalendarView.YearGrid -> displayedYear += YEAR_PAGE_SIZE
+                    CalendarView.MonthGrid -> displayedYear++
+                    CalendarView.Calendar -> {
+                        val (y, m) = nextMonth(displayedYear, displayedMonth)
+                        displayedYear = y; displayedMonth = m
+                    }
                 }
             },
         )
-        if (showMonthGrid) {
-            MonthYearGrid(
+        when (calendarView) {
+            CalendarView.YearGrid -> YearGrid(
+                centerYear = displayedYear,
+                selectedYear = displayedYear,
+                onYearSelected = { year ->
+                    displayedYear = year
+                    calendarView = CalendarView.MonthGrid
+                },
+            )
+            CalendarView.MonthGrid -> MonthYearGrid(
                 selectedMonth = displayedMonth,
                 onMonthSelected = { month ->
                     displayedMonth = month
-                    showMonthGrid = false
+                    calendarView = CalendarView.Calendar
                 },
             )
-        } else {
-            CalendarMonth(
+            CalendarView.Calendar -> CalendarMonth(
                 year = displayedYear,
                 month = displayedMonth,
                 selectedDate = value,
@@ -200,38 +224,59 @@ fun DateTimePicker(
 ) {
     var displayedYear by remember(value) { mutableStateOf(value.date.year) }
     var displayedMonth by remember(value) { mutableStateOf(value.date.month) }
-    var showMonthGrid by remember { mutableStateOf(false) }
+    var calendarView by remember { mutableStateOf(CalendarView.Calendar) }
 
     PickerContainer(modifier = modifier.then(if (!enabled) Modifier.alpha(0.45f) else Modifier)) {
         CalendarHeader(
             year = displayedYear,
             month = displayedMonth,
             enabled = enabled,
-            showMonthGrid = showMonthGrid,
-            onTitleClick = { if (enabled) showMonthGrid = !showMonthGrid },
-            onPreviousMonth = {
-                if (showMonthGrid) displayedYear-- else {
-                    val (y, m) = previousMonth(displayedYear, displayedMonth)
-                    displayedYear = y; displayedMonth = m
+            calendarView = calendarView,
+            onTitleClick = {
+                if (enabled) calendarView = when (calendarView) {
+                    CalendarView.Calendar -> CalendarView.MonthGrid
+                    CalendarView.MonthGrid -> CalendarView.YearGrid
+                    CalendarView.YearGrid -> CalendarView.Calendar
                 }
             },
-            onNextMonth = {
-                if (showMonthGrid) displayedYear++ else {
-                    val (y, m) = nextMonth(displayedYear, displayedMonth)
-                    displayedYear = y; displayedMonth = m
+            onPrevious = {
+                when (calendarView) {
+                    CalendarView.YearGrid -> displayedYear -= YEAR_PAGE_SIZE
+                    CalendarView.MonthGrid -> displayedYear--
+                    CalendarView.Calendar -> {
+                        val (y, m) = previousMonth(displayedYear, displayedMonth)
+                        displayedYear = y; displayedMonth = m
+                    }
+                }
+            },
+            onNext = {
+                when (calendarView) {
+                    CalendarView.YearGrid -> displayedYear += YEAR_PAGE_SIZE
+                    CalendarView.MonthGrid -> displayedYear++
+                    CalendarView.Calendar -> {
+                        val (y, m) = nextMonth(displayedYear, displayedMonth)
+                        displayedYear = y; displayedMonth = m
+                    }
                 }
             },
         )
-        if (showMonthGrid) {
-            MonthYearGrid(
+        when (calendarView) {
+            CalendarView.YearGrid -> YearGrid(
+                centerYear = displayedYear,
+                selectedYear = displayedYear,
+                onYearSelected = { year ->
+                    displayedYear = year
+                    calendarView = CalendarView.MonthGrid
+                },
+            )
+            CalendarView.MonthGrid -> MonthYearGrid(
                 selectedMonth = displayedMonth,
                 onMonthSelected = { month ->
                     displayedMonth = month
-                    showMonthGrid = false
+                    calendarView = CalendarView.Calendar
                 },
             )
-        } else {
-            CalendarMonth(
+            CalendarView.Calendar -> CalendarMonth(
                 year = displayedYear,
                 month = displayedMonth,
                 selectedDate = value.date,
@@ -304,13 +349,22 @@ private fun CalendarHeader(
     year: Int,
     month: Month,
     enabled: Boolean,
-    showMonthGrid: Boolean,
+    calendarView: CalendarView,
     onTitleClick: () -> Unit,
-    onPreviousMonth: () -> Unit,
-    onNextMonth: () -> Unit,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
 ) {
     val accent = DarwinTheme.colorScheme.accent
     val textPrimary = DarwinTheme.colorScheme.textPrimary
+
+    val titleText = when (calendarView) {
+        CalendarView.Calendar -> "${monthFullName(month)} $year"
+        CalendarView.MonthGrid -> "$year"
+        CalendarView.YearGrid -> {
+            val start = year - year.mod(YEAR_PAGE_SIZE)
+            "$start – ${start + YEAR_PAGE_SIZE - 1}"
+        }
+    }
 
     Row(
         modifier = Modifier
@@ -318,7 +372,7 @@ private fun CalendarHeader(
             .height(40.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Month Year title — clickable to toggle month grid
+        // Title — clickable to cycle views: Calendar → MonthGrid → YearGrid
         Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(6.dp))
@@ -332,15 +386,14 @@ private fun CalendarHeader(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = if (showMonthGrid) "$year" else "${monthFullName(month)} $year",
+                text = titleText,
                 color = textPrimary,
                 fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(Modifier.width(4.dp))
-            // Disclosure chevron — rotates down when month grid is shown
             Icon(
-                imageVector = if (showMonthGrid) LucideChevronDown else LucideChevronRight,
+                imageVector = if (calendarView != CalendarView.Calendar) LucideChevronDown else LucideChevronRight,
                 modifier = Modifier.size(13.dp),
                 tint = accent,
             )
@@ -358,7 +411,7 @@ private fun CalendarHeader(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
-                            onClick = onPreviousMonth,
+                            onClick = onPrevious,
                         ),
                     tint = accent,
                 )
@@ -369,7 +422,7 @@ private fun CalendarHeader(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
-                            onClick = onNextMonth,
+                            onClick = onNext,
                         ),
                     tint = accent,
                 )
@@ -380,10 +433,9 @@ private fun CalendarHeader(
 
 // ===========================================================================
 // MonthYearGrid — 4×3 month selection grid
-//
-// Shown when the user clicks the disclosure chevron in the header.
-// Allows fast navigation to any month without repeated arrow clicking.
 // ===========================================================================
+
+private const val YEAR_PAGE_SIZE = 12
 
 @Composable
 private fun MonthYearGrid(
@@ -392,8 +444,6 @@ private fun MonthYearGrid(
 ) {
     val accent = DarwinTheme.colorScheme.accent
     val textPrimary = DarwinTheme.colorScheme.textPrimary
-
-    val shortNames = listOf("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC")
 
     Column(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
@@ -408,22 +458,13 @@ private fun MonthYearGrid(
                     val monthIndex = row * 4 + col
                     val month = Month.entries[monthIndex]
                     val isSelected = month == selectedMonth
-
                     val cellShape = RoundedCornerShape(8.dp)
-                    val bgColor = when {
-                        isSelected -> accent
-                        else -> Color.Transparent
-                    }
-                    val labelColor = when {
-                        isSelected -> Color.White
-                        else -> textPrimary
-                    }
 
                     Box(
                         modifier = Modifier
                             .size(width = 72.dp, height = 40.dp)
                             .clip(cellShape)
-                            .background(bgColor, cellShape)
+                            .background(if (isSelected) accent else Color.Transparent, cellShape)
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null,
@@ -432,8 +473,61 @@ private fun MonthYearGrid(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = shortNames[monthIndex],
-                            color = labelColor,
+                            text = monthShortName(month),
+                            color = if (isSelected) Color.White else textPrimary,
+                            fontSize = 14.sp,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ===========================================================================
+// YearGrid — 4×3 year selection grid
+// ===========================================================================
+
+@Composable
+private fun YearGrid(
+    centerYear: Int,
+    selectedYear: Int,
+    onYearSelected: (Int) -> Unit,
+) {
+    val accent = DarwinTheme.colorScheme.accent
+    val textPrimary = DarwinTheme.colorScheme.textPrimary
+    val startYear = centerYear - centerYear.mod(YEAR_PAGE_SIZE)
+
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        for (row in 0 until 3) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+            ) {
+                for (col in 0 until 4) {
+                    val year = startYear + row * 4 + col
+                    val isSelected = year == selectedYear
+                    val cellShape = RoundedCornerShape(8.dp)
+
+                    Box(
+                        modifier = Modifier
+                            .size(width = 72.dp, height = 40.dp)
+                            .clip(cellShape)
+                            .background(if (isSelected) accent else Color.Transparent, cellShape)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null,
+                                onClick = { onYearSelected(year) },
+                            ),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "$year",
+                            color = if (isSelected) Color.White else textPrimary,
                             fontSize = 14.sp,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                         )
@@ -1385,20 +1479,11 @@ private fun PickerPopover(
 // Utility functions
 // ===========================================================================
 
-private fun monthFullName(month: Month): String = when (month) {
-    Month.JANUARY -> "January"
-    Month.FEBRUARY -> "February"
-    Month.MARCH -> "March"
-    Month.APRIL -> "April"
-    Month.MAY -> "May"
-    Month.JUNE -> "June"
-    Month.JULY -> "July"
-    Month.AUGUST -> "August"
-    Month.SEPTEMBER -> "September"
-    Month.OCTOBER -> "October"
-    Month.NOVEMBER -> "November"
-    Month.DECEMBER -> "December"
-}
+private fun monthFullName(month: Month): String =
+    month.name.lowercase().replaceFirstChar { it.uppercase() }
+
+private fun monthShortName(month: Month): String =
+    month.name.take(3)
 
 private fun formatTime(time: LocalTime, is24Hour: Boolean): String {
     return if (is24Hour) {
