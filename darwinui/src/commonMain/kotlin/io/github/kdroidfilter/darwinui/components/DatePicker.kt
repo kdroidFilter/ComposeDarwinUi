@@ -2,6 +2,7 @@ package io.github.kdroidfilter.darwinui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.hoverable
@@ -53,6 +54,7 @@ import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideChevronDown
 import io.github.kdroidfilter.darwinui.icons.LucideChevronLeft
 import io.github.kdroidfilter.darwinui.icons.LucideChevronRight
+import io.github.kdroidfilter.darwinui.theme.darwinGlass
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
@@ -91,12 +93,13 @@ fun DatePicker(
     onValueChange: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    useGlass: Boolean = false,
 ) {
     var displayedYear by remember(value) { mutableStateOf(value.year) }
     var displayedMonth by remember(value) { mutableStateOf(value.month) }
     var calendarView by remember { mutableStateOf(CalendarView.Calendar) }
 
-    PickerContainer(modifier = modifier.then(if (!enabled) Modifier.alpha(0.45f) else Modifier)) {
+    PickerContainer(modifier = modifier.then(if (!enabled) Modifier.alpha(0.45f) else Modifier), useGlass = useGlass) {
         CalendarHeader(
             year = displayedYear,
             month = displayedMonth,
@@ -311,13 +314,14 @@ fun DateTimePicker(
 @Composable
 private fun PickerContainer(
     modifier: Modifier = Modifier,
+    useGlass: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val isDark = DarwinTheme.colorScheme.isDark
     val shape = RoundedCornerShape(13.dp)
-
-    val bgColor = if (isDark) Color(0xFF121212) else Color(0xFFFAFAFA)
+    val fallbackBg = if (isDark) Color(0xFF121212) else Color(0xFFFAFAFA)
     val shadowColor = if (isDark) Color.Black.copy(alpha = 0.16f) else Color.Black.copy(alpha = 0.12f)
+    val borderColor = if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.08f)
 
     Column(
         modifier = modifier
@@ -328,8 +332,17 @@ private fun PickerContainer(
                 ambientColor = shadowColor,
                 spotColor = shadowColor,
             )
-            .clip(shape)
-            .background(bgColor, shape)
+            .then(
+                if (useGlass) {
+                    Modifier
+                        .darwinGlass(shape = shape, fallbackColor = fallbackBg)
+                        .border(0.5.dp, borderColor, shape)
+                } else {
+                    Modifier
+                        .clip(shape)
+                        .background(fallbackBg, shape)
+                },
+            )
             .padding(horizontal = 16.dp),
     ) {
         content()
@@ -849,7 +862,7 @@ private fun TimeValuePill(
                 onDismissRequest = { expanded = false },
                 anchorSize = anchorSize,
             ) {
-                PickerContainer {
+                PickerContainer(useGlass = true) {
                     WheelTimePicker(
                         value = value,
                         onValueChange = onValueChange,
@@ -1338,6 +1351,7 @@ fun DatePickerButton(
                     value = value,
                     onValueChange = onValueChange,
                     enabled = enabled,
+                    useGlass = true,
                 )
             }
         }
@@ -1387,7 +1401,7 @@ fun TimePickerButton(
                 onDismissRequest = { expanded = false },
                 anchorSize = anchorSize,
             ) {
-                PickerContainer {
+                PickerContainer(useGlass = true) {
                     WheelTimePicker(
                         value = value,
                         onValueChange = onValueChange,
