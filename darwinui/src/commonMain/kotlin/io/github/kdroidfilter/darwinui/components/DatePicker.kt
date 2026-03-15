@@ -589,6 +589,9 @@ private fun TimeValuePill(
     textColor: Color,
 ) {
     val shape = RoundedCornerShape(percent = 50)
+    val accentColor = DarwinTheme.colorScheme.accent
+    var expanded by remember { mutableStateOf(false) }
+    var anchorSize by remember { mutableStateOf(IntSize.Zero) }
 
     val displayText = if (is24Hour) {
         "${value.hour.toString().padStart(2, '0')}:${value.minute.toString().padStart(2, '0')}"
@@ -601,37 +604,50 @@ private fun TimeValuePill(
         "$hour12:${value.minute.toString().padStart(2, '0')}"
     }
 
-    Box(
-        modifier = Modifier
-            .height(34.dp)
-            .widthIn(min = 67.dp)
-            .clip(shape)
-            .background(bgColor, shape)
-            .then(
-                if (enabled) {
-                    Modifier.clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = {
-                            // Increment minutes by 1 on click (simple interaction)
-                            val newMinute = (value.minute + 1) % 60
-                            val newHour = if (value.minute == 59) (value.hour + 1) % 24 else value.hour
-                            onValueChange(LocalTime(newHour, newMinute))
-                        },
-                    )
-                } else {
-                    Modifier
-                },
+    Box {
+        Box(
+            modifier = Modifier
+                .height(34.dp)
+                .widthIn(min = 67.dp)
+                .onSizeChanged { anchorSize = it }
+                .clip(shape)
+                .background(bgColor, shape)
+                .then(
+                    if (enabled) {
+                        Modifier.clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = { expanded = !expanded },
+                        )
+                    } else {
+                        Modifier
+                    },
+                )
+                .padding(horizontal = 12.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = displayText,
+                color = if (expanded) accentColor else textColor,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Medium,
             )
-            .padding(horizontal = 12.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = displayText,
-            color = textColor,
-            fontSize = 17.sp,
-            fontWeight = FontWeight.Medium,
-        )
+        }
+
+        if (expanded) {
+            PickerPopover(
+                onDismissRequest = { expanded = false },
+                anchorSize = anchorSize,
+            ) {
+                PickerContainer {
+                    WheelTimePicker(
+                        value = value,
+                        onValueChange = onValueChange,
+                        is24Hour = is24Hour,
+                    )
+                }
+            }
+        }
     }
 }
 
