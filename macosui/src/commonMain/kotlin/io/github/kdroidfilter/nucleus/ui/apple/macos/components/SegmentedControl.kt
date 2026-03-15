@@ -11,12 +11,13 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -230,7 +231,7 @@ private fun fontSizeFor(controlSize: ControlSize) = when (controlSize) {
 }
 
 @Composable
-private fun RowScope.Segment(
+private fun Segment(
     index: Int,
     isSelected: Boolean,
     enabled: Boolean,
@@ -271,9 +272,13 @@ private fun RowScope.Segment(
 
     val segmentShape = RoundedCornerShape(cornerRadius)
 
+    val metrics = MacosTheme.componentStyling.segmentedControl.metrics
+    val minWidth = metrics.segmentMinWidthFor(controlSize)
+    val horizontalPadding = metrics.segmentHorizontalPaddingFor(controlSize)
+
     Box(
         modifier = Modifier
-            .weight(1f)
+            .widthIn(min = minWidth)
             .fillMaxHeight()
             .onGloballyPositioned { coordinates ->
                 onMeasured(
@@ -306,7 +311,9 @@ private fun RowScope.Segment(
             LocalContentColor provides textColor,
             LocalTextStyle provides textStyle,
         ) {
-            content()
+            Box(Modifier.padding(horizontal = horizontalPadding)) {
+                content()
+            }
         }
     }
 }

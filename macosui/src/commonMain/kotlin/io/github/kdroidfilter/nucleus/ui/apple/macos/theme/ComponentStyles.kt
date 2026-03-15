@@ -631,6 +631,22 @@ data class SegmentedControlStyle(
             ControlSize.Large -> 5.dp
             ControlSize.ExtraLarge -> 8.dp
         }
+
+        fun segmentMinWidthFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 22.dp
+            ControlSize.Small -> 26.dp
+            ControlSize.Regular -> 30.dp
+            ControlSize.Large -> 36.dp
+            ControlSize.ExtraLarge -> 44.dp
+        }
+
+        fun segmentHorizontalPaddingFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 6.dp
+            ControlSize.Small -> 8.dp
+            ControlSize.Regular -> 10.dp
+            ControlSize.Large -> 12.dp
+            ControlSize.ExtraLarge -> 16.dp
+        }
     }
 }
 
