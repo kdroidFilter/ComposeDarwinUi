@@ -134,6 +134,7 @@ import io.github.kdroidfilter.darwinui.sample.pages.TextAreaPage
 import io.github.kdroidfilter.darwinui.sample.pages.TitleBarPage
 import io.github.kdroidfilter.darwinui.sample.pages.ToastPage
 import io.github.kdroidfilter.darwinui.sample.pages.TooltipPage
+import io.github.kdroidfilter.darwinui.sample.pages.IconsPage
 import io.github.kdroidfilter.darwinui.components.Switch
 import io.github.kdroidfilter.darwinui.theme.AccentColor
 import io.github.kdroidfilter.darwinui.theme.ControlSize
@@ -187,6 +188,7 @@ private val sidebarEntryDefs = listOf(
     SidebarEntryDef("titlebar", "Title Bar", "NAVIGATION", Lucide.PanelTopOpen),
     SidebarEntryDef("addressbar", "Address Bar", "NAVIGATION", Lucide.Search),
     SidebarEntryDef("scaffold", "Scaffold", "NAVIGATION", LucidePanelLeft),
+    SidebarEntryDef("icons", "Icons", "THEME", Lucide.Scan),
     SidebarEntryDef("material", "Material", "THEME", Lucide.Scan),
     SidebarEntryDef("controlsize", "Control Size", "THEME", Lucide.SlidersHorizontal),
 )
@@ -468,6 +470,7 @@ fun App() {
                         "popupbutton" -> PopupButtonPage()
                         "datepicker" -> DatePickerPage()
                         "colorwell" -> ColorWellPage()
+                        "icons" -> IconsPage()
                         "material" -> MaterialPage()
                         "controlsize" -> ControlSizePage()
                     }

@@ -32,4 +32,4 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-include(":darwinui", ":sample", ":gallery-annotations", ":gallery-ksp")
+include(":darwinui", ":darwinui-icons", ":darwinui-icons-extended", ":sample", ":gallery-annotations", ":gallery-ksp")

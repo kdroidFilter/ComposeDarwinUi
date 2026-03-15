@@ -96,6 +96,7 @@ kotlin {
             implementation(libs.compose.components.resources)
             api(libs.kotlinx.datetime)
             implementation(libs.liquid)
+            api(projects.darwinuiIcons)
         }
         jvmMain.dependencies {
             implementation(libs.jna)

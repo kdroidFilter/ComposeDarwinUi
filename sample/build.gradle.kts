@@ -49,6 +49,7 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(project(":darwinui"))
+            implementation(project(":darwinui-icons-extended"))
             implementation(project(":gallery-annotations"))
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
