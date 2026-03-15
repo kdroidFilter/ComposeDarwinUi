@@ -10,7 +10,6 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,77 +27,111 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideSearch
 import io.github.kdroidfilter.darwinui.icons.LucideX
+import io.github.kdroidfilter.darwinui.theme.ControlSize
 import io.github.kdroidfilter.darwinui.theme.DarwinDuration
+import io.github.kdroidfilter.darwinui.theme.DarwinSurface
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinContentColor
+import io.github.kdroidfilter.darwinui.theme.LocalDarwinSurface
 import io.github.kdroidfilter.darwinui.theme.LocalDarwinTextStyle
-import io.github.kdroidfilter.darwinui.theme.Outline
 import io.github.kdroidfilter.darwinui.theme.darwinTween
-import io.github.kdroidfilter.darwinui.theme.outline as validationOutline
 
 @Composable
 fun SearchField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "Search...",
+    placeholder: String = "Search",
     enabled: Boolean = true,
     singleLine: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     focusRequester: FocusRequester = remember { FocusRequester() },
-    // Backward-compatible params (ignored but API-stable)
-    label: String? = null,
-    supportingText: String? = null,
-    isError: Boolean = false,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    outline: Outline = Outline.None,
 ) {
     val controlSize = LocalControlSize.current
+    val tfColors = DarwinTheme.componentStyling.textField.colors
     val tfMetrics = DarwinTheme.componentStyling.textField.metrics
     val colors = DarwinTheme.colorScheme
     val typography = DarwinTheme.typography
-    val isDark = colors.isDark
-    val accentColor = colors.accent
-    val outlines = DarwinTheme.globalColors.outlines
+    val accent = colors.accent
+    val surface = LocalDarwinSurface.current
+    val isOverGlass = surface == DarwinSurface.OverGlass
 
     var isFocused by remember { mutableStateOf(false) }
 
     val shape = DarwinTheme.shapes.full
+    val fieldHeight = tfMetrics.heightFor(controlSize)
+    val startPad = tfMetrics.startPaddingFor(controlSize)
+    val endPad = tfMetrics.endPaddingFor(controlSize)
 
-    // Animated background: white when focused (macOS native behavior)
-    val bgColor by animateColorAsState(
+    // Sketch: XL/Lg/Md = 13sp (footnote), Sm = 11sp (caption2), Mn = 10sp
+    val resolvedTextStyle = when (controlSize) {
+        ControlSize.ExtraLarge, ControlSize.Large, ControlSize.Regular -> typography.footnote
+        ControlSize.Small -> typography.caption2
+        ControlSize.Mini -> typography.caption2.copy(fontSize = 10.sp)
+    }
+
+    // Sketch icon sizes: Mn glyph ~13dp, Sm-XL glyph ~15dp
+    val searchIconSize = when (controlSize) {
+        ControlSize.Mini -> 13.dp
+        else -> 15.dp
+    }
+
+    // Sketch clear button: Mn = 13dp, Sm-XL = 16dp
+    val clearButtonSize = when (controlSize) {
+        ControlSize.Mini -> 13.dp
+        else -> 16.dp
+    }
+
+    // Background — reuses TextField component styling
+    val backgroundColor by animateColorAsState(
         targetValue = when {
-            isFocused -> if (isDark) Color.White.copy(alpha = 0.12f) else Color.Black.copy(alpha = 0.03f)
-            else -> if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.06f)
+            !enabled -> if (isOverGlass) tfColors.overGlassDisabledBackground else tfColors.backgroundDisabled
+            isFocused && isOverGlass -> tfColors.overGlassFocusedBackground
+            isOverGlass -> tfColors.overGlassBackground
+            else -> tfColors.background
         },
-        animationSpec = darwinTween(DarwinDuration.Normal),
+        animationSpec = darwinTween(DarwinDuration.Fast),
         label = "search_bg",
     )
 
-    // Animated blue focus ring
-    val ringColor by animateColorAsState(
-        targetValue = if (isFocused) accentColor.copy(alpha = 0.4f) else Color.Transparent,
-        animationSpec = darwinTween(DarwinDuration.Normal),
-        label = "search_ring",
+    // Border — Sketch: 1dp #00000014 idle, #0000000a disabled
+    val borderColor by animateColorAsState(
+        targetValue = when {
+            !enabled -> if (isOverGlass) Color.Transparent else tfColors.borderDisabled
+            isOverGlass -> Color.Transparent
+            else -> tfColors.border
+        },
+        animationSpec = darwinTween(DarwinDuration.Fast),
+        label = "search_border",
     )
 
+    // Sketch: magnifying glass = Primary, placeholder = Secondary, clear = Secondary
     val textColor = colors.textPrimary
-    val placeholderColor = colors.textTertiary
-    val iconColor = colors.textTertiary
+    val placeholderColor = colors.textSecondary
+    val searchIconColor = colors.textPrimary
+    val clearButtonColor = colors.textSecondary
+
+    // Focus ring — Sketch: 3.5dp accent@25% + 1dp accent@15%
+    val pillCornerRadius = fieldHeight / 2
 
     BasicTextField(
         value = value,
@@ -108,103 +141,110 @@ fun SearchField(
             .onFocusChanged { isFocused = it.isFocused },
         enabled = enabled,
         singleLine = singleLine,
-        textStyle = typography.subheadline.copy(color = textColor),
+        textStyle = resolvedTextStyle.copy(color = textColor),
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
-        cursorBrush = SolidColor(accentColor),
+        cursorBrush = SolidColor(accent),
         decorationBox = { innerTextField ->
-            // Outer unclipped box carries the validation ring (Phase 1.4).
-            // SearchField handles its own animated focus ring via border(), so only
-            // the validation outline (Warning/Error) is drawn here.
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(tfMetrics.heightFor(controlSize))
-                    .shadow(
-                        elevation = if (isFocused) 4.dp else 0.dp,
-                        shape = shape,
-                        clip = false,
-                        ambientColor = accentColor.copy(alpha = 0.25f),
-                        spotColor = accentColor.copy(alpha = 0.25f),
+                    .height(fieldHeight)
+                    .then(
+                        if (isFocused && enabled) {
+                            Modifier.pillFocusRing(
+                                cornerRadius = pillCornerRadius,
+                                outerColor = accent.copy(alpha = 0.25f),
+                                innerColor = accent.copy(alpha = 0.15f),
+                            )
+                        } else {
+                            Modifier
+                        },
                     )
-                    .validationOutline(outline, shape, outlines),
-            ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
+                    // Over-glass shadow — Sketch: 0,0,6 #00000008 idle / #00000004 disabled
+                    .then(
+                        if (isOverGlass) {
+                            Modifier.overGlassPillShadow(
+                                cornerRadius = pillCornerRadius,
+                                shadowAlpha = if (enabled) 0.03f else 0.015f,
+                            )
+                        } else {
+                            Modifier
+                        },
+                    )
                     .clip(shape)
-                    .background(bgColor, shape)
-                    .border(1.5.dp, ringColor, shape)
-                    .padding(horizontal = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    .background(backgroundColor, shape)
+                    .then(
+                        if (borderColor != Color.Transparent) {
+                            Modifier.border(1.dp, borderColor, shape)
+                        } else {
+                            Modifier
+                        },
+                    )
+                    .padding(start = startPad, end = endPad),
+                contentAlignment = Alignment.CenterStart,
             ) {
-                Icon(
-                    imageVector = LucideSearch,
-                    tint = iconColor,
-                    modifier = Modifier.size(14.dp),
-                )
-                Box(
-                    modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.CenterStart,
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(3.dp),
                 ) {
-                    if (value.isEmpty()) {
+                    Icon(
+                        imageVector = LucideSearch,
+                        tint = searchIconColor,
+                        modifier = Modifier.size(searchIconSize),
+                    )
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.CenterStart,
+                    ) {
+                        if (value.isEmpty()) {
+                            CompositionLocalProvider(
+                                LocalDarwinContentColor provides placeholderColor,
+                                LocalDarwinTextStyle provides resolvedTextStyle.copy(color = placeholderColor),
+                            ) {
+                                Text(placeholder)
+                            }
+                        }
                         CompositionLocalProvider(
-                            LocalDarwinContentColor provides placeholderColor,
-                            LocalDarwinTextStyle provides typography.caption1.copy(color = placeholderColor),
+                            LocalDarwinTextStyle provides resolvedTextStyle.copy(color = textColor),
                         ) {
-                            Text(placeholder)
+                            innerTextField()
                         }
                     }
-                    CompositionLocalProvider(
-                        LocalDarwinTextStyle provides typography.caption1.copy(color = textColor),
-                    ) {
-                        innerTextField()
+                    // Clear button — visible when value is not empty and enabled
+                    if (value.isNotEmpty() && enabled) {
+                        SearchClearButton(
+                            onClick = { onValueChange("") },
+                            tint = clearButtonColor,
+                            size = clearButtonSize,
+                        )
                     }
                 }
-                if (isFocused && value.isNotEmpty()) {
-                    SearchClearButton(
-                        onClick = { onValueChange("") },
-                        isDark = isDark,
-                    )
-                } else if (trailingIcon != null) {
-                    trailingIcon()
-                }
-            } // Row
-            } // validation outline Box
+            }
         },
     )
 }
 
-// macOS-style clear button — filled circle with × icon
+// Sketch: xmark.circle.fill — filled circle with X cutout, rendered in secondary color
 @Composable
 private fun SearchClearButton(
     onClick: () -> Unit,
-    isDark: Boolean,
+    tint: Color,
+    size: Dp,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
     val bgColor by animateColorAsState(
-        targetValue = when {
-            isHovered -> if (isDark) Color.White.copy(alpha = 0.35f) else Color.Black.copy(alpha = 0.30f)
-            else -> if (isDark) Color.White.copy(alpha = 0.25f) else Color.Black.copy(alpha = 0.20f)
-        },
+        targetValue = if (isHovered) tint else tint.copy(alpha = tint.alpha * 0.7f),
         animationSpec = darwinTween(DarwinDuration.Fast),
         label = "search_clear_bg",
-    )
-    val iconColor by animateColorAsState(
-        targetValue = when {
-            isHovered -> if (isDark) Color.Black.copy(alpha = 0.8f) else Color.White.copy(alpha = 0.9f)
-            else -> if (isDark) Color.Black.copy(alpha = 0.65f) else Color.White.copy(alpha = 0.8f)
-        },
-        animationSpec = darwinTween(DarwinDuration.Fast),
-        label = "search_clear_icon",
     )
 
     Box(
         modifier = Modifier
-            .size(16.dp)
+            .size(size)
             .clip(CircleShape)
             .background(bgColor, CircleShape)
             .hoverable(interactionSource = interactionSource)
@@ -218,17 +258,56 @@ private fun SearchClearButton(
     ) {
         Icon(
             imageVector = LucideX,
-            tint = iconColor,
-            modifier = Modifier.size(10.dp),
+            tint = Color.White,
+            modifier = Modifier.size(size * 0.6f),
         )
     }
 }
 
-@Preview
-@Composable
-private fun SearchFieldPreview() {
-    DarwinTheme {
-        var query by remember { mutableStateOf("") }
-        SearchField(value = query, onValueChange = { query = it })
-    }
+// Over-glass subtle drop shadow — Sketch: 0 0 6px black@3% (idle) / black@1.5% (disabled)
+private fun Modifier.overGlassPillShadow(
+    cornerRadius: Dp,
+    shadowAlpha: Float,
+): Modifier = drawBehind {
+    val cornerPx = cornerRadius.toPx()
+    val blurPx = 6.dp.toPx()
+    val halfBlur = blurPx / 2f
+
+    drawRoundRect(
+        color = Color.Black.copy(alpha = shadowAlpha),
+        topLeft = Offset(-halfBlur, -halfBlur),
+        size = Size(size.width + blurPx, size.height + blurPx),
+        cornerRadius = CornerRadius(cornerPx + halfBlur),
+    )
+}
+
+// Draws macOS-style dual focus ring for pill-shaped fields
+private fun Modifier.pillFocusRing(
+    cornerRadius: Dp,
+    outerColor: Color,
+    innerColor: Color,
+): Modifier = drawBehind {
+    val outerStrokePx = 3.5.dp.toPx()
+    val innerStrokePx = 1.dp.toPx()
+    val cornerPx = cornerRadius.toPx()
+
+    // Outer ring — expands beyond component bounds
+    val outerHalf = outerStrokePx / 2f
+    drawRoundRect(
+        color = outerColor,
+        topLeft = Offset(-outerHalf, -outerHalf),
+        size = Size(size.width + outerStrokePx, size.height + outerStrokePx),
+        cornerRadius = CornerRadius(cornerPx + outerHalf),
+        style = Stroke(width = outerStrokePx),
+    )
+
+    // Inner ring — on the component edge
+    val innerHalf = innerStrokePx / 2f
+    drawRoundRect(
+        color = innerColor,
+        topLeft = Offset(-innerHalf, -innerHalf),
+        size = Size(size.width + innerStrokePx, size.height + innerStrokePx),
+        cornerRadius = CornerRadius(cornerPx + innerHalf),
+        style = Stroke(width = innerStrokePx),
+    )
 }

@@ -23,6 +23,7 @@ import io.github.kdroidfilter.darwinui.components.Text
 import io.github.kdroidfilter.darwinui.components.ToolbarSearchField
 import io.github.kdroidfilter.darwinui.gallery.GalleryExample
 import io.github.kdroidfilter.darwinui.theme.ControlSize
+import io.github.kdroidfilter.darwinui.theme.DarwinSurface
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.icons.Icon
 import io.github.kdroidfilter.darwinui.icons.LucideSearch
@@ -94,6 +95,57 @@ fun SearchInputAddressBarWithIconExample() {
     )
 }
 
+@GalleryExample("SearchInput", "Surface Variants")
+@Composable
+fun SearchInputSurfaceVariantsExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        // Content Area (default)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Content Area",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.ContentArea) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    var text by remember { mutableStateOf("") }
+                    SearchField(value = text, onValueChange = { text = it })
+                    SearchField(value = "With value", onValueChange = {})
+                    SearchField(value = "", onValueChange = {}, enabled = false)
+                }
+            }
+        }
+
+        // Over Glass
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Over Glass",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.OverGlass) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    var text by remember { mutableStateOf("") }
+                    SearchField(value = text, onValueChange = { text = it })
+                    SearchField(value = "With value", onValueChange = {})
+                    SearchField(value = "", onValueChange = {}, enabled = false)
+                }
+            }
+        }
+    }
+}
+
 @GalleryExample("SearchInput", "Toolbar Search")
 @Composable
 fun SearchInputToolbarSearchExample() {
@@ -139,6 +191,13 @@ internal fun SearchInputPage() {
             description = "Pill-shaped search input with magnifier icon",
             sourceCode = GallerySources.SearchInputDefaultExample,
         ) { SearchInputDefaultExample() }
+
+        SectionHeader("Surface Variants")
+        ExampleCard(
+            title = "Content Area vs Over Glass",
+            description = "SearchField adapts its appearance based on DarwinSurface",
+            sourceCode = GallerySources.SearchInputSurfaceVariantsExample,
+        ) { SearchInputSurfaceVariantsExample() }
 
         SectionHeader("Address Bar")
         ExampleCard(
