@@ -59,8 +59,10 @@ private val THUMB_BREADTH_HOVER = 8.dp   // expands toward content on hover
 private val THUMB_TRAILING_PAD = 3.dp    // fixed gap from window edge (right/bottom)
 private val THUMB_CORNER_RADIUS = 3.dp   // rx = breadth/2 = full capsule
 private val THUMB_MIN_LENGTH = 30.dp
-private const val THUMB_ALPHA_IDLE = 0.15f
-private const val THUMB_ALPHA_HOVER = 0.35f
+private const val THUMB_ALPHA_IDLE_LIGHT = 0.15f
+private const val THUMB_ALPHA_IDLE_DARK = 0.40f
+private const val THUMB_ALPHA_HOVER_LIGHT = 0.35f
+private const val THUMB_ALPHA_HOVER_DARK = 0.55f
 private const val HIDE_DELAY_MS = 1500L
 
 // ============================================================
@@ -274,8 +276,8 @@ private fun DarwinScrollbarImpl(
     val isHovered = isThumbHovered || isTrackHovered
     val targetAlpha = when {
         !showThumb || trackSizePx == 0 || state.maxScrollPx <= 0f -> 0f
-        isHovered -> THUMB_ALPHA_HOVER
-        else -> THUMB_ALPHA_IDLE
+        isHovered -> if (isDark) THUMB_ALPHA_HOVER_DARK else THUMB_ALPHA_HOVER_LIGHT
+        else -> if (isDark) THUMB_ALPHA_IDLE_DARK else THUMB_ALPHA_IDLE_LIGHT
     }
     val thumbColor by animateColorAsState(
         targetValue = baseColor.copy(alpha = targetAlpha),
