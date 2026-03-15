@@ -410,42 +410,46 @@ data class SliderStyle(
 
     @Immutable
     data class Metrics(
-        /** Track height for the small size. */
-        val trackHeightSm: Dp = 2.dp,
-        /** Track height for the default size. */
-        val trackHeightMd: Dp = 4.dp,
-        /** Track height for the large size. */
-        val trackHeightLg: Dp = 6.dp,
-        /** Thumb diameter for the small size. */
-        val thumbSizeSm: Dp = 14.dp,
-        /** Thumb diameter for the default size. */
-        val thumbSizeMd: Dp = 18.dp,
-        /** Thumb diameter for the large size. */
-        val thumbSizeLg: Dp = 22.dp,
         val thumbBorderWidth: Dp = 1.dp,
     ) {
         fun trackHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 1.dp
-            ControlSize.Small -> trackHeightSm
-            ControlSize.Regular -> trackHeightMd
-            ControlSize.Large -> trackHeightLg
-            ControlSize.ExtraLarge -> 8.dp
+            ControlSize.Mini -> 4.dp
+            ControlSize.Small -> 4.dp
+            ControlSize.Regular -> 6.dp
+            ControlSize.Large -> 6.dp
+            ControlSize.ExtraLarge -> 6.dp
         }
 
         fun thumbWidthFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 12.dp
-            ControlSize.Small -> 16.dp
+            ControlSize.Mini -> 16.dp
+            ControlSize.Small -> 18.dp
             ControlSize.Regular -> 20.dp
             ControlSize.Large -> 24.dp
-            ControlSize.ExtraLarge -> 28.dp
+            ControlSize.ExtraLarge -> 24.dp
         }
 
         fun thumbHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
-            ControlSize.Mini -> 10.dp
-            ControlSize.Small -> 12.dp
+            ControlSize.Mini -> 12.dp
+            ControlSize.Small -> 14.dp
             ControlSize.Regular -> 16.dp
             ControlSize.Large -> 20.dp
-            ControlSize.ExtraLarge -> 24.dp
+            ControlSize.ExtraLarge -> 20.dp
+        }
+
+        fun thumbCornerRadiusFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 7.dp
+            ControlSize.Small -> 7.dp
+            ControlSize.Regular -> 8.dp
+            ControlSize.Large -> 10.dp
+            ControlSize.ExtraLarge -> 10.dp
+        }
+
+        fun totalHeightFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 16.dp
+            ControlSize.Small -> 20.dp
+            ControlSize.Regular -> 24.dp
+            ControlSize.Large -> 28.dp
+            ControlSize.ExtraLarge -> 36.dp
         }
     }
 }

@@ -22,6 +22,7 @@ import io.github.kdroidfilter.darwinui.sample.gallery.GalleryPage
 import io.github.kdroidfilter.darwinui.sample.gallery.SectionHeader
 import io.github.kdroidfilter.darwinui.sample.gallery.generated.GallerySources
 import io.github.kdroidfilter.darwinui.theme.ControlSize
+import io.github.kdroidfilter.darwinui.theme.DarwinSurface
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 
 @GalleryExample("Slider", "Sizes")
@@ -93,11 +94,68 @@ fun SliderWithValueExample() {
     }
 }
 
+@GalleryExample("Slider", "Surface")
+@Composable
+fun SliderSurfaceExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        // Content Area (default)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Content Area",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.ContentArea) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    for (size in ControlSize.entries) {
+                        ControlSize(size) {
+                            var value by remember { mutableStateOf(50f) }
+                            Slider(value = value, onValueChange = { value = it }, valueRange = 0f..100f)
+                        }
+                    }
+                }
+            }
+        }
+
+        // Over Glass
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Over Glass",
+                style = DarwinTheme.typography.caption1,
+                color = DarwinTheme.colorScheme.textSecondary,
+            )
+            DarwinSurface(DarwinSurface.OverGlass) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    for (size in ControlSize.entries) {
+                        ControlSize(size) {
+                            var value by remember { mutableStateOf(50f) }
+                            Slider(value = value, onValueChange = { value = it }, valueRange = 0f..100f)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 internal fun SliderPage() {
     GalleryPage("Slider", "An input where the user selects a value from within a given range.") {
         SectionHeader("Sizes")
         ExampleCard(title = "All Sizes", sourceCode = GallerySources.SliderSizesExample) { SliderSizesExample() }
+        SectionHeader("Surface Appearance")
+        ExampleCard(title = "Content Area vs Over Glass", sourceCode = GallerySources.SliderSurfaceExample) { SliderSurfaceExample() }
         SectionHeader("Examples")
         ExampleCard(title = "Volume", sourceCode = GallerySources.SliderVolumeExample) { SliderVolumeExample() }
         ExampleCard(title = "With Value Display", sourceCode = GallerySources.SliderWithValueExample) { SliderWithValueExample() }

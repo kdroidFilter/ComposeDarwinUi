@@ -37,9 +37,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import io.github.fletchmckee.liquid.LiquidState
+import io.github.fletchmckee.liquid.liquefiable
+import io.github.fletchmckee.liquid.liquid
+import io.github.fletchmckee.liquid.rememberLiquidState
 import io.github.kdroidfilter.darwinui.theme.DarwinSpringPreset
 import io.github.kdroidfilter.darwinui.theme.DarwinTheme
 import io.github.kdroidfilter.darwinui.theme.LocalControlSize
+import io.github.kdroidfilter.darwinui.theme.LocalDarwinLiquidState
 import io.github.kdroidfilter.darwinui.theme.darwinSpring
 import kotlin.math.round
 import kotlin.math.roundToInt
@@ -82,24 +87,48 @@ class SliderColors(
 object SliderDefaults {
     @Composable
     fun colors(
-        thumbColor: Color = Color.White,
-        activeTrackColor: Color = DarwinTheme.colorScheme.accent,
-        activeTickColor: Color = DarwinTheme.colorScheme.accent.copy(alpha = 0.5f),
-        inactiveTrackColor: Color = if (DarwinTheme.colorScheme.isDark) Color.White.copy(0.10f) else Color.Black.copy(0.05f),
+        thumbColor: Color = DarwinTheme.componentStyling.slider.colors.thumb,
+        activeTrackColor: Color = DarwinTheme.componentStyling.slider.colors.activeTrack,
+        activeTickColor: Color = activeTrackColor.copy(alpha = 0.5f),
+        inactiveTrackColor: Color = DarwinTheme.componentStyling.slider.colors.inactiveTrack,
         inactiveTickColor: Color = inactiveTrackColor.copy(alpha = 0.5f),
-        disabledThumbColor: Color = thumbColor.copy(0.38f),
-        disabledActiveTrackColor: Color = activeTrackColor.copy(0.38f),
+        disabledThumbColor: Color = DarwinTheme.componentStyling.slider.colors.thumbDisabled,
+        disabledActiveTrackColor: Color = DarwinTheme.componentStyling.slider.colors.disabledActiveTrack,
         disabledActiveTickColor: Color = activeTickColor.copy(0.38f),
-        disabledInactiveTrackColor: Color = inactiveTrackColor.copy(0.38f),
+        disabledInactiveTrackColor: Color = DarwinTheme.componentStyling.slider.colors.disabledInactiveTrack,
         disabledInactiveTickColor: Color = inactiveTickColor.copy(0.38f),
     ) = SliderColors(thumbColor, activeTrackColor, activeTickColor, inactiveTrackColor, inactiveTickColor, disabledThumbColor, disabledActiveTrackColor, disabledActiveTickColor, disabledInactiveTrackColor, disabledInactiveTickColor)
 }
 
-private val ThumbShape = RoundedCornerShape(50)
-
 // ===========================================================================
 // Slider — M3-compatible
 // ===========================================================================
+
+/**
+ * Applies pure liquid refraction to the slider thumb.
+ * Uses a dedicated [LiquidState] whose liquefiable scope covers only the
+ * track — the thumb itself is outside that scope, preventing recursive capture.
+ */
+@Composable
+private fun Modifier.sliderThumbGlass(
+    shape: RoundedCornerShape,
+    liquidState: LiquidState?,
+): Modifier {
+    return if (liquidState != null) {
+        this.liquid(liquidState) {
+            this.shape = shape
+            this.tint = Color.Transparent
+            this.frost = 0.dp
+            refraction = 0.15f
+            curve = 0.8f
+            edge = 0.3f
+            saturation = 1.0f
+            contrast = 1.0f
+        }
+    } else {
+        this.clip(shape).background(Color.Transparent, shape)
+    }
+}
 
 @Composable
 fun Slider(
@@ -119,6 +148,7 @@ fun Slider(
 ) {
     val controlSize = LocalControlSize.current
     val metrics = DarwinTheme.componentStyling.slider.metrics
+    val thumbShape = RoundedCornerShape(metrics.thumbCornerRadiusFor(controlSize))
 
     val min = valueRange.start
     val max = valueRange.endInclusive
@@ -132,11 +162,13 @@ fun Slider(
     }
 
     val fraction = ((value - min) / (max - min)).coerceIn(0f, 1f)
+    var isClicked by remember { mutableStateOf(false) }
     var isDragging by remember { mutableStateOf(false) }
+    val isActive = isClicked || isDragging
 
     val animatedFraction by animateFloatAsState(
         targetValue = fraction,
-        animationSpec = if (isDragging) tween(0) else darwinSpring(DarwinSpringPreset.Snappy),
+        animationSpec = if (isActive) tween(0) else darwinSpring(DarwinSpringPreset.Snappy),
     )
 
     val density = LocalDensity.current
@@ -145,7 +177,7 @@ fun Slider(
 
     val isHovered by interactionSource.collectIsHoveredAsState()
     val thumbScale by animateFloatAsState(
-        targetValue = if (isDragging || isHovered) 1.1f else 1f,
+        targetValue = if (isActive || isHovered) 1.1f else 1f,
         animationSpec = darwinSpring(DarwinSpringPreset.Snappy),
     )
 
@@ -156,17 +188,29 @@ fun Slider(
 
     val trackColor = if (enabled) colors.inactiveTrackColor else colors.disabledInactiveTrackColor
     val fillColor = if (enabled) colors.activeTrackColor else colors.disabledActiveTrackColor
+
     val thumbColor = if (enabled) colors.thumbColor else colors.disabledThumbColor
+
+    // Dedicated liquid state: liquefiable wraps only the track,
+    // thumb is a sibling outside it — no recursive capture.
+    val parentLiquidState = LocalDarwinLiquidState.current
+    val sliderLiquidState = if (parentLiquidState != null) rememberLiquidState() else null
 
     Column(modifier = modifier) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(metrics.thumbHeightFor(controlSize))
+                .height(metrics.totalHeightFor(controlSize))
                 .onSizeChanged { containerSize = it }
                 .then(if (enabled) Modifier
                     .pointerInput(min, max, steps) {
-                        detectTapGestures { offset ->
+                        detectTapGestures(
+                            onPress = {
+                                isClicked = true
+                                tryAwaitRelease()
+                                isClicked = false
+                            },
+                        ) { offset ->
                             onValueChange(valueFromPosition(offset.x))
                             onValueChangeFinished?.invoke()
                         }
@@ -184,19 +228,27 @@ fun Slider(
                 .then(if (!enabled) Modifier.graphicsLayer { alpha = 0.5f } else Modifier),
             contentAlignment = Alignment.CenterStart,
         ) {
-            if (track != null) {
-                track(animatedFraction)
-            } else {
-                Canvas(modifier = Modifier.fillMaxWidth().height(metrics.trackHeightFor(controlSize)).align(Alignment.Center)) {
-                    val cornerRadius = CornerRadius(this.size.height / 2f)
-                    drawRoundRect(color = trackColor, cornerRadius = cornerRadius, size = this.size)
-                    val fillWidth = animatedFraction * this.size.width
-                    if (fillWidth > 0f) {
-                        drawRoundRect(color = fillColor, cornerRadius = cornerRadius, size = Size(fillWidth, this.size.height))
+            // Track layer — wrapped in liquefiable so the thumb can sample it
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .then(if (sliderLiquidState != null) Modifier.liquefiable(sliderLiquidState) else Modifier),
+            ) {
+                if (track != null) {
+                    track(animatedFraction)
+                } else {
+                    Canvas(modifier = Modifier.fillMaxWidth().height(metrics.trackHeightFor(controlSize)).align(Alignment.Center)) {
+                        val cornerRadius = CornerRadius(this.size.height / 2f)
+                        drawRoundRect(color = trackColor, cornerRadius = cornerRadius, size = this.size)
+                        val fillWidth = animatedFraction * this.size.width
+                        if (fillWidth > 0f) {
+                            drawRoundRect(color = fillColor, cornerRadius = cornerRadius, size = Size(fillWidth, this.size.height))
+                        }
                     }
                 }
             }
 
+            // Thumb — outside the liquefiable scope, uses liquid() to sample the track
             val trackWidthPx = containerSize.width.toFloat() - thumbWidthPx
             val thumbOffsetPx = animatedFraction * trackWidthPx
             val thumbOffsetDp = with(density) { thumbOffsetPx.toDp() }
@@ -210,9 +262,16 @@ fun Slider(
                         .size(width = metrics.thumbWidthFor(controlSize), height = metrics.thumbHeightFor(controlSize))
                         .graphicsLayer { scaleX = thumbScale; scaleY = thumbScale }
                         .hoverable(interactionSource)
-                        .shadow(2.dp, ThumbShape, clip = false)
-                        .clip(ThumbShape)
-                        .background(thumbColor),
+                        .shadow(1.dp, thumbShape, clip = false)
+                        .then(
+                            if (isActive && enabled) {
+                                Modifier.sliderThumbGlass(thumbShape, sliderLiquidState)
+                            } else {
+                                Modifier
+                                    .clip(thumbShape)
+                                    .background(thumbColor)
+                            },
+                        ),
                 )
             }
         }
@@ -251,6 +310,7 @@ fun RangeSlider(
 ) {
     val controlSize = LocalControlSize.current
     val metrics = DarwinTheme.componentStyling.slider.metrics
+    val thumbShape = RoundedCornerShape(metrics.thumbCornerRadiusFor(controlSize))
 
     val min = valueRange.start
     val max = valueRange.endInclusive
@@ -258,8 +318,8 @@ fun RangeSlider(
     val startFraction = ((value.start - min) / (max - min)).coerceIn(0f, 1f)
     val endFraction = ((value.endInclusive - min) / (max - min)).coerceIn(0f, 1f)
 
-    var isDraggingStart by remember { mutableStateOf(false) }
-    var isDraggingEnd by remember { mutableStateOf(false) }
+    var isPressedStart by remember { mutableStateOf(false) }
+    var isPressedEnd by remember { mutableStateOf(false) }
 
     val density = LocalDensity.current
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
@@ -272,33 +332,44 @@ fun RangeSlider(
     val fillColor = if (enabled) colors.activeTrackColor else colors.disabledActiveTrackColor
     val thumbColor = if (enabled) colors.thumbColor else colors.disabledThumbColor
 
+    val parentLiquidState = LocalDarwinLiquidState.current
+    val sliderLiquidState = if (parentLiquidState != null) rememberLiquidState() else null
+
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(metrics.thumbHeightFor(controlSize))
+            .height(metrics.totalHeightFor(controlSize))
             .onSizeChanged { containerSize = it }
             .then(if (!enabled) Modifier.graphicsLayer { alpha = 0.5f } else Modifier),
         contentAlignment = Alignment.CenterStart,
     ) {
-        if (track != null) {
-            track(value)
-        } else {
-            Canvas(modifier = Modifier.fillMaxWidth().height(metrics.trackHeightFor(controlSize)).align(Alignment.Center)) {
-                val cornerRadius = CornerRadius(this.size.height / 2f)
-                drawRoundRect(color = trackColor, cornerRadius = cornerRadius, size = this.size)
-                val startX = startFraction * this.size.width
-                val fillWidth = (endFraction - startFraction) * this.size.width
-                if (fillWidth > 0f) {
-                    drawRoundRect(
-                        color = fillColor,
-                        topLeft = androidx.compose.ui.geometry.Offset(startX, 0f),
-                        size = Size(fillWidth, this.size.height),
-                        cornerRadius = cornerRadius,
-                    )
+        // Track layer — inside liquefiable scope for thumb glass sampling
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .then(if (sliderLiquidState != null) Modifier.liquefiable(sliderLiquidState) else Modifier),
+        ) {
+            if (track != null) {
+                track(value)
+            } else {
+                Canvas(modifier = Modifier.fillMaxWidth().height(metrics.trackHeightFor(controlSize)).align(Alignment.Center)) {
+                    val cornerRadius = CornerRadius(this.size.height / 2f)
+                    drawRoundRect(color = trackColor, cornerRadius = cornerRadius, size = this.size)
+                    val startX = startFraction * this.size.width
+                    val fillWidth = (endFraction - startFraction) * this.size.width
+                    if (fillWidth > 0f) {
+                        drawRoundRect(
+                            color = fillColor,
+                            topLeft = androidx.compose.ui.geometry.Offset(startX, 0f),
+                            size = Size(fillWidth, this.size.height),
+                            cornerRadius = cornerRadius,
+                        )
+                    }
                 }
             }
         }
 
+        // Thumbs — outside liquefiable scope
         val trackWidthPx = containerSize.width.toFloat() - thumbWidthPx
 
         // Start thumb
@@ -307,9 +378,9 @@ fun RangeSlider(
             Box(modifier = Modifier.offset(x = startOffsetDp)
                 .then(if (enabled) Modifier.pointerInput(Unit) {
                     detectDragGestures(
-                        onDragStart = { isDraggingStart = true },
-                        onDragEnd = { isDraggingStart = false; onValueChangeFinished?.invoke() },
-                        onDragCancel = { isDraggingStart = false },
+                        onDragStart = { isPressedStart = true },
+                        onDragEnd = { isPressedStart = false; onValueChangeFinished?.invoke() },
+                        onDragCancel = { isPressedStart = false },
                     ) { change, _ ->
                         change.consume()
                         val newStart = valueFromFraction(fractionFromX(change.position.x + startOffsetDp.value * density.density)).coerceAtMost(value.endInclusive)
@@ -322,9 +393,14 @@ fun RangeSlider(
                 modifier = Modifier
                     .offset(x = startOffsetDp)
                     .size(width = metrics.thumbWidthFor(controlSize), height = metrics.thumbHeightFor(controlSize))
-                    .shadow(2.dp, ThumbShape, clip = false)
-                    .clip(ThumbShape)
-                    .background(thumbColor),
+                    .shadow(1.dp, thumbShape, clip = false)
+                    .then(
+                        if (isPressedStart && enabled) {
+                            Modifier.sliderThumbGlass(thumbShape, sliderLiquidState)
+                        } else {
+                            Modifier.clip(thumbShape).background(thumbColor)
+                        },
+                    ),
             )
         }
 
@@ -337,9 +413,14 @@ fun RangeSlider(
                 modifier = Modifier
                     .offset(x = endOffsetDp)
                     .size(width = metrics.thumbWidthFor(controlSize), height = metrics.thumbHeightFor(controlSize))
-                    .shadow(2.dp, ThumbShape, clip = false)
-                    .clip(ThumbShape)
-                    .background(thumbColor),
+                    .shadow(1.dp, thumbShape, clip = false)
+                    .then(
+                        if (isPressedEnd && enabled) {
+                            Modifier.sliderThumbGlass(thumbShape, sliderLiquidState)
+                        } else {
+                            Modifier.clip(thumbShape).background(thumbColor)
+                        },
+                    ),
             )
         }
     }

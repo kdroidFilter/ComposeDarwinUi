@@ -250,11 +250,11 @@ private fun defaultSwitchStyle(cs: ColorScheme): SwitchStyle {
 private fun defaultSliderStyle(cs: ColorScheme) = SliderStyle(
     colors = SliderStyle.Colors(
         activeTrack = cs.accent,
-        inactiveTrack = if (cs.isDark) Color(0xFF3A3A3C) else Color(0xFFD1D1D6),
+        inactiveTrack = if (cs.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.06f),
         disabledActiveTrack = cs.accent.copy(alpha = 0.5f),
-        disabledInactiveTrack = (if (cs.isDark) Color(0xFF3A3A3C) else Color(0xFFD1D1D6)).copy(alpha = 0.5f),
+        disabledInactiveTrack = if (cs.isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.03f),
         thumb = Color.White,
-        thumbBorder = Color.Black.copy(alpha = 0.15f),
+        thumbBorder = Color.Black.copy(alpha = 0.10f),
         thumbDisabled = Color.White.copy(alpha = 0.7f),
         tickMark = if (cs.isDark) Color(0xFF636366) else Color(0xFFAEAEB2),
         tickMarkActive = cs.onAccent,
