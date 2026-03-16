@@ -1,4 +1,3 @@
-import org.apache.tools.ant.taskdefs.condition.Os
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -100,26 +99,9 @@ kotlin {
             api(projects.macosuiIcons)
         }
         jvmMain.dependencies {
+            api(projects.decoratedWindow)
         }
     }
-}
-
-// Native build task for macOS JNI bridge (traffic-light repositioning)
-val buildNativeMacOs by tasks.registering(Exec::class) {
-    description = "Compiles the Objective-C JNI bridge into macOS dylibs (arm64 + x64)"
-    group = "build"
-    val nativeDir = file("src/jvmMain/native/macos")
-    val outputDir = file("src/jvmMain/resources/macosui/native")
-    val checkFile = File(outputDir, "darwin-aarch64/libmacosui_jni.dylib")
-    onlyIf { Os.isFamily(Os.FAMILY_MAC) && !checkFile.exists() }
-    inputs.dir(nativeDir)
-    outputs.dir(outputDir)
-    workingDir(nativeDir)
-    commandLine("bash", "build.sh")
-}
-
-tasks.named("jvmProcessResources") {
-    dependsOn(buildNativeMacOs)
 }
 
 android {

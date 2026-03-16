@@ -19,4 +19,4 @@ captures
 node_modules/
 
 # Compiled native JNI dylibs (built locally by build.sh)
-macosui/src/jvmMain/resources/macosui/native/
+decorated-window/src/main/resources/macosui/native/

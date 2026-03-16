@@ -26,9 +26,6 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.RootPaneContainer
 
-/** Fallback traffic-light inset when JNI is not available. */
-private val FALLBACK_INSET = 80.dp
-
 /** Default title bar height matching TitleBarStyle.Unified. */
 private const val DEFAULT_TITLE_BAR_HEIGHT = 52f
 
@@ -36,14 +33,11 @@ private const val DEFAULT_TITLE_BAR_HEIGHT = 52f
  * A Compose Desktop window that replicates the SwiftUI full-size content
  * window style on macOS.
  *
- * When the native JNI bridge is available, this:
- * 1. Makes the title bar transparent with full-size content view
- * 2. Installs an invisible `NSToolbar` for the macOS 26pt corner radius
- * 3. Repositions traffic-light buttons via Auto Layout constraints
- *    (further from the edge, matching Finder / Safari)
- * 4. Syncs the AWT background color to prevent white flashes during resize
- *
- * Falls back to AWT client properties when JNI is unavailable.
+ * Uses the native JNI bridge to:
+ * 1. Make the title bar transparent with full-size content view
+ * 2. Install an invisible `NSToolbar` for the macOS 26pt corner radius
+ * 3. Reposition traffic-light buttons via Auto Layout constraints
+ * 4. Sync the AWT background color to prevent white flashes during resize
  *
  * The [Scaffold][io.github.kdroidfilter.nucleus.ui.apple.macos.components.Scaffold]
  * sidebar extends to the top of the window with the traffic lights floating
@@ -78,7 +72,7 @@ fun MacosWindow(
         onPreviewKeyEvent = onPreviewKeyEvent,
         onKeyEvent = onKeyEvent,
     ) {
-        var trafficLightInset: Dp by remember { mutableStateOf(FALLBACK_INSET) }
+        var trafficLightInset: Dp by remember { mutableStateOf(0.dp) }
         var revalidateCallback: (() -> Unit)? by remember { mutableStateOf(null) }
 
         // Track window focus for inactive appearance (grayed-out controls, etc.)
@@ -92,47 +86,28 @@ fun MacosWindow(
             onDispose { window.removeWindowListener(listener) }
         }
 
-        if (isApplePlatform) {
-            if (MacosWindowBridge.isLoaded) {
-                // JNI path: proper traffic-light repositioning
-                DisposableEffect(Unit) {
-                    val ptr = MacosWindowBridge.nativeGetNSWindowPtr(window)
-                    if (ptr != 0L) {
-                        (window as? RootPaneContainer)?.rootPane?.apply {
-                            putClientProperty("apple.awt.fullWindowContent", true)
-                            putClientProperty("apple.awt.transparentTitleBar", true)
-                            putClientProperty("apple.awt.windowTitleVisible", false)
-                        }
-                        val inset = MacosWindowBridge.nativeApplyTitleBar(ptr, DEFAULT_TITLE_BAR_HEIGHT)
-                        trafficLightInset = inset.dp
-                        revalidateCallback = { MacosWindowBridge.nativeRevalidateTitleBar(ptr) }
-                    }
-                    onDispose {
-                        revalidateCallback = null
-                        if (ptr != 0L) {
-                            MacosWindowBridge.nativeResetTitleBar(ptr)
-                        }
-                        (window as? RootPaneContainer)?.rootPane?.apply {
-                            putClientProperty("apple.awt.fullWindowContent", false)
-                            putClientProperty("apple.awt.transparentTitleBar", false)
-                            putClientProperty("apple.awt.windowTitleVisible", true)
-                        }
-                    }
-                }
-            } else {
-                // AWT-only fallback (traffic lights at default position)
-                DisposableEffect(Unit) {
+        if (isApplePlatform && MacosWindowBridge.isLoaded) {
+            DisposableEffect(Unit) {
+                val ptr = MacosWindowBridge.nativeGetNSWindowPtr(window)
+                if (ptr != 0L) {
                     (window as? RootPaneContainer)?.rootPane?.apply {
                         putClientProperty("apple.awt.fullWindowContent", true)
                         putClientProperty("apple.awt.transparentTitleBar", true)
                         putClientProperty("apple.awt.windowTitleVisible", false)
                     }
-                    onDispose {
-                        (window as? RootPaneContainer)?.rootPane?.apply {
-                            putClientProperty("apple.awt.fullWindowContent", false)
-                            putClientProperty("apple.awt.transparentTitleBar", false)
-                            putClientProperty("apple.awt.windowTitleVisible", true)
-                        }
+                    val inset = MacosWindowBridge.nativeApplyTitleBar(ptr, DEFAULT_TITLE_BAR_HEIGHT)
+                    trafficLightInset = inset.dp
+                    revalidateCallback = { MacosWindowBridge.nativeRevalidateTitleBar(ptr) }
+                }
+                onDispose {
+                    revalidateCallback = null
+                    if (ptr != 0L) {
+                        MacosWindowBridge.nativeResetTitleBar(ptr)
+                    }
+                    (window as? RootPaneContainer)?.rootPane?.apply {
+                        putClientProperty("apple.awt.fullWindowContent", false)
+                        putClientProperty("apple.awt.transparentTitleBar", false)
+                        putClientProperty("apple.awt.windowTitleVisible", true)
                     }
                 }
             }

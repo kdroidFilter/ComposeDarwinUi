@@ -6,10 +6,10 @@ import java.nio.file.StandardCopyOption
 import java.util.logging.Level
 import java.util.logging.Logger
 
-private const val LIBRARY_NAME = "macosui_jni"
-private const val RESOURCE_PREFIX = "/macosui/native"
+private const val LibraryName = "macosui_jni"
+private const val ResourcePrefix = "/macosui/native"
 
-internal object MacosWindowBridge {
+object MacosWindowBridge {
 
     private val logger = Logger.getLogger(MacosWindowBridge::class.java.simpleName)
 
@@ -30,7 +30,7 @@ internal object MacosWindowBridge {
     @Suppress("TooGenericExceptionCaught")
     private fun loadLibrary(): Boolean {
         try {
-            System.loadLibrary(LIBRARY_NAME)
+            System.loadLibrary(LibraryName)
             return true
         } catch (_: UnsatisfiedLinkError) { /* fall through */ }
 
@@ -38,8 +38,8 @@ internal object MacosWindowBridge {
             val arch = System.getProperty("os.arch").let {
                 if (it == "aarch64" || it == "arm64") "aarch64" else "x64"
             }
-            val fileName = "lib$LIBRARY_NAME.dylib"
-            val resourcePath = "$RESOURCE_PREFIX/darwin-$arch/$fileName"
+            val fileName = "lib$LibraryName.dylib"
+            val resourcePath = "$ResourcePrefix/darwin-$arch/$fileName"
             val stream = MacosWindowBridge::class.java.getResourceAsStream(resourcePath)
                 ?: throw UnsatisfiedLinkError("Not found in resources: $resourcePath")
 
@@ -51,7 +51,7 @@ internal object MacosWindowBridge {
             val target = cacheDir.resolve(fileName)
 
             stream.use { input ->
-                val tmp = Files.createTempFile(cacheDir, LIBRARY_NAME, ".tmp")
+                val tmp = Files.createTempFile(cacheDir, LibraryName, ".tmp")
                 Files.copy(input, tmp, StandardCopyOption.REPLACE_EXISTING)
                 try {
                     Files.move(tmp, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE)
@@ -63,7 +63,7 @@ internal object MacosWindowBridge {
             System.load(target.toAbsolutePath().toString())
             true
         } catch (e: Exception) {
-            logger.log(Level.WARNING, "Failed to load $LIBRARY_NAME native library", e)
+            logger.log(Level.WARNING, "Failed to load $LibraryName native library", e)
             false
         }
     }
