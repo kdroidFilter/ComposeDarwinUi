@@ -19,7 +19,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
@@ -312,6 +314,20 @@ fun TitleBarGroupButton(
     // Icon area size matches Sketch: XL=28dp, Medium=20dp
     val iconAreaSize = style.buttonHeight - (style.buttonPadding * 2)
 
+    // Scale icons by increasing density so vectors render natively at the larger size
+    // (avoids graphicsLayer bitmap scaling which causes blur)
+    val currentDensity = LocalDensity.current
+    val scaledDensity = remember(currentDensity.density, currentDensity.fontScale, iconScale) {
+        if (iconScale != 1f) {
+            Density(
+                density = currentDensity.density * iconScale,
+                fontScale = currentDensity.fontScale,
+            )
+        } else {
+            currentDensity
+        }
+    }
+
     CompositionLocalProvider(
         LocalContentColor provides contentColor,
         LocalTextStyle provides MacosTheme.typography.caption1,
@@ -335,13 +351,7 @@ fun TitleBarGroupButton(
                     .size(iconAreaSize)
                     .background(bgOverlay, CircleShape),
             )
-            if (iconScale != 1f) {
-                Box(
-                    modifier = Modifier.graphicsLayer {
-                        scaleX = iconScale; scaleY = iconScale; clip = true
-                    },
-                ) { content() }
-            } else {
+            CompositionLocalProvider(LocalDensity provides scaledDensity) {
                 content()
             }
         }
