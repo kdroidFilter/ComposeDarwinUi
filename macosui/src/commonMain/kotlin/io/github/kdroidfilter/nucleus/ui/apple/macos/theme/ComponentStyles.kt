@@ -729,8 +729,8 @@ data class SidebarStyle(
             ControlSize.ExtraLarge -> 8.dp
         }
 
-        /** Sketch: 4dp gap between icon and label for all sizes */
-        fun iconGapFor(controlSize: ControlSize): Dp = 4.dp
+        /** Sketch: 2dp gap between icon and label for all sizes */
+        fun iconGapFor(controlSize: ControlSize): Dp = 2.dp
 
         fun itemSpacingFor(controlSize: ControlSize): Dp = when (controlSize) {
             ControlSize.Mini -> 0.dp

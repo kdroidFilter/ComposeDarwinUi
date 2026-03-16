@@ -226,7 +226,7 @@ fun Sidebar(
     )
 
     val animatedTrackStartPadding by animateDpAsState(
-        targetValue = if (collapsed) 4.dp else 9.dp,
+        targetValue = if (collapsed) 4.dp else 2.dp,
         animationSpec = sidebarSpring(),
     )
     val animatedTrackEndPadding by animateDpAsState(
@@ -756,18 +756,12 @@ private fun SidebarItemRow(
 
     val isDark = colors.isDark
     // Sketch: selected background — light: #0000001c, dark: use white overlay
-    val backgroundColor by animateColorAsState(
-        targetValue = if (active) {
-            if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.11f)
-        } else {
-            Color.Transparent
-        },
-        animationSpec = macosSpring(SpringPreset.Snappy),
-    )
-    val contentColor by animateColorAsState(
-        targetValue = if (active) colors.accent else colors.textPrimary,
-        animationSpec = macosSpring(SpringPreset.Snappy),
-    )
+    val backgroundColor = if (active) {
+        if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.11f)
+    } else {
+        Color.Transparent
+    }
+    val contentColor = if (active) colors.accent else colors.textPrimary
 
     val itemShape = MacosTheme.shapes.small
 
