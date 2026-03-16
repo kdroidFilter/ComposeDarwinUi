@@ -1,5 +1,5 @@
 [versions]
-agp = "8.12.0"
+agp = "8.12.3"
 kotlinMath = "1.7.0"
 liquid = "1.1.1"
 android-compileSdk = "36"
@@ -9,8 +9,8 @@ androidx-activity = "1.13.0"
 androidx-appcompat = "1.7.1"
 androidx-core = "1.18.0"
 androidx-espresso = "3.7.0"
-androidx-lifecycle = "2.10.0-alpha07"
-androidx-nav3 = "1.1.0-alpha01"
+androidx-lifecycle = "2.10.0-beta01"
+androidx-nav3 = "1.1.0-alpha04"
 navigation3Browser = "0.3.1"
 androidx-testExt = "1.3.0"
 composeHotReload = "1.0.0"
@@ -19,15 +19,18 @@ compose-rules = "0.5.6"
 detekt = "1.23.8"
 highlights = "1.1.0"
 iconsLucideCmp = "2.2.1"
-jna = "5.16.0"
+jna = "5.18.1"
 junit = "4.13.2"
-kotlin = "2.3.10"
+kotlin = "2.3.20"
 kotlinx-coroutines = "1.10.2"
 kotlinx-datetime = "0.7.1"
 ksp = "2.3.1"
 multiplatformMarkdownRenderer = "0.39.2"
+nucleus = "1.4.7"
 
 [libraries]
+nucleus-core-runtime = { module = "io.github.kdroidfilter:nucleus.core-runtime", version.ref = "nucleus" }
+nucleus-decorated-window-jni = { module = "io.github.kdroidfilter:nucleus.decorated-window-jni", version.ref = "nucleus" }
 kotlin-math = { module = "dev.romainguy:kotlin-math", version.ref = "kotlinMath" }
 liquid = { module = "io.github.fletchmckee.liquid:liquid", version.ref = "liquid" }
 highlights = { module = "dev.snipme:highlights", version.ref = "highlights" }
