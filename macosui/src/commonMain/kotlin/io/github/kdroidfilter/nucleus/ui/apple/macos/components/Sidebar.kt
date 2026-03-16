@@ -230,7 +230,7 @@ fun Sidebar(
         animationSpec = sidebarSpring(),
     )
     val animatedTrackEndPadding by animateDpAsState(
-        targetValue = if (collapsed) 4.dp else 9.dp,
+        targetValue = if (collapsed) 4.dp else 11.dp,
         animationSpec = sidebarSpring(),
     )
 
