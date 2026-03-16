@@ -452,7 +452,10 @@ private fun SidebarItemWithVisibility(
         return
     }
 
-    val indentPadding = sidebarMetrics.indentFor(indentLevel)
+    // Leaf items add disclosureWidth so their content aligns with disclosure parents at the same level,
+    // and is properly indented one level deeper than the parent above.
+    val disclosureWidth = sidebarMetrics.disclosureWidthFor(controlSize)
+    val indentPadding = sidebarMetrics.indentFor(indentLevel, controlSize) + disclosureWidth
 
     if (item.icon != null) {
         SidebarItemRow(
@@ -514,19 +517,14 @@ private fun DisclosureItem(
         animationSpec = sidebarSpring(),
     )
 
-    val indentPadding = sidebarMetrics.indentFor(indentLevel)
+    val indentPadding = sidebarMetrics.indentFor(indentLevel, controlSize)
+    val disclosureWidth = sidebarMetrics.disclosureWidthFor(controlSize)
 
     // Parent item row with chevron
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = indentPadding)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-            ) {
-                if (item.onClick != {}) item.onClick() else expanded = !expanded
-            },
+            .padding(start = indentPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Disclosure chevron (hidden when sidebar is collapsed)
@@ -536,7 +534,8 @@ private fun DisclosureItem(
         )
         Box(
             modifier = Modifier
-                .size(sidebarMetrics.itemHeightFor(controlSize))
+                .width(disclosureWidth)
+                .height(sidebarMetrics.itemHeightFor(controlSize))
                 .graphicsLayer {
                     alpha = chevronAlpha
                     rotationZ = chevronRotation
@@ -559,7 +558,7 @@ private fun DisclosureItem(
         Box(modifier = Modifier.weight(1f)) {
             SidebarItemRow(
                 label = item.label,
-                onClick = { expanded = !expanded },
+                onClick = item.onClick,
                 active = activeItem == item.id,
                 icon = item.icon?.let { SystemIcon(it) },
                 isCollapsed = collapsed,

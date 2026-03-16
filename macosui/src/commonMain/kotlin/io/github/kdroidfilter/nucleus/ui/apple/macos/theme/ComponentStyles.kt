@@ -768,12 +768,18 @@ data class SidebarStyle(
             ControlSize.ExtraLarge -> 17
         }
 
-        /** Sketch: Level 0 indent=0, Level 1=10dp, Level 2+=12dp per level */
-        fun indentFor(level: Int): Dp = when (level) {
-            0 -> 0.dp
-            1 -> 10.dp
-            else -> (10 + (level - 1) * 12).dp
+        /** Width of the disclosure chevron hit area, also used as the indent step per nesting level. */
+        fun disclosureWidthFor(controlSize: ControlSize): Dp = when (controlSize) {
+            ControlSize.Mini -> 16.dp
+            ControlSize.Small -> 18.dp
+            ControlSize.Regular -> 20.dp
+            ControlSize.Large -> 22.dp
+            ControlSize.ExtraLarge -> 24.dp
         }
+
+        /** Each nesting level indents by one [disclosureWidthFor] so children align with their parent's content. */
+        fun indentFor(level: Int, controlSize: ControlSize): Dp =
+            disclosureWidthFor(controlSize) * level
     }
 }
 

@@ -155,7 +155,24 @@ fun SidebarDisclosureExample() {
                 "Mailboxes", onClick = {}, icon = LucideFolder, group = "Mail",
                 children = listOf(
                     SidebarItem("Inbox", onClick = { active = "Inbox" }, icon = LucideStar),
-                    SidebarItem("Sent", onClick = { active = "Sent" }, icon = LucideCalendar),
+                    SidebarItem(
+                        "Work", onClick = { active = "Work" }, icon = LucideFolder,
+                        children = listOf(
+                            SidebarItem(
+                                "Projects", onClick = { active = "Projects" }, icon = LucideFolder,
+                                children = listOf(
+                                    SidebarItem(
+                                        "2026", onClick = { active = "2026" }, icon = LucideFolder,
+                                        children = listOf(
+                                            SidebarItem("Q1 Report", onClick = { active = "Q1 Report" }, icon = LucideStar),
+                                            SidebarItem("Q2 Report", onClick = { active = "Q2 Report" }, icon = LucideCalendar),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                            SidebarItem("Archive", onClick = { active = "Archive" }, icon = LucideTrash2),
+                        ),
+                    ),
                     SidebarItem("Trash", onClick = { active = "Trash" }, icon = LucideTrash2),
                 ),
             ),
@@ -170,7 +187,7 @@ fun SidebarDisclosureExample() {
             SidebarItem("Documents", onClick = { active = "Documents" }, icon = LucideFolder, group = "Locations"),
         )
     }
-    Card(modifier = Modifier.fillMaxWidth().height(350.dp)) {
+    Card(modifier = Modifier.fillMaxWidth().height(480.dp)) {
         Row(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.fillMaxHeight().background(MacosTheme.colorScheme.muted)) {
                 Sidebar(
