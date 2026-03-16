@@ -82,7 +82,6 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchSuggestion
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchSuggestionSeparator
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SegmentedControl
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Sidebar
-import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SidebarButton
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SidebarItem
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Switch
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
@@ -278,22 +277,6 @@ fun App() {
                             collapsed = sidebarCollapsed,
                             onCollapsedChange = { sidebarCollapsed = it },
                             collapsible = true,
-                            header = {
-                                // Spacer matching TitleBar height — on macOS
-                                // the traffic lights float in the left portion.
-                                // The SidebarButton sits on the right side.
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(52.dp)
-                                        .padding(end = 8.dp),
-                                    contentAlignment = Alignment.CenterEnd,
-                                ) {
-                                    SidebarButton(
-                                        onClick = { columnVisibility = ColumnVisibility.DoubleColumn },
-                                    )
-                                }
-                            },
                         )
                     }
                 },

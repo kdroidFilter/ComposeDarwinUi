@@ -52,6 +52,15 @@ class SidebarResizeCallbacks(
 val LocalSidebarResize = compositionLocalOf<SidebarResizeCallbacks?> { null }
 
 /**
+ * Callback to hide (close) the sidebar.
+ * Set by [Scaffold][io.github.kdroidfilter.nucleus.ui.apple.macos.components.Scaffold]
+ * when the sidebar is toggleable. The [Sidebar][io.github.kdroidfilter.nucleus.ui.apple.macos.components.Sidebar]
+ * reads this to automatically show a hide button in its header area.
+ * Null when the sidebar is not toggleable.
+ */
+val LocalSidebarHide = compositionLocalOf<(() -> Unit)?> { null }
+
+/**
  * The two glass appearance variants matching macOS 26.
  *
  * - [Regular] — neutral translucent glass with a lighter tint.

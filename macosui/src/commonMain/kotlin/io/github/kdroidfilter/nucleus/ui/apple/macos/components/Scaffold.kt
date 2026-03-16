@@ -41,10 +41,12 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarWidth
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTitleBarHeight
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SidebarResizeCallbacks
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalToolbarGlassState
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarHide
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.unit.IntSize
 
 /**
@@ -177,9 +179,11 @@ fun Scaffold(
                     null
                 }
 
+                val hideCallback: (() -> Unit)? = if (managedToggle) toggleSidebar else null
                 CompositionLocalProvider(
                     LocalSidebarWidth provides currentSidebarWidth,
                     LocalSidebarResize provides sidebarResizeCallbacks,
+                    LocalSidebarHide provides hideCallback,
                 ) {
                     sidebar()
                 }
