@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.fletchmckee.liquid.liquefiable
 import io.github.fletchmckee.liquid.liquid
@@ -44,6 +45,8 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalGlassType
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalToolbarGlassState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
+import androidx.compose.animation.core.spring
+import androidx.compose.ui.unit.IntSize
 
 /**
  * macOS-style scaffold layout with optional sidebar, content list, inspector,
@@ -151,14 +154,19 @@ fun Scaffold(
     ) {
         // ---- Sidebar (full height, side-by-side with the title bar) ----
         if (sidebar != null) {
+            // Critically damped spring (no overshoot/bounce) for a natural Apple-style slide
+            val sidebarSpring = spring<IntSize>(
+                dampingRatio = 1.0f,
+                stiffness = SpringPreset.Snappy.stiffness,
+            )
             AnimatedVisibility(
                 visible = showSidebar,
                 enter = expandHorizontally(
-                    animationSpec = macosSpring(SpringPreset.Snappy),
+                    animationSpec = sidebarSpring,
                     expandFrom = Alignment.Start,
                 ),
                 exit = shrinkHorizontally(
-                    animationSpec = macosSpring(SpringPreset.Snappy),
+                    animationSpec = sidebarSpring,
                     shrinkTowards = Alignment.Start,
                 ),
             ) {
@@ -360,18 +368,24 @@ fun Scaffold(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         if (managedToggle) {
+                            val toggleSpring = spring<IntSize>(
+                                dampingRatio = 1.0f,
+                                stiffness = SpringPreset.Snappy.stiffness,
+                            )
                             AnimatedVisibility(
                                 visible = !showSidebar,
                                 enter = expandHorizontally(
-                                    animationSpec = macosSpring(SpringPreset.Snappy),
+                                    animationSpec = toggleSpring,
                                     expandFrom = Alignment.Start,
                                 ) + fadeIn(macosTween(MacosDuration.Normal)),
                                 exit = shrinkHorizontally(
-                                    animationSpec = macosSpring(SpringPreset.Snappy),
+                                    animationSpec = toggleSpring,
                                     shrinkTowards = Alignment.Start,
                                 ) + fadeOut(macosTween(MacosDuration.Fast)),
                             ) {
-                                Box(modifier = Modifier.padding(start = 12.dp)) {
+                                val windowControlInset = LocalWindowControlInset.current
+                                val startPadding = if (windowControlInset != Dp.Unspecified) windowControlInset else 12.dp
+                                Box(modifier = Modifier.padding(start = startPadding)) {
                                     SidebarButton(onClick = toggleSidebar)
                                 }
                             }

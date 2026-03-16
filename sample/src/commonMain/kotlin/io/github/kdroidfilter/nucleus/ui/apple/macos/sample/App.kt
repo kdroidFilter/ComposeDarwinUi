@@ -279,27 +279,16 @@ fun App() {
                             onCollapsedChange = { sidebarCollapsed = it },
                             collapsible = true,
                             header = {
-                                // Title + toggle — aligns vertically with 52dp title bar
-                                Row(
+                                // Spacer matching TitleBar height — on macOS
+                                // the traffic lights float in the left portion.
+                                // The SidebarButton sits on the right side.
+                                Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                        .height(52.dp)
+                                        .padding(end = 8.dp),
+                                    contentAlignment = Alignment.CenterEnd,
                                 ) {
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = "macOS UI",
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = MacosTheme.colorScheme.textPrimary,
-                                        )
-                                        Text(
-                                            text = "Component Docs",
-                                            style = MacosTheme.typography.caption1,
-                                            color = MacosTheme.colorScheme.textTertiary,
-                                        )
-                                    }
                                     SidebarButton(
                                         onClick = { columnVisibility = ColumnVisibility.DoubleColumn },
                                     )
