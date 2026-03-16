@@ -204,9 +204,9 @@ fun Sidebar(
         animationSpec = sidebarSpring(),
     )
 
-    // Animated padding: collapsed=4dp, expanded=4dp
+    // Animated padding: collapsed=6dp, expanded=6dp
     val animatedPadding by animateDpAsState(
-        targetValue = if (collapsed) 4.dp else 4.dp,
+        targetValue = if (collapsed) 6.dp else 6.dp,
         animationSpec = sidebarSpring(),
     )
 
