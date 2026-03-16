@@ -252,7 +252,7 @@ fun Sidebar(
     val inactiveOverlay = if (isWindowActive) {
         Color.Transparent
     } else {
-        if (isDark) Color(0xFF282828) else Color(0xFFECECEC)
+        if (isDark) Color(0xFF282828) else Color(0xFFF4F4F4)
     }
 
     Box(

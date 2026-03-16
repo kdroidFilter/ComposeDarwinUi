@@ -30,6 +30,7 @@ nucleus = "1.4.7"
 
 [libraries]
 nucleus-core-runtime = { module = "io.github.kdroidfilter:nucleus.core-runtime", version.ref = "nucleus" }
+nucleus-darkmode-detector = { module = "io.github.kdroidfilter:nucleus.darkmode-detector", version.ref = "nucleus" }
 nucleus-decorated-window-jni = { module = "io.github.kdroidfilter:nucleus.decorated-window-jni", version.ref = "nucleus" }
 kotlin-math = { module = "dev.romainguy:kotlin-math", version.ref = "kotlinMath" }
 liquid = { module = "io.github.fletchmckee.liquid:liquid", version.ref = "liquid" }

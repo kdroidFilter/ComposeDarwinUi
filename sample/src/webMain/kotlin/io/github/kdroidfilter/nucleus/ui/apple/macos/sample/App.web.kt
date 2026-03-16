@@ -1,5 +1,6 @@
 package io.github.kdroidfilter.nucleus.ui.apple.macos.sample
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.github.terrakok.navigation3.browser.ChronologicalBrowserNavigation
@@ -24,3 +25,6 @@ internal actual fun BrowserNavigation(backStack: SnapshotStateList<AppNavKey>) {
         },
     )
 }
+
+@Composable
+internal actual fun isSystemDarkMode(): Boolean = isSystemInDarkTheme()

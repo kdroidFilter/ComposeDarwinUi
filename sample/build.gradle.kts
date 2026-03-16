@@ -73,6 +73,8 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.nucleus.core.runtime)
+            implementation(libs.nucleus.darkmode.detector)
         }
         webMain.dependencies {
             implementation(libs.navigation3.browser)

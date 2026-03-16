@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
+import com.composables.icons.lucide.Monitor
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -158,6 +158,8 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.VibrantColors
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.vibrant
 
+internal enum class ThemeMode { System, Light, Dark }
+
 // Navigation data
 internal data class SidebarEntryDef(val id: String, val label: String, val group: String, val icon: ImageVector)
 
@@ -214,8 +216,13 @@ internal val sidebarEntryDefs = listOf(
 
 @Composable
 fun App() {
-    val systemTheme = isSystemInDarkTheme()
-    var isDark by remember { mutableStateOf(systemTheme) }
+    var themeMode by remember { mutableStateOf(ThemeMode.System) }
+    val systemDark = isSystemDarkMode()
+    val isDark = when (themeMode) {
+        ThemeMode.System -> systemDark
+        ThemeMode.Light -> false
+        ThemeMode.Dark -> true
+    }
     var accentColor by remember { mutableStateOf(AccentColor.Blue) }
     var sidebarControlSize by remember { mutableStateOf(ControlSize.Regular) }
     var isVibrant by remember { mutableStateOf(false) }
@@ -375,8 +382,21 @@ fun App() {
                                 }
                             }
                             TitleBarButtonGroup {
-                                TitleBarGroupButton(onClick = { isDark = !isDark }) {
-                                    Icon(if (isDark) LucideSun else LucideMoon, modifier = Modifier.size(14.dp))
+                                TitleBarGroupButton(onClick = {
+                                    themeMode = when (themeMode) {
+                                        ThemeMode.System -> ThemeMode.Light
+                                        ThemeMode.Light -> ThemeMode.Dark
+                                        ThemeMode.Dark -> ThemeMode.System
+                                    }
+                                }) {
+                                    Icon(
+                                        when (themeMode) {
+                                            ThemeMode.System -> Lucide.Monitor
+                                            ThemeMode.Light -> LucideSun
+                                            ThemeMode.Dark -> LucideMoon
+                                        },
+                                        modifier = Modifier.size(14.dp),
+                                    )
                                 }
                             }
                             ToolbarSearchField(
@@ -569,3 +589,6 @@ private fun AccentColorPicker(
 
 @Composable
 internal expect fun BrowserNavigation(backStack: androidx.compose.runtime.snapshots.SnapshotStateList<AppNavKey>)
+
+@Composable
+internal expect fun isSystemDarkMode(): Boolean
