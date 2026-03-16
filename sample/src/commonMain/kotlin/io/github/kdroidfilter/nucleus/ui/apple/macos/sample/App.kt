@@ -223,7 +223,9 @@ fun App() {
         ThemeMode.Light -> false
         ThemeMode.Dark -> true
     }
-    var accentColor by remember { mutableStateOf(AccentColor.Blue) }
+    val systemRawColor = systemAccentRawColor()
+    var overriddenAccent by remember { mutableStateOf<AccentColor?>(null) }
+    val accentColor = overriddenAccent ?: AccentColor.Blue
     var sidebarControlSize by remember { mutableStateOf(ControlSize.Regular) }
     var isVibrant by remember { mutableStateOf(false) }
     var glassType by remember { mutableStateOf(GlassType.Regular) }
@@ -233,11 +235,24 @@ fun App() {
     } else {
         io.github.kdroidfilter.nucleus.ui.apple.macos.theme.lightColorScheme(accentColor)
     }
-    val colorScheme = if (isVibrant) {
-        val vibrant = if (isDark) VibrantColors.dark() else VibrantColors.light()
-        baseColorScheme.vibrant(vibrant, accentColor)
+    // Override accent with exact system color when no manual override is set
+    val withSystemColor = if (systemRawColor != null && overriddenAccent == null) {
+        baseColorScheme.copy(
+            accent = systemRawColor,
+            info = systemRawColor,
+            ring = systemRawColor,
+            inputFocusBorder = systemRawColor,
+            surfaceTint = systemRawColor,
+            tertiary = systemRawColor,
+        )
     } else {
         baseColorScheme
+    }
+    val colorScheme = if (isVibrant) {
+        val vibrant = if (isDark) VibrantColors.dark() else VibrantColors.light()
+        withSystemColor.vibrant(vibrant, accentColor)
+    } else {
+        withSystemColor
     }
 
     MacosTheme(darkTheme = isDark, accentColor = accentColor, colorScheme = colorScheme, glassType = glassType) {
@@ -324,7 +339,7 @@ fun App() {
                                     )
                                     AccentColorPicker(
                                         selected = accentColor,
-                                        onSelect = { accentColor = it },
+                                        onSelect = { overriddenAccent = it },
                                     )
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
@@ -592,3 +607,6 @@ internal expect fun BrowserNavigation(backStack: androidx.compose.runtime.snapsh
 
 @Composable
 internal expect fun isSystemDarkMode(): Boolean
+
+@Composable
+internal expect fun systemAccentRawColor(): androidx.compose.ui.graphics.Color?

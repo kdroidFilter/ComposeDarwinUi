@@ -75,6 +75,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.nucleus.core.runtime)
             implementation(libs.nucleus.darkmode.detector)
+            implementation(libs.nucleus.system.color)
         }
         webMain.dependencies {
             implementation(libs.navigation3.browser)
