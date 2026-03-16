@@ -60,6 +60,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.GlassMaterialSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarResize
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalWindowActive
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SidebarStyle
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarHide
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarVisible
@@ -237,7 +238,22 @@ fun Sidebar(
     val hasBottomSection = collapsible || pinnedItems.isNotEmpty() || onLogout != null
 
     val sidebarContentShape = MacosTheme.shapes.extraLarge
-    val sidebarBorderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.08f)
+
+    // Window active state: macOS instantly removes glass vibrancy from inactive windows
+    val isWindowActive = LocalWindowActive.current
+
+    val sidebarBorderColor = if (isWindowActive) {
+        if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.08f)
+    } else {
+        if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.04f)
+    }
+
+    // Opaque background that covers the glass material when the window is inactive
+    val inactiveOverlay = if (isWindowActive) {
+        Color.Transparent
+    } else {
+        if (isDark) Color(0xFF282828) else Color(0xFFECECEC)
+    }
 
     Box(
         modifier = modifier
@@ -251,29 +267,32 @@ fun Sidebar(
                 .width(animatedWidth)
                 .padding(animatedPadding)
                 .drawBehind {
-                    // Soft outer shadow: concentric stroke rings, no fill
-                    val steps = 5
-                    val maxExpand = 6.dp.toPx()
-                    val baseAlpha = if (isDark) 0.02f else 0.03f
-                    val cornerRad = 16.dp.toPx()
-                    val strokeWidth = maxExpand / steps
-                    for (i in 1..steps) {
-                        val expand = maxExpand * (i.toFloat() / steps)
-                        val alpha = baseAlpha * ((steps - i + 1).toFloat() / steps)
-                        val shadowBase = if (isDark) Color.White else Color.Black
-                        drawRoundRect(
-                            color = shadowBase.copy(alpha = alpha),
-                            topLeft = Offset(-expand, -expand),
-                            size = Size(size.width + expand * 2, size.height + expand * 2),
-                            cornerRadius = CornerRadius(cornerRad + expand),
-                            style = Stroke(width = strokeWidth),
-                        )
+                    // Soft outer shadow: concentric stroke rings, no fill (hidden when inactive)
+                    if (isWindowActive) {
+                        val steps = 5
+                        val maxExpand = 6.dp.toPx()
+                        val baseAlpha = if (isDark) 0.02f else 0.03f
+                        val cornerRad = 16.dp.toPx()
+                        val strokeWidth = maxExpand / steps
+                        for (i in 1..steps) {
+                            val expand = maxExpand * (i.toFloat() / steps)
+                            val alpha = baseAlpha * ((steps - i + 1).toFloat() / steps)
+                            val shadowBase = if (isDark) Color.White else Color.Black
+                            drawRoundRect(
+                                color = shadowBase.copy(alpha = alpha),
+                                topLeft = Offset(-expand, -expand),
+                                size = Size(size.width + expand * 2, size.height + expand * 2),
+                                cornerRadius = CornerRadius(cornerRad + expand),
+                                style = Stroke(width = strokeWidth),
+                            )
+                        }
                     }
                 }
                 .macosGlassMaterial(
                     shape = sidebarContentShape,
                     materialSize = GlassMaterialSize.Large,
                 )
+                .background(inactiveOverlay, sidebarContentShape)
                 .border(1.dp, sidebarBorderColor, sidebarContentShape),
         ) {
             // ---- Hide button (matches title bar height, aligned to end) ----

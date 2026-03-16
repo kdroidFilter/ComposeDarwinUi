@@ -20,7 +20,10 @@ import androidx.compose.ui.window.rememberWindowState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.LocalTitleBarRevalidate
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.LocalWindowControlInset
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalColorScheme
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalWindowActive
 import io.github.kdroidfilter.nucleus.ui.apple.macos.util.isApplePlatform
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import javax.swing.RootPaneContainer
 
 /** Fallback traffic-light inset when JNI is not available. */
@@ -77,6 +80,17 @@ fun MacosWindow(
     ) {
         var trafficLightInset: Dp by remember { mutableStateOf(FALLBACK_INSET) }
         var revalidateCallback: (() -> Unit)? by remember { mutableStateOf(null) }
+
+        // Track window focus for inactive appearance (grayed-out controls, etc.)
+        var isWindowActive by remember { mutableStateOf(window.isFocused) }
+        DisposableEffect(window) {
+            val listener = object : WindowAdapter() {
+                override fun windowActivated(e: WindowEvent?) { isWindowActive = true }
+                override fun windowDeactivated(e: WindowEvent?) { isWindowActive = false }
+            }
+            window.addWindowListener(listener)
+            onDispose { window.removeWindowListener(listener) }
+        }
 
         if (isApplePlatform) {
             if (MacosWindowBridge.isLoaded) {
@@ -143,6 +157,7 @@ fun MacosWindow(
         CompositionLocalProvider(
             LocalWindowControlInset provides if (isApplePlatform) trafficLightInset else 0.dp,
             LocalTitleBarRevalidate provides revalidateCallback,
+            LocalWindowActive provides isWindowActive,
         ) {
             content()
         }
