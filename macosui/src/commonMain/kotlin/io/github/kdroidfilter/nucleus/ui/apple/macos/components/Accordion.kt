@@ -8,9 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -211,7 +209,6 @@ fun AccordionTrigger(
     val typography = MacosTheme.typography
 
     val interactionSource = remember { MutableInteractionSource() }
-    val isHovered by interactionSource.collectIsHoveredAsState()
 
     // Chevron rotation animation
     val chevronRotation by animateFloatAsState(
@@ -220,8 +217,7 @@ fun AccordionTrigger(
         label = "accordion_chevron_rotation",
     )
 
-    // Hover: textTertiary (zinc-500) gives clear contrast from textPrimary in both themes
-    val textColor = if (isHovered) colors.textTertiary else colors.textPrimary
+    val textColor = colors.textPrimary
 
     val textStyle = typography.subheadline.merge(
         TextStyle(
@@ -233,7 +229,6 @@ fun AccordionTrigger(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .hoverable(interactionSource = interactionSource)
             .clickable(
                 indication = null,
                 interactionSource = interactionSource,
