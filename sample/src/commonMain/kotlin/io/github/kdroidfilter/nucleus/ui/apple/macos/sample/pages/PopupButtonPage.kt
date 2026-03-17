@@ -13,8 +13,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.MenuPlacement
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.PopupButton
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.PopupButtonDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.gallery.GalleryExample
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.ExampleCard
@@ -277,6 +279,38 @@ fun PopupButtonCustomItemsExample() {
 // PopupButtonPage
 // ===========================================================================
 
+@GalleryExample("PopupButton", "Custom Colors")
+@Composable
+fun PopupButtonCustomColorsExample() {
+    val items = listOf("McIntosh", "Granny Smith", "Fuji")
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        var s1 by remember { mutableIntStateOf(0) }
+        PopupButton(
+            items = items,
+            selectedIndex = s1,
+            onSelectedChange = { s1 = it },
+            modifier = Modifier.widthIn(min = 150.dp),
+            colors = PopupButtonDefaults.colors(
+                selectedItemColor = Color(0xFF34C759),
+                checkmarkColor = Color(0xFF34C759),
+            ),
+        )
+        var s2 by remember { mutableIntStateOf(0) }
+        PopupButton(
+            items = items,
+            selectedIndex = s2,
+            onSelectedChange = { s2 = it },
+            modifier = Modifier.widthIn(min = 150.dp),
+            colors = PopupButtonDefaults.colors(
+                backgroundColor = Color(0xFFAF52DE).copy(alpha = 0.12f),
+                textColor = Color(0xFFAF52DE),
+                chevronColor = Color(0xFFAF52DE),
+                selectedItemColor = Color(0xFFAF52DE),
+            ),
+        )
+    }
+}
+
 @Composable
 internal fun PopupButtonPage() {
     GalleryPage("Pop-up Button", "Selection control for choosing from a list of options.") {
@@ -307,6 +341,13 @@ internal fun PopupButtonPage() {
             description = "Control where the menu appears relative to the button",
             sourceCode = GallerySources.PopupButtonPlacementExample,
         ) { PopupButtonPlacementExample() }
+
+        SectionHeader("Custom Colors")
+        ExampleCard(
+            title = "Custom Colors",
+            description = "PopupButton with custom selection and button colors",
+            sourceCode = GallerySources.PopupButtonCustomColorsExample,
+        ) { PopupButtonCustomColorsExample() }
 
         SectionHeader("Custom Items")
         ExampleCard(

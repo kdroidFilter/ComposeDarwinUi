@@ -65,6 +65,34 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTextStyle
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosGlass
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 
+import androidx.compose.runtime.Immutable
+
+// ===========================================================================
+// PopupButtonColors — public customizable colors
+// ===========================================================================
+
+@Immutable
+class PopupButtonColors(
+    val backgroundColor: Color,
+    val textColor: Color,
+    val chevronColor: Color,
+    val selectedItemColor: Color,
+    val selectedItemTextColor: Color,
+    val checkmarkColor: Color,
+)
+
+object PopupButtonDefaults {
+    @Composable
+    fun colors(
+        backgroundColor: Color = Color.Unspecified,
+        textColor: Color = Color.Unspecified,
+        chevronColor: Color = Color.Unspecified,
+        selectedItemColor: Color = Color.Unspecified,
+        selectedItemTextColor: Color = Color.Unspecified,
+        checkmarkColor: Color = Color.Unspecified,
+    ) = PopupButtonColors(backgroundColor, textColor, chevronColor, selectedItemColor, selectedItemTextColor, checkmarkColor)
+}
+
 // ===========================================================================
 // PopupButton — macOS 26 pop-up button (NSPopUpButton equivalent)
 //
@@ -100,6 +128,7 @@ fun <T> PopupButton(
     enabled: Boolean = true,
     placement: MenuPlacement = MenuPlacement.Below,
     itemText: (T) -> String = { it.toString() },
+    colors: PopupButtonColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val controlSize = LocalControlSize.current
@@ -115,19 +144,29 @@ fun <T> PopupButton(
 
     val base = if (isDark) Color.White else Color.Black
 
-    // Background — Sketch: #0000000D idle, #00000026 clicked, #00000008 disabled
-    val bgColor = when {
+    // Background — custom colors take priority
+    val bgColor = if (colors?.backgroundColor != null && colors.backgroundColor != Color.Unspecified) {
+        colors.backgroundColor
+    } else when {
         !enabled -> base.copy(alpha = if (isDark) 0.04f else 0.031f)
         isPressed || expanded -> base.copy(alpha = 0.15f)
         isHovered -> base.copy(alpha = 0.08f)
         else -> base.copy(alpha = 0.051f)
     }
 
-    // Text — always use the "enabled" color; disabled is handled by overall alpha
-    val contentColor = if (isDark) Color.White else Color(0xFF1A1A1A)
+    // Text — custom colors take priority
+    val contentColor = if (colors?.textColor != null && colors.textColor != Color.Unspecified) {
+        colors.textColor
+    } else {
+        if (isDark) Color.White else Color(0xFF1A1A1A)
+    }
 
-    // Chevron — always use the "enabled" tint; disabled is handled by overall alpha
-    val chevronColor = base.copy(alpha = 0.85f)
+    // Chevron — custom colors take priority
+    val chevronColor = if (colors?.chevronColor != null && colors.chevronColor != Color.Unspecified) {
+        colors.chevronColor
+    } else {
+        base.copy(alpha = 0.85f)
+    }
 
     // Press scale like PushButton
     val scale by animateFloatAsState(
@@ -224,6 +263,7 @@ fun <T> PopupButton(
                 anchorSize = anchorSize,
                 placement = placement,
                 itemText = itemText,
+                colors = colors,
             )
         }
     }
@@ -238,6 +278,7 @@ fun PopupButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     placement: MenuPlacement = MenuPlacement.Below,
+    colors: PopupButtonColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     PopupButton(
@@ -248,6 +289,7 @@ fun PopupButton(
         enabled = enabled,
         placement = placement,
         itemText = { it },
+        colors = colors,
         interactionSource = interactionSource,
     )
 }
@@ -266,6 +308,7 @@ private fun <T> PopupButtonMenu(
     anchorSize: IntSize,
     placement: MenuPlacement,
     itemText: (T) -> String,
+    colors: PopupButtonColors?,
 ) {
     val colors = MacosTheme.colorScheme
     val density = LocalDensity.current
@@ -343,6 +386,7 @@ private fun <T> PopupButtonMenu(
                             text = itemText(item),
                             selected = index == selectedIndex,
                             onClick = { onSelectedChange(index) },
+                            colors = colors,
                         )
                     }
                 }
@@ -360,9 +404,14 @@ private fun PopupMenuItem(
     text: String,
     selected: Boolean,
     onClick: () -> Unit,
+    colors: PopupButtonColors?,
 ) {
-    val colors = MacosTheme.colorScheme
-    val accentColor = colors.accent
+    val scheme = MacosTheme.colorScheme
+    val accentColor = if (colors?.selectedItemColor != null && colors.selectedItemColor != Color.Unspecified) {
+        colors.selectedItemColor
+    } else {
+        scheme.accent
+    }
 
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -372,11 +421,15 @@ private fun PopupMenuItem(
     val itemBg = if (isHighlighted) accentColor else Color.Transparent
 
     val textColor = when {
-        isHighlighted -> Color.White
-        else -> if (colors.isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1A1A1A)
+        isHighlighted -> if (colors?.selectedItemTextColor != null && colors.selectedItemTextColor != Color.Unspecified) colors.selectedItemTextColor else Color.White
+        else -> if (scheme.isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1A1A1A)
     }
 
-    val checkColor = if (isHighlighted) Color.White else accentColor
+    val checkColor = if (isHighlighted) {
+        if (colors?.selectedItemTextColor != null && colors.selectedItemTextColor != Color.Unspecified) colors.selectedItemTextColor else Color.White
+    } else {
+        if (colors?.checkmarkColor != null && colors.checkmarkColor != Color.Unspecified) colors.checkmarkColor else accentColor
+    }
 
     val itemShape = RoundedCornerShape(8.dp)
     val contentStyle = TextStyle(
