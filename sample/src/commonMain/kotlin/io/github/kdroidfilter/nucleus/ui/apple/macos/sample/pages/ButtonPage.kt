@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
-import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ArrowButton
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.PushButton
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.PushButtonColors
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.PushButtonDefaults
@@ -63,7 +62,6 @@ private fun ButtonPreview() {
             PushButton(text = "Neutral", onClick = {}, style = PushButtonStyle.Neutral)
             PushButton(text = "Borderless", onClick = {}, style = PushButtonStyle.Borderless)
             PushButton(text = "Bezel", onClick = {}, style = PushButtonStyle.BorderlessBezel)
-            ArrowButton(onClick = {})
         }
     }
 }
@@ -381,83 +379,6 @@ fun ButtonSurfaceExample() {
 }
 
 // ===========================================================================
-// Arrow Button — Sizes
-// ===========================================================================
-
-@GalleryExample("Button", "Arrow")
-@Composable
-fun ButtonArrowExample() {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        for (size in ControlSize.entries) {
-            ControlSize(size) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = size.name,
-                        style = MacosTheme.typography.caption1,
-                        color = MacosTheme.colorScheme.textSecondary,
-                        modifier = Modifier.widthIn(min = 72.dp),
-                    )
-                    ArrowButton(onClick = {})
-                    ArrowButton(onClick = {}, enabled = false)
-                }
-            }
-        }
-    }
-}
-
-// ===========================================================================
-// Arrow Button — Surface Appearance (Content Area vs Over Glass)
-// ===========================================================================
-
-@GalleryExample("Button", "Arrow Surface")
-@Composable
-fun ButtonArrowSurfaceExample() {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(24.dp),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(1f),
-        ) {
-            Text(
-                text = "Content Area",
-                style = MacosTheme.typography.caption1,
-                color = MacosTheme.colorScheme.textSecondary,
-            )
-            Surface(Surface.ContentArea) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ArrowButton(onClick = {})
-                    ArrowButton(onClick = {}, enabled = false)
-                }
-            }
-        }
-
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(1f),
-        ) {
-            Text(
-                text = "Over Glass",
-                style = MacosTheme.typography.caption1,
-                color = MacosTheme.colorScheme.textSecondary,
-            )
-            Surface(Surface.OverGlass) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ArrowButton(onClick = {})
-                    ArrowButton(onClick = {}, enabled = false)
-                }
-            }
-        }
-    }
-}
-
-// ===========================================================================
 // Custom Colors
 // ===========================================================================
 
@@ -602,7 +523,7 @@ fun ButtonCustomTextContentExample() {
 
 @Composable
 internal fun ButtonPage() {
-    GalleryPage("Button", "Push buttons and arrow buttons — macOS 26 Liquid Glass style.") {
+    GalleryPage("Button", "Push buttons — macOS 26 Liquid Glass style.") {
         PreviewContainer { ButtonPreview() }
 
         SectionHeader("Sizes")
@@ -696,17 +617,5 @@ internal fun ButtonPage() {
             sourceCode = GallerySources.ButtonSurfaceExample,
         ) { ButtonSurfaceExample() }
 
-        SectionHeader("Arrow Button")
-        ExampleCard(
-            title = "Arrow Button — Sizes",
-            description = "Circular popup chevron button at each ControlSize",
-            sourceCode = GallerySources.ButtonArrowExample,
-        ) { ButtonArrowExample() }
-
-        ExampleCard(
-            title = "Arrow Button — Surface",
-            description = "Arrow button adapts disabled opacity per surface",
-            sourceCode = GallerySources.ButtonArrowSurfaceExample,
-        ) { ButtonArrowSurfaceExample() }
     }
 }

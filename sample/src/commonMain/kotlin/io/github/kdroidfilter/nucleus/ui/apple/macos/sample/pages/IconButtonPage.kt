@@ -7,12 +7,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.Modifier
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ArrowButton
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.IconButton
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.IconButtonDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.IconButtonRole
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.IconButtonStyle
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Surface
 import io.github.kdroidfilter.nucleus.ui.apple.macos.gallery.GalleryExample
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.CodeBlock
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.ExampleCard
@@ -150,6 +155,75 @@ fun IconButtonCustomColorsExample() {
     }
 }
 
+@GalleryExample("IconButton", "Arrow")
+@Composable
+fun IconButtonArrowExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        for (size in ControlSize.entries) {
+            ControlSize(size) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = size.name,
+                        style = MacosTheme.typography.caption1,
+                        color = MacosTheme.colorScheme.textSecondary,
+                        modifier = Modifier.widthIn(min = 72.dp),
+                    )
+                    ArrowButton(onClick = {})
+                    ArrowButton(onClick = {}, enabled = false)
+                }
+            }
+        }
+    }
+}
+
+@GalleryExample("IconButton", "Arrow Surface")
+@Composable
+fun IconButtonArrowSurfaceExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(24.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Content Area",
+                style = MacosTheme.typography.caption1,
+                color = MacosTheme.colorScheme.textSecondary,
+            )
+            Surface(Surface.ContentArea) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ArrowButton(onClick = {})
+                    ArrowButton(onClick = {}, enabled = false)
+                }
+            }
+        }
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                text = "Over Glass",
+                style = MacosTheme.typography.caption1,
+                color = MacosTheme.colorScheme.textSecondary,
+            )
+            Surface(Surface.OverGlass) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    ArrowButton(onClick = {})
+                    ArrowButton(onClick = {}, enabled = false)
+                }
+            }
+        }
+    }
+}
+
 @Composable
 internal fun IconButtonPage() {
     GalleryPage("Icon Button", "Circular icon-only buttons for toolbar and content area actions.") {
@@ -185,5 +259,18 @@ IconButton(icon = Icons.Trash2, onClick = {}, role = IconButtonRole.Destructive)
             description = "Icon buttons with fully custom background and icon colors",
             sourceCode = GallerySources.IconButtonCustomColorsExample,
         ) { IconButtonCustomColorsExample() }
+
+        SectionHeader("Arrow Button")
+        ExampleCard(
+            title = "Arrow Button — Sizes",
+            description = "Circular popup chevron button at each ControlSize",
+            sourceCode = GallerySources.IconButtonArrowExample,
+        ) { IconButtonArrowExample() }
+
+        ExampleCard(
+            title = "Arrow Button — Surface",
+            description = "Arrow button adapts disabled opacity per surface",
+            sourceCode = GallerySources.IconButtonArrowSurfaceExample,
+        ) { IconButtonArrowSurfaceExample() }
     }
 }
