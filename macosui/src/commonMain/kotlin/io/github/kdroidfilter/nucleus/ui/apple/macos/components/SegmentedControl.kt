@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
@@ -43,17 +44,61 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.ControlSize
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SpringPreset
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalContentColor
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTextStyle
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalWindowActive
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SegmentedControlStyle
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SegmentedControlColors
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SegmentedControlVariant
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SpringPreset
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+
+// =============================================================================
+// SegmentedControlDefaults
+// =============================================================================
+
+object SegmentedControlDefaults {
+
+    @Composable
+    fun colors(
+        track: Color = Color.Unspecified,
+        selectedSegment: Color = Color.Unspecified,
+        selectedContent: Color = Color.Unspecified,
+        unselectedContent: Color = Color.Unspecified,
+        pressedOverlay: Color = Color.Unspecified,
+        disabledContent: Color = Color.Unspecified,
+        separatorColor: Color = Color.Unspecified,
+        inactiveSelectedSegment: Color = Color.Unspecified,
+        inactiveSelectedContent: Color = Color.Unspecified,
+        variant: SegmentedControlVariant = SegmentedControlVariant.ContentArea,
+    ): SegmentedControlColors {
+        val style = MacosTheme.componentStyling.segmentedControl.colorsFor(variant)
+        return SegmentedControlColors(
+            track = track.takeOrElse(style.track),
+            selectedSegment = selectedSegment.takeOrElse(style.selectedSegment),
+            selectedContent = selectedContent.takeOrElse(style.selectedContent),
+            unselectedContent = unselectedContent.takeOrElse(style.unselectedContent),
+            pressedOverlay = pressedOverlay.takeOrElse(style.pressedOverlay),
+            disabledContent = disabledContent.takeOrElse(style.disabledContent),
+            separatorColor = separatorColor.takeOrElse(style.separatorColor),
+            inactiveSelectedSegment = inactiveSelectedSegment.takeOrElse(style.inactiveSelectedSegment),
+            inactiveSelectedContent = inactiveSelectedContent.takeOrElse(style.inactiveSelectedContent),
+        )
+    }
+
+    @Composable
+    fun shape(): Shape {
+        val controlSize = LocalControlSize.current
+        val metrics = MacosTheme.componentStyling.segmentedControl.metrics
+        return RoundedCornerShape(metrics.cornerRadiusFor(controlSize))
+    }
+}
+
+private fun Color.takeOrElse(other: Color): Color =
+    if (this != Color.Unspecified) this else other
 
 // =============================================================================
 // SegmentedControl — slot-based API
@@ -66,22 +111,18 @@ fun SegmentedControl(
     onSelectedIndexChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    variant: SegmentedControlVariant = SegmentedControlVariant.ContentArea,
+    colors: SegmentedControlColors = SegmentedControlDefaults.colors(),
+    shape: Shape = SegmentedControlDefaults.shape(),
     segment: @Composable (index: Int) -> Unit,
 ) {
     require(segmentCount > 0) { "segmentCount must be > 0" }
 
     val controlSize = LocalControlSize.current
     val isWindowActive = LocalWindowActive.current
-    val style = MacosTheme.componentStyling.segmentedControl
-    val metrics = style.metrics
-    val colors = style.colorsFor(variant)
+    val metrics = MacosTheme.componentStyling.segmentedControl.metrics
     val density = LocalDensity.current
 
     val trackHeight = metrics.containerHeightFor(controlSize)
-    val cornerRadius = metrics.cornerRadiusFor(controlSize)
-    val trackShape = RoundedCornerShape(cornerRadius)
-    val pillShape = RoundedCornerShape(cornerRadius)
 
     // Resolve pill color based on active/inactive window state
     val pillColor by animateColorAsState(
@@ -123,8 +164,8 @@ fun SegmentedControl(
     Box(
         modifier = modifier
             .height(trackHeight)
-            .clip(trackShape)
-            .background(colors.track, trackShape),
+            .clip(shape)
+            .background(colors.track, shape),
         contentAlignment = Alignment.CenterStart,
     ) {
         // Sliding pill indicator
@@ -141,7 +182,7 @@ fun SegmentedControl(
                         width = with(density) { indicatorWidthAnim.value.toDp() },
                         height = trackHeight,
                     )
-                    .background(pillColor, pillShape),
+                    .background(pillColor, shape),
             )
         }
 
@@ -164,7 +205,7 @@ fun SegmentedControl(
                     isSelected = index == selectedIndex,
                     enabled = enabled,
                     controlSize = controlSize,
-                    cornerRadius = cornerRadius,
+                    shape = shape,
                     selectedTextColor = selectedContentColor,
                     unselectedTextColor = if (enabled) colors.unselectedContent else colors.disabledContent,
                     pressedOverlay = colors.pressedOverlay,
@@ -184,7 +225,7 @@ fun SegmentedControl(
 }
 
 private fun resolveSelectedSegmentColor(
-    colors: SegmentedControlStyle.Colors,
+    colors: SegmentedControlColors,
     enabled: Boolean,
     isWindowActive: Boolean,
 ): Color = when {
@@ -204,7 +245,8 @@ fun SegmentedControl(
     onSelectedIndexChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    variant: SegmentedControlVariant = SegmentedControlVariant.ContentArea,
+    colors: SegmentedControlColors = SegmentedControlDefaults.colors(),
+    shape: Shape = SegmentedControlDefaults.shape(),
 ) {
     SegmentedControl(
         segmentCount = options.size,
@@ -212,7 +254,8 @@ fun SegmentedControl(
         onSelectedIndexChange = onSelectedIndexChange,
         modifier = modifier,
         enabled = enabled,
-        variant = variant,
+        colors = colors,
+        shape = shape,
     ) { index ->
         Text(options[index])
     }
@@ -236,7 +279,7 @@ private fun Segment(
     isSelected: Boolean,
     enabled: Boolean,
     controlSize: ControlSize,
-    cornerRadius: Dp,
+    shape: Shape,
     selectedTextColor: Color,
     unselectedTextColor: Color,
     pressedOverlay: Color,
@@ -270,8 +313,6 @@ private fun Segment(
         fontSize = fontSizeFor(controlSize),
     )
 
-    val segmentShape = RoundedCornerShape(cornerRadius)
-
     val metrics = MacosTheme.componentStyling.segmentedControl.metrics
     val minWidth = metrics.segmentMinWidthFor(controlSize)
     val horizontalPadding = metrics.segmentHorizontalPaddingFor(controlSize)
@@ -287,7 +328,7 @@ private fun Segment(
                     coordinates.size.width.toFloat(),
                 )
             }
-            .clip(segmentShape)
+            .clip(shape)
             .then(
                 if (pressAlpha > 0f) {
                     Modifier.background(pressedOverlay.copy(alpha = pressedOverlay.alpha * pressAlpha))

@@ -653,6 +653,23 @@ data class SegmentedControlStyle(
     }
 }
 
+// ---------------------------------------------------------------------------
+// SegmentedControlColors — public immutable color set for call-site overrides
+// ---------------------------------------------------------------------------
+
+@Immutable
+data class SegmentedControlColors(
+    val track: Color,
+    val selectedSegment: Color,
+    val selectedContent: Color,
+    val unselectedContent: Color,
+    val pressedOverlay: Color,
+    val disabledContent: Color,
+    val separatorColor: Color,
+    val inactiveSelectedSegment: Color,
+    val inactiveSelectedContent: Color,
+)
+
 
 // ---------------------------------------------------------------------------
 // ProgressStyle
