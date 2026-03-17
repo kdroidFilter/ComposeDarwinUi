@@ -312,6 +312,7 @@ fun App() {
                     titleBar = {
                         TitleBar(
                             glass = true,
+                            pushActionsOnExpand = isCompact,
                             navigationActionsMinWidth = if (isCompact) 0.dp else 80.dp,
                             navigationActions = if (!isCompact) {
                                 {
