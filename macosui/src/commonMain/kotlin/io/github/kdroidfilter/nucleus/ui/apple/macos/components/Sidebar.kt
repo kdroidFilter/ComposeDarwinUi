@@ -329,6 +329,7 @@ fun Sidebar(
                 .macosGlassMaterial(
                     shape = sidebarContentShape,
                     materialSize = GlassMaterialSize.Large,
+                    drawShadow = false,
                 )
                 .background(inactiveOverlay, sidebarContentShape)
                 .border(1.dp, sidebarBorderColor, sidebarContentShape),

@@ -285,6 +285,7 @@ fun Modifier.macosGlassMaterial(
     shape: Shape,
     materialSize: GlassMaterialSize,
     tintColor: Color? = null,
+    drawShadow: Boolean = true,
 ): Modifier {
     val isDark = LocalColorScheme.current.isDark
     val glassType = LocalGlassType.current
@@ -298,12 +299,15 @@ fun Modifier.macosGlassMaterial(
     }
 
     var result = this
-        .shadow(
+    if (drawShadow) {
+        result = result.shadow(
             elevation = spec.shadowBlur / 2,
             shape = shape,
             ambientColor = spec.edgeShadowColor,
             spotColor = spec.shadowColor,
         )
+    }
+    result = result
         .clip(shape)
         .background(effectiveTint, shape)
         .background(spec.baseColor.copy(alpha = 0.6f), shape)
