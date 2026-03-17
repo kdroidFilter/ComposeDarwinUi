@@ -32,6 +32,40 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
+import androidx.compose.runtime.Immutable
+
+// ===========================================================================
+// IconButtonColors — public customizable colors
+// ===========================================================================
+
+@Immutable
+class IconButtonColors(
+    val backgroundColor: Color,
+    val contentColor: Color,
+    val disabledBackgroundColor: Color,
+    val disabledContentColor: Color,
+    val hoverOverlay: Color,
+) {
+    fun copy(
+        backgroundColor: Color = this.backgroundColor,
+        contentColor: Color = this.contentColor,
+        disabledBackgroundColor: Color = this.disabledBackgroundColor,
+        disabledContentColor: Color = this.disabledContentColor,
+        hoverOverlay: Color = this.hoverOverlay,
+    ) = IconButtonColors(backgroundColor, contentColor, disabledBackgroundColor, disabledContentColor, hoverOverlay)
+}
+
+object IconButtonDefaults {
+
+    @Composable
+    fun colors(
+        backgroundColor: Color = MacosTheme.colorScheme.accent,
+        contentColor: Color = Color.White,
+        disabledBackgroundColor: Color = backgroundColor.copy(alpha = 0.40f),
+        disabledContentColor: Color = contentColor.copy(alpha = 0.50f),
+        hoverOverlay: Color = Color.White.copy(alpha = 0.10f),
+    ) = IconButtonColors(backgroundColor, contentColor, disabledBackgroundColor, disabledContentColor, hoverOverlay)
+}
 
 /**
  * Visual style for [IconButton], matching macOS Sketch specifications.
@@ -94,6 +128,7 @@ fun IconButton(
     style: IconButtonStyle = IconButtonStyle.Bordered,
     role: IconButtonRole = IconButtonRole.Default,
     enabled: Boolean = true,
+    colors: IconButtonColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val controlSize = LocalControlSize.current
@@ -110,28 +145,28 @@ fun IconButton(
         label = "icon_btn_scale",
     )
 
-    val colors = resolveIconButtonColors(style, role, isDark, accent, destructive)
+    val resolved = resolveIconButtonColors(style, role, isDark, accent, destructive)
 
     val bgColor by animateColorAsState(
         targetValue = when {
-            !enabled -> colors.backgroundDisabled
-            isPressed -> colors.backgroundPressed
-            else -> colors.background
+            !enabled -> colors?.disabledBackgroundColor ?: resolved.backgroundDisabled
+            isPressed -> colors?.backgroundColor ?: resolved.backgroundPressed
+            else -> colors?.backgroundColor ?: resolved.background
         },
         animationSpec = macosTween(MacosDuration.Fast),
         label = "icon_btn_bg",
     )
-    val hoverOverlay by animateColorAsState(
+    val hoverOverlayColor by animateColorAsState(
         targetValue = when {
             !isHovered || !enabled -> Color.Transparent
-            else -> colors.hoverOverlay
+            else -> colors?.hoverOverlay ?: resolved.hoverOverlay
         },
         animationSpec = macosTween(MacosDuration.Fast),
         label = "icon_btn_hover",
     )
     val iconColor = when {
-        !enabled -> colors.iconDisabled
-        else -> colors.icon
+        !enabled -> colors?.disabledContentColor ?: resolved.iconDisabled
+        else -> colors?.contentColor ?: resolved.icon
     }
 
     val buttonSize = iconButtonSizeFor(controlSize)
@@ -143,7 +178,7 @@ fun IconButton(
             .size(buttonSize)
             .clip(CircleShape)
             .background(bgColor, CircleShape)
-            .background(hoverOverlay, CircleShape)
+            .background(hoverOverlayColor, CircleShape)
             .hoverable(interactionSource = interactionSource, enabled = enabled)
             .clickable(
                 interactionSource = interactionSource,
@@ -183,6 +218,7 @@ fun IconButton(
     style: IconButtonStyle = IconButtonStyle.Bordered,
     role: IconButtonRole = IconButtonRole.Default,
     enabled: Boolean = true,
+    colors: IconButtonColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val controlSize = LocalControlSize.current
@@ -199,28 +235,28 @@ fun IconButton(
         label = "icon_btn_scale",
     )
 
-    val colors = resolveIconButtonColors(style, role, isDark, accent, destructive)
+    val resolved = resolveIconButtonColors(style, role, isDark, accent, destructive)
 
     val bgColor by animateColorAsState(
         targetValue = when {
-            !enabled -> colors.backgroundDisabled
-            isPressed -> colors.backgroundPressed
-            else -> colors.background
+            !enabled -> colors?.disabledBackgroundColor ?: resolved.backgroundDisabled
+            isPressed -> colors?.backgroundColor ?: resolved.backgroundPressed
+            else -> colors?.backgroundColor ?: resolved.background
         },
         animationSpec = macosTween(MacosDuration.Fast),
         label = "icon_btn_bg",
     )
-    val hoverOverlay by animateColorAsState(
+    val hoverOverlayColor by animateColorAsState(
         targetValue = when {
             !isHovered || !enabled -> Color.Transparent
-            else -> colors.hoverOverlay
+            else -> colors?.hoverOverlay ?: resolved.hoverOverlay
         },
         animationSpec = macosTween(MacosDuration.Fast),
         label = "icon_btn_hover",
     )
     val iconColor = when {
-        !enabled -> colors.iconDisabled
-        else -> colors.icon
+        !enabled -> colors?.disabledContentColor ?: resolved.iconDisabled
+        else -> colors?.contentColor ?: resolved.icon
     }
 
     val buttonSize = iconButtonSizeFor(controlSize)
@@ -232,7 +268,7 @@ fun IconButton(
             .size(buttonSize)
             .clip(CircleShape)
             .background(bgColor, CircleShape)
-            .background(hoverOverlay, CircleShape)
+            .background(hoverOverlayColor, CircleShape)
             .hoverable(interactionSource = interactionSource, enabled = enabled)
             .clickable(
                 interactionSource = interactionSource,

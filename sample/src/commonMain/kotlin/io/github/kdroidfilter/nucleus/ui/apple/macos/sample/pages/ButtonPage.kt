@@ -15,8 +15,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ArrowButton
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.PushButton
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.PushButtonColors
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.PushButtonDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.PushButtonStyle
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideDownload
@@ -448,6 +451,54 @@ fun ButtonArrowSurfaceExample() {
 }
 
 // ===========================================================================
+// Custom Colors
+// ===========================================================================
+
+@OptIn(ExperimentalLayoutApi::class)
+@GalleryExample("Button", "Custom Colors")
+@Composable
+fun ButtonCustomColorsExample() {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        PushButton(
+            text = "Green",
+            onClick = {},
+            colors = PushButtonDefaults.colors(
+                backgroundColor = Color(0xFF34C759),
+                contentColor = Color.White,
+            ),
+        )
+        PushButton(
+            text = "Orange",
+            onClick = {},
+            colors = PushButtonDefaults.colors(
+                backgroundColor = Color(0xFFFF9500),
+                contentColor = Color.White,
+            ),
+        )
+        PushButton(
+            text = "Purple",
+            onClick = {},
+            colors = PushButtonDefaults.colors(
+                backgroundColor = Color(0xFFAF52DE),
+                contentColor = Color.White,
+            ),
+        )
+        PushButton(
+            text = "Disabled",
+            onClick = {},
+            enabled = false,
+            colors = PushButtonDefaults.colors(
+                backgroundColor = Color(0xFF34C759),
+                contentColor = Color.White,
+            ),
+        )
+    }
+}
+
+// ===========================================================================
 // ButtonPage — organized exactly like Sketch Buttons page
 // ===========================================================================
 
@@ -518,6 +569,13 @@ internal fun ButtonPage() {
             description = "Leading icon with text, or icon-only — sizing adapts to ControlSize",
             sourceCode = GallerySources.ButtonIconExample,
         ) { ButtonIconExample() }
+
+        SectionHeader("Custom Colors")
+        ExampleCard(
+            title = "Custom Colors",
+            description = "Buttons with fully custom background and content colors",
+            sourceCode = GallerySources.ButtonCustomColorsExample,
+        ) { ButtonCustomColorsExample() }
 
         SectionHeader("Surface Appearance")
         ExampleCard(

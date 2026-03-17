@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.IconButton
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.IconButtonDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.IconButtonRole
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.IconButtonStyle
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
@@ -105,6 +107,49 @@ fun IconButtonSizesExample() {
     }
 }
 
+@GalleryExample("IconButton", "Custom Colors")
+@Composable
+fun IconButtonCustomColorsExample() {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconButton(
+            icon = Icons.Heart,
+            onClick = {},
+            colors = IconButtonDefaults.colors(
+                backgroundColor = Color(0xFFE91E63),
+                contentColor = Color.White,
+            ),
+        )
+        IconButton(
+            icon = Icons.Star,
+            onClick = {},
+            colors = IconButtonDefaults.colors(
+                backgroundColor = Color(0xFFFF9500),
+                contentColor = Color.White,
+            ),
+        )
+        IconButton(
+            icon = Icons.Share2,
+            onClick = {},
+            colors = IconButtonDefaults.colors(
+                backgroundColor = Color(0xFF34C759),
+                contentColor = Color.White,
+            ),
+        )
+        IconButton(
+            icon = Icons.Heart,
+            onClick = {},
+            enabled = false,
+            colors = IconButtonDefaults.colors(
+                backgroundColor = Color(0xFFE91E63),
+                contentColor = Color.White,
+            ),
+        )
+    }
+}
+
 @Composable
 internal fun IconButtonPage() {
     GalleryPage("Icon Button", "Circular icon-only buttons for toolbar and content area actions.") {
@@ -133,5 +178,12 @@ IconButton(icon = Icons.Trash2, onClick = {}, role = IconButtonRole.Destructive)
             description = "Icon button at each ControlSize level",
             sourceCode = GallerySources.IconButtonSizesExample,
         ) { IconButtonSizesExample() }
+
+        SectionHeader("Custom Colors")
+        ExampleCard(
+            title = "Custom Colors",
+            description = "Icon buttons with fully custom background and icon colors",
+            sourceCode = GallerySources.IconButtonCustomColorsExample,
+        ) { IconButtonCustomColorsExample() }
     }
 }

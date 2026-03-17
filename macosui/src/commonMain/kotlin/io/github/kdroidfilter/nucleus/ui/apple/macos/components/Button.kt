@@ -54,6 +54,43 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.iconGap
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.iconSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.labelStyle
+import androidx.compose.runtime.Immutable
+
+// ===========================================================================
+// PushButtonColors — public customizable colors
+// ===========================================================================
+
+@Immutable
+class PushButtonColors(
+    val backgroundColor: Color,
+    val contentColor: Color,
+    val disabledBackgroundColor: Color,
+    val disabledContentColor: Color,
+    val pressOverlay: Color,
+    val hoverOverlay: Color,
+) {
+    fun copy(
+        backgroundColor: Color = this.backgroundColor,
+        contentColor: Color = this.contentColor,
+        disabledBackgroundColor: Color = this.disabledBackgroundColor,
+        disabledContentColor: Color = this.disabledContentColor,
+        pressOverlay: Color = this.pressOverlay,
+        hoverOverlay: Color = this.hoverOverlay,
+    ) = PushButtonColors(backgroundColor, contentColor, disabledBackgroundColor, disabledContentColor, pressOverlay, hoverOverlay)
+}
+
+object PushButtonDefaults {
+
+    @Composable
+    fun colors(
+        backgroundColor: Color = MacosTheme.colorScheme.accent,
+        contentColor: Color = Color.White,
+        disabledBackgroundColor: Color = backgroundColor.copy(alpha = 0.40f),
+        disabledContentColor: Color = contentColor.copy(alpha = 0.50f),
+        pressOverlay: Color = Color.Black.copy(alpha = 0.08f),
+        hoverOverlay: Color = Color.White.copy(alpha = 0.10f),
+    ) = PushButtonColors(backgroundColor, contentColor, disabledBackgroundColor, disabledContentColor, pressOverlay, hoverOverlay)
+}
 
 // ===========================================================================
 // PushButtonStyle — macOS 26 push button visual styles
@@ -111,6 +148,7 @@ fun PushButton(
     style: PushButtonStyle = PushButtonStyle.Default,
     selected: Boolean = false,
     enabled: Boolean = true,
+    colors: PushButtonColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
 ) {
@@ -129,32 +167,33 @@ fun PushButton(
         label = "push_scale",
     )
 
-    val colors = resolvePushButtonColors(style, selected, isDark, accent, surface)
+    // Custom colors take priority over style-resolved colors
+    val resolved = resolvePushButtonColors(style, selected, isDark, accent, surface)
 
     val bgColor by animateColorAsState(
         targetValue = when {
-            !enabled -> colors.backgroundDisabled
-            isPressed -> colors.backgroundPressed
-            selected -> colors.backgroundSelected
-            else -> colors.background
+            !enabled -> colors?.disabledBackgroundColor ?: resolved.backgroundDisabled
+            isPressed -> colors?.backgroundColor ?: resolved.backgroundPressed
+            selected -> colors?.backgroundColor ?: resolved.backgroundSelected
+            else -> colors?.backgroundColor ?: resolved.background
         },
         animationSpec = macosTween(MacosDuration.Fast),
         label = "push_bg",
     )
     val contentColor by animateColorAsState(
         targetValue = when {
-            !enabled -> colors.contentDisabled
-            isPressed && colors.contentPressed != Color.Unspecified -> colors.contentPressed
-            selected && (style == PushButtonStyle.Borderless || style == PushButtonStyle.BorderlessBezel) -> colors.contentSelected
-            else -> colors.content
+            !enabled -> colors?.disabledContentColor ?: resolved.contentDisabled
+            isPressed && resolved.contentPressed != Color.Unspecified && colors == null -> resolved.contentPressed
+            selected && colors == null && (style == PushButtonStyle.Borderless || style == PushButtonStyle.BorderlessBezel) -> resolved.contentSelected
+            else -> colors?.contentColor ?: resolved.content
         },
         animationSpec = macosTween(MacosDuration.Fast),
         label = "push_content",
     )
     val overlayColor by animateColorAsState(
         targetValue = when {
-            isPressed && enabled -> colors.pressOverlay
-            isHovered && enabled -> colors.hoverOverlay
+            isPressed && enabled -> colors?.pressOverlay ?: resolved.pressOverlay
+            isHovered && enabled -> colors?.hoverOverlay ?: resolved.hoverOverlay
             else -> Color.Transparent
         },
         animationSpec = macosTween(MacosDuration.Fast),
@@ -204,9 +243,10 @@ fun PushButton(
     style: PushButtonStyle = PushButtonStyle.Default,
     selected: Boolean = false,
     enabled: Boolean = true,
+    colors: PushButtonColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    PushButton(onClick, modifier, style, selected, enabled, interactionSource) {
+    PushButton(onClick, modifier, style, selected, enabled, colors, interactionSource) {
         if (icon != null) {
             val controlSize = LocalControlSize.current
             Icon(
@@ -229,9 +269,10 @@ fun PushButton(
     style: PushButtonStyle = PushButtonStyle.Default,
     selected: Boolean = false,
     enabled: Boolean = true,
+    colors: PushButtonColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    PushButton(onClick, modifier, style, selected, enabled, interactionSource) {
+    PushButton(onClick, modifier, style, selected, enabled, colors, interactionSource) {
         val controlSize = LocalControlSize.current
         Icon(
             imageVector = icon,
