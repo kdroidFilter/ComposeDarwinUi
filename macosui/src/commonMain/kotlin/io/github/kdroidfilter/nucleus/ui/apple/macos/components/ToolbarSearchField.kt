@@ -71,9 +71,6 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosDuration
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalContentColor
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTextStyle
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Zinc400
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Zinc500
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Zinc900
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosGlass
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
 
@@ -473,7 +470,7 @@ private fun SearchSuggestionsPopup(
     val shapes = MacosTheme.shapes
     val density = androidx.compose.ui.platform.LocalDensity.current
 
-    val fallbackBg = if (isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
+    val fallbackBg = if (isDark) MacosTheme.colorScheme.background.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
     val borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
     // Field height + 4dp gap, converted to pixels
@@ -531,7 +528,7 @@ fun SearchSuggestionHeader(
             text = text,
             style = typography.caption1.copy(
                 fontWeight = FontWeight.SemiBold,
-                color = if (isDark) Zinc400 else Zinc500,
+                color = MacosTheme.colorScheme.textSecondary,
             ),
         )
     }

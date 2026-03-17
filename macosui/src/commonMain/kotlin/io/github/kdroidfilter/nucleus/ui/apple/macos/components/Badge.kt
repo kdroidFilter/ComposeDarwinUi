@@ -130,7 +130,7 @@ fun Badge(
 }
 
 // ===========================================================================
-// M3-style Badge overload
+// Badge overload with containerColor/contentColor
 // ===========================================================================
 
 @Composable

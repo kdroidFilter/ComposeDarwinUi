@@ -23,7 +23,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTextStyle
 
 // ===========================================================================
-// CardColors — mirrors M3's CardColors
+// CardColors
 // ===========================================================================
 
 @Immutable
@@ -42,7 +42,7 @@ class CardColors(
 }
 
 // ===========================================================================
-// CardDefaults — mirrors M3's CardDefaults
+// CardDefaults
 // ===========================================================================
 
 object CardDefaults {
@@ -78,7 +78,7 @@ object CardDefaults {
 }
 
 // ===========================================================================
-// Card — M3-compatible
+// Card
 // ===========================================================================
 
 @Composable
@@ -101,7 +101,7 @@ fun Card(
 }
 
 // ===========================================================================
-// ElevatedCard — M3-compatible
+// ElevatedCard
 // ===========================================================================
 
 @Composable
@@ -125,7 +125,7 @@ fun ElevatedCard(
 }
 
 // ===========================================================================
-// OutlinedCard — M3-compatible
+// OutlinedCard
 // ===========================================================================
 
 @Composable

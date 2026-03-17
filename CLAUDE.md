@@ -13,19 +13,19 @@ A Kotlin Multiplatform library implementing a macOS/iOS-inspired design system u
 - Kotlin 2.3.x, Compose Multiplatform 1.11.x
 - KSP for annotation processing
 - Detekt + Compose rules for static analysis
-- No Material3 dependency — pure Compose primitives
+- Pure Compose primitives (no Material3 dependency)
 
 ## Architecture & Conventions
 
 ### Component Design
-- Mirror Material3 API conventions: `ButtonDefaults`, `ButtonColors`, `ButtonElevation`, etc.
+- Follow `Defaults`/`Colors`/`Elevation` pattern: `ButtonDefaults`, `ButtonColors`, `ButtonElevation`, etc.
 - Expose both functional (composable content) and convenience (text-only) overloads
 - Use `InteractionSource` for hover/press states with smooth animations
 - Follow `CompositionLocal` theming: `LocalColorScheme`, `LocalTypography`, etc.
 
 ### Theming
 - All design tokens live in `macosui/src/commonMain/.../theme/`
-- Use `MacosTheme` as the root provider — never depend on MaterialTheme
+- Use `MacosTheme` as the root provider
 - Accent color system: blue, purple, violet, green, orange, red, yellow, cyan, pink, teal, emerald, sky
 
 ### Animations
@@ -41,7 +41,7 @@ A Kotlin Multiplatform library implementing a macOS/iOS-inspired design system u
 - Each component has a corresponding page in `sample/.../pages/`
 
 ## Key Rules
-- No Material3 imports in `:macosui` — use macOS primitives only
+- No Material3 imports in `:macosui`
 - Run `./gradlew detekt` before committing to catch Compose rule violations
 - New components must have a corresponding sample page
 - Keep component APIs minimal and consistent with existing patterns

@@ -153,7 +153,7 @@ fun SurfaceNestedExample() {
 
 @Composable
 internal fun SurfacePage() {
-    GalleryPage("Surface", "A styled container with Liquid Glass material rendering — the macOS 26 alternative to Material3 Surface.") {
+    GalleryPage("Surface", "A styled container with Liquid Glass material rendering.") {
         PreviewContainer { SurfacePreview() }
 
         SectionHeader("Glass")

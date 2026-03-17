@@ -5,27 +5,11 @@ import androidx.compose.ui.graphics.Color
 
 // ==================== macOS System Colors ====================
 
-// Legacy Zinc palette — kept for backward compatibility with components
-// that still reference these. Will be removed as components are migrated.
-val Zinc50 = Color(0xFFFAFAFA)
-val Zinc100 = Color(0xFFF4F4F5)
-val Zinc200 = Color(0xFFE4E4E7)
-val Zinc300 = Color(0xFFD4D4D8)
-val Zinc400 = Color(0xFFA1A1AA)
-val Zinc500 = Color(0xFF71717A)
-val Zinc600 = Color(0xFF52525B)
-val Zinc700 = Color(0xFF3F3F46)
-val Zinc800 = Color(0xFF27272A)
-val Zinc900 = Color(0xFF18181B)
-val Zinc950 = Color(0xFF09090B)
-
 /**
- * Color scheme for macOS UI — aligns with Material3's ColorScheme API
- * while adding macOS-specific design tokens.
+ * Color scheme for macOS UI with standard and macOS-specific design tokens.
  */
 @Stable
 class ColorScheme(
-    // ---- Material3 standard properties ----
     val primary: Color,
     val onPrimary: Color,
     val primaryContainer: Color,
@@ -200,7 +184,7 @@ fun darkColorScheme(accentColor: AccentColor = AccentColor.Blue): ColorScheme {
     val accentContainer = accentColor.containerDark
 
     return ColorScheme(
-        // M3 standard — primary is neutral gray (Apple buttons are not accent-colored)
+        // Primary is neutral gray (Apple buttons are not accent-colored)
         primary = Color(0xFFF5F5F5),
         onPrimary = Color(0xFF1C1C1E),
         primaryContainer = Color(0xFF2C2C2E),
@@ -281,7 +265,7 @@ fun lightColorScheme(accentColor: AccentColor = AccentColor.Blue): ColorScheme {
     val accentContainer = accentColor.containerLight
 
     return ColorScheme(
-        // M3 standard — primary is neutral (Apple buttons are not accent-colored)
+        // Primary is neutral (Apple buttons are not accent-colored)
         primary = Color(0xFF1C1C1E),
         onPrimary = Color.White,
         primaryContainer = Color(0xFFF2F2F7),

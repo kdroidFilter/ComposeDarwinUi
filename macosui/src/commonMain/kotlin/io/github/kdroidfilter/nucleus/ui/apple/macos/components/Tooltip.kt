@@ -29,8 +29,6 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Zinc100
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Zinc900
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -74,9 +72,9 @@ fun Tooltip(
     )
 
     // Tooltip colors: inverted from current theme
-    val tooltipBackground = if (colors.isDark) Zinc100 else Zinc900
+    val tooltipBackground = colors.inverseSurface
 
-    val tooltipTextColor = if (colors.isDark) Zinc900 else Zinc100
+    val tooltipTextColor = colors.inverseOnSurface
 
     Box(
         modifier = modifier

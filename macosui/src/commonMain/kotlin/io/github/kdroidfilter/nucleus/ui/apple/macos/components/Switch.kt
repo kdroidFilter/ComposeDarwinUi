@@ -300,7 +300,7 @@ fun TriStateSwitch(
 }
 
 // ===========================================================================
-// Switcher — convenience wrapper with optional label
+// Switcher — Switch with optional label
 // ===========================================================================
 
 @Composable

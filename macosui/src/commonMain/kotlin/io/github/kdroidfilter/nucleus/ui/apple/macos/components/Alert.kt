@@ -220,7 +220,7 @@ object AlertDialogDefaults {
  * @param onDismissRequest Callback invoked when the dialog should close.
  * @param title The dialog title text (bold, centered).
  * @param message The dialog body message (regular, centered).
- * @param type The semantic type (currently used for theming compatibility).
+ * @param type The semantic type (used for theming).
  * @param confirmText The label for the primary action button (blue accent).
  * @param destructiveText Optional label for a destructive action button (red tint).
  * @param cancelText The label for the cancel button. Pass null to hide it.
@@ -532,11 +532,11 @@ private fun AlertPillButton(
 }
 
 // ===========================================================================
-// AlertDialog — M3-compatible overload with composable slots
+// AlertDialog — overload with composable slots
 // ===========================================================================
 
 /**
- * A modal alert dialog — mirrors Material3's AlertDialog with composable slots.
+ * A modal alert dialog with composable slots.
  *
  * @param onDismissRequest Callback when the dialog should close.
  * @param confirmButton The confirm action button composable.

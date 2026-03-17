@@ -49,10 +49,6 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalContentColor
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTextStyle
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Zinc100
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Zinc200
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Zinc800
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Zinc900
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.labelStyle
@@ -217,9 +213,9 @@ fun TabsTrigger(
     val isHovered by interactionSource.collectIsHoveredAsState()
 
     val textColor = when {
-        isSelected -> if (isDark) Zinc100 else Zinc900
-        isHovered -> if (isDark) Zinc100 else Zinc900
-        else -> if (isDark) Zinc200 else Zinc800
+        isSelected -> MacosTheme.colorScheme.textPrimary
+        isHovered -> MacosTheme.colorScheme.textPrimary
+        else -> MacosTheme.colorScheme.textSecondary
     }
 
     val textStyle = controlSize.labelStyle()

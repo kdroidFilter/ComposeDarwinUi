@@ -18,8 +18,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalContentColor
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTextStyle
 
 /**
- * macOS UI Text composable — a drop-in replacement for `material3.Text` that
- * uses only Foundation APIs.
+ * macOS UI Text composable using Foundation APIs.
  *
  * Reads the default [TextStyle] from [LocalTextStyle] and the default
  * content [Color] from [LocalContentColor], merging the provided

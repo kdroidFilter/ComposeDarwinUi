@@ -65,7 +65,6 @@ fun MacosTheme(
 
 /**
  * Entry point for accessing macOS UI design tokens.
- * Mirrors Material3's MaterialTheme object API.
  */
 object MacosTheme {
     val colorScheme: ColorScheme

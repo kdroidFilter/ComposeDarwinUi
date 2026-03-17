@@ -13,7 +13,7 @@ import androidx.compose.ui.layout.ContentScale
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalContentColor
 
 /**
- * Renders an [ImageVector] icon — mirrors Material3's Icon.
+ * Renders an [ImageVector] icon.
  *
  * @param imageVector The icon vector to render.
  * @param contentDescription Accessibility description (null for decorative icons).
@@ -37,7 +37,7 @@ fun Icon(
 }
 
 /**
- * Renders a [Painter] icon — mirrors Material3's Icon.
+ * Renders a [Painter] icon.
  */
 @Composable
 fun Icon(
@@ -56,7 +56,7 @@ fun Icon(
 }
 
 /**
- * Renders an [ImageBitmap] icon — mirrors Material3's Icon.
+ * Renders an [ImageBitmap] icon.
  */
 @Composable
 fun Icon(

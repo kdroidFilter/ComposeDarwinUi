@@ -36,10 +36,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SpringPreset
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Zinc100
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Zinc200
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Zinc800
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.Zinc900
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 import kotlinx.coroutines.launch
 
@@ -51,8 +47,7 @@ object TabRowDefaults {
 }
 
 /**
- * Tab row with animated indicator.
- * Mirrors Material3's TabRow using index-based selection.
+ * Tab row with animated indicator and index-based selection.
  */
 @Composable
 fun TabRow(
@@ -123,7 +118,6 @@ private fun DefaultTabIndicator(tabPosition: TabPosition) {
 
 /**
  * A single tab in a [TabRow].
- * Mirrors Material3's Tab.
  */
 @Composable
 fun Tab(
@@ -172,7 +166,6 @@ fun Tab(
 
 /**
  * Scrollable version of [TabRow].
- * Mirrors Material3's ScrollableTabRow.
  */
 @Composable
 fun ScrollableTabRow(

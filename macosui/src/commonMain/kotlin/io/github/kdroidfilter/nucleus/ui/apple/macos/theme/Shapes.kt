@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 
 /**
- * macOS UI shape system — mirrors Material3's Shapes class with 5 standard levels.
+ * macOS UI shape system with 5 standard levels.
  */
 @Immutable
 data class Shapes(
@@ -26,7 +26,7 @@ data class Shapes(
     /** 20dp — large cards, modals */
     val extraLarge: Shape = RoundedCornerShape(20.dp),
 
-    /** Full rounded: pills, avatar, circular — macOS extension (not in M3). */
+    /** Full rounded: pills, avatar, circular. */
     val full: Shape = RoundedCornerShape(50),
 )
 

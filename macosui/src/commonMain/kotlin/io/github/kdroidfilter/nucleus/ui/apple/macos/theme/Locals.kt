@@ -6,15 +6,11 @@ import androidx.compose.ui.text.TextStyle
 
 /**
  * CompositionLocal for providing a default [TextStyle] to descendant composables.
- *
- * Replaces `androidx.compose.material3.LocalTextStyle`.
  */
 val LocalTextStyle = compositionLocalOf { TextStyle.Default }
 
 /**
  * CompositionLocal for providing a default content [Color] to descendant composables.
- *
- * Replaces `androidx.compose.material3.LocalContentColor`.
  */
 val LocalContentColor = compositionLocalOf { Color.Unspecified }
 

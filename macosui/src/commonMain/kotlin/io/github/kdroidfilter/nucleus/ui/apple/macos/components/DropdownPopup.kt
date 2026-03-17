@@ -14,7 +14,7 @@ import androidx.compose.ui.window.PopupProperties
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 
 /**
- * A simple Popup-based dropdown that replaces material3 [DropdownMenu].
+ * A simple Popup-based dropdown menu.
  *
  * The popup is shown when [expanded] is `true` and dismissed when the user
  * clicks outside or presses the back/escape key (thanks to focusable properties).
