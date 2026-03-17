@@ -33,6 +33,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -53,6 +57,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.ControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SpringPreset
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.GlassMaterialSize
+import io.github.fletchmckee.liquid.liquid
 import io.github.fletchmckee.liquid.liquefiable
 import io.github.fletchmckee.liquid.rememberLiquidState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
@@ -66,7 +71,6 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarHide
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarVisible
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarWidth
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosDuration
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.liquidGlassFade
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosGlassMaterial
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
@@ -433,13 +437,34 @@ fun Sidebar(
                             .align(Alignment.TopCenter)
                             .fillMaxWidth()
                             .height(glassHeight)
-                            .liquidGlassFade(
-                                state = sidebarGlassState,
+                            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                            .drawWithContent {
+                                drawContent()
+                                drawRect(
+                                    brush = Brush.verticalGradient(
+                                        colorStops = arrayOf(
+                                            0.0f to Color.Transparent,
+                                            0.5f to Color.Black.copy(alpha = 0.4f),
+                                            1.0f to Color.Black,
+                                        ),
+                                        startY = size.height * 0.85f,
+                                        endY = size.height,
+                                    ),
+                                    blendMode = BlendMode.DstOut,
+                                )
+                            }
+                            .liquid(sidebarGlassState) {
+                                frost = 2.dp
                                 shape = RoundedCornerShape(
                                     topStart = 20.dp, topEnd = 20.dp,
                                     bottomStart = 0.dp, bottomEnd = 0.dp,
-                                ),
-                            ),
+                                )
+                                tint = Color.Transparent
+                                saturation = 1.05f
+                                edge = 0f
+                                refraction = 0f
+                                curve = 0f
+                            },
                     )
                     // Hide button (separate, not affected by the fade mask)
                     val hideFraction by animateFloatAsState(
