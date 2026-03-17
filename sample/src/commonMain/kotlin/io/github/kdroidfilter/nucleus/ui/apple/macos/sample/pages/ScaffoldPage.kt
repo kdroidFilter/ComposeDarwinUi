@@ -44,7 +44,6 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideDownload
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideFolder
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideHome
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideMoon
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucidePanelLeft
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSettings
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideStar
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSun

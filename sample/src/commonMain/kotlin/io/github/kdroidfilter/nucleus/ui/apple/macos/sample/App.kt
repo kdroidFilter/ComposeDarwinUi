@@ -98,9 +98,9 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideHome
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideMoon
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucidePanelLeft
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSettings
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSun
+import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.RadixPanelLeft
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.extended.ExternalLink
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.extended.IconsExtended
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AccordionPage
@@ -204,11 +204,11 @@ internal val sidebarEntryDefs = listOf(
     SidebarEntryDef("contextmenu", "Context Menu", "OVERLAYS", Lucide.Ellipsis),
     SidebarEntryDef("tabs", "Tabs", "NAVIGATION", Lucide.Columns3),
     SidebarEntryDef("accordion", "Accordion", "NAVIGATION", Lucide.ChevronsUpDown),
-    SidebarEntryDef("sidebar", "Sidebar", "NAVIGATION", LucidePanelLeft),
+    SidebarEntryDef("sidebar", "Sidebar", "NAVIGATION", RadixPanelLeft),
     SidebarEntryDef("segmentedcontrol", "Segmented Control", "FORM CONTROLS", Lucide.Columns3),
     SidebarEntryDef("titlebar", "Title Bar", "NAVIGATION", Lucide.PanelTopOpen),
     SidebarEntryDef("addressbar", "Address Bar", "NAVIGATION", Lucide.Search),
-    SidebarEntryDef("scaffold", "Scaffold", "NAVIGATION", LucidePanelLeft),
+    SidebarEntryDef("scaffold", "Scaffold", "NAVIGATION", RadixPanelLeft),
     SidebarEntryDef("icons", "Icons", "THEME", Lucide.Scan),
     SidebarEntryDef("material", "Material", "THEME", Lucide.Scan),
     SidebarEntryDef("controlsize", "Control Size", "THEME", Lucide.SlidersHorizontal),

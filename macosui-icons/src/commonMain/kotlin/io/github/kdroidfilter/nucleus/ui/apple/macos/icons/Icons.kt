@@ -35,7 +35,7 @@ object Icons {
     val Folder = SystemIcon("folder", LucideFolder)
     val BarChart3 = SystemIcon("chart.bar", LucideBarChart3)
     val ChevronsUpDown = SystemIcon("chevron.up.chevron.down", LucideChevronsUpDown)
-    val PanelLeft = SystemIcon("sidebar.left", LucidePanelLeft)
+    val PanelLeft = SystemIcon("sidebar.left", RadixPanelLeft)
     val LayoutGrid = SystemIcon("square.grid.2x2", LucideLayoutGrid)
     val List = SystemIcon("list.bullet", LucideList)
     val Ellipsis = SystemIcon("ellipsis", LucideEllipsis)
