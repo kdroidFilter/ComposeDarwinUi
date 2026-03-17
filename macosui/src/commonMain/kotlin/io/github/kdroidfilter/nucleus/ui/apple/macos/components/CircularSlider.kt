@@ -31,6 +31,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.ControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SpringPreset
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalWindowActive
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 import kotlin.math.PI
 import kotlin.math.atan2
@@ -46,6 +47,9 @@ class CircularSliderColors(
     val backgroundDisabled: Color,
     val indicator: Color,
     val indicatorDisabled: Color,
+    // Inactive window (unfocused)
+    val inactiveWindowBackground: Color,
+    val inactiveWindowIndicator: Color,
 )
 
 // ===========================================================================
@@ -60,7 +64,12 @@ object CircularSliderDefaults {
         backgroundDisabled: Color = if (MacosTheme.colorScheme.isDark) Color.White.copy(alpha = 0.04f) else Color.Black.copy(alpha = 0.04f),
         indicator: Color = if (MacosTheme.colorScheme.isDark) Color.White.copy(alpha = 0.85f) else Color.Black.copy(alpha = 0.85f),
         indicatorDisabled: Color = indicator.copy(alpha = indicator.alpha * 0.38f),
-    ) = CircularSliderColors(background, backgroundPressed, backgroundDisabled, indicator, indicatorDisabled)
+        inactiveWindowBackground: Color = if (MacosTheme.colorScheme.isDark) Color.White.copy(alpha = 0.04f) else Color.Black.copy(alpha = 0.04f),
+        inactiveWindowIndicator: Color = if (MacosTheme.colorScheme.isDark) Color.White.copy(alpha = 0.35f) else Color.Black.copy(alpha = 0.35f),
+    ) = CircularSliderColors(
+        background, backgroundPressed, backgroundDisabled, indicator, indicatorDisabled,
+        inactiveWindowBackground, inactiveWindowIndicator,
+    )
 }
 
 // ===========================================================================
@@ -110,6 +119,7 @@ fun CircularSlider(
     size: Dp = circularSliderSizeFor(LocalControlSize.current),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
+    val isWindowActive = LocalWindowActive.current
     val min = valueRange.start
     val max = valueRange.endInclusive
     val fraction = ((value - min) / (max - min)).coerceIn(0f, 1f)
@@ -129,10 +139,15 @@ fun CircularSlider(
 
     val bgColor = when {
         !enabled -> colors.backgroundDisabled
+        !isWindowActive -> colors.inactiveWindowBackground
         isDragging -> colors.backgroundPressed
         else -> colors.background
     }
-    val indicatorColor = if (enabled) colors.indicator else colors.indicatorDisabled
+    val indicatorColor = when {
+        !enabled -> colors.indicatorDisabled
+        !isWindowActive -> colors.inactiveWindowIndicator
+        else -> colors.indicator
+    }
 
     fun angleToValue(position: Offset, center: Offset): Float {
         val delta = position - center

@@ -406,6 +406,9 @@ data class SliderStyle(
         val thumbDisabled: Color,
         val tickMark: Color,
         val tickMarkActive: Color,
+        // Inactive window colors (when window loses focus)
+        val inactiveWindowActiveTrack: Color,
+        val inactiveWindowInactiveTrack: Color,
     )
 
     @Immutable

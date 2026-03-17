@@ -45,6 +45,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SpringPreset
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalLiquidState
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalWindowActive
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 import kotlin.math.round
 import kotlin.math.roundToInt
@@ -65,20 +66,10 @@ class SliderColors(
     val disabledActiveTickColor: Color,
     val disabledInactiveTrackColor: Color,
     val disabledInactiveTickColor: Color,
-) {
-    fun copy(
-        thumbColor: Color = this.thumbColor,
-        activeTrackColor: Color = this.activeTrackColor,
-        activeTickColor: Color = this.activeTickColor,
-        inactiveTrackColor: Color = this.inactiveTrackColor,
-        inactiveTickColor: Color = this.inactiveTickColor,
-        disabledThumbColor: Color = this.disabledThumbColor,
-        disabledActiveTrackColor: Color = this.disabledActiveTrackColor,
-        disabledActiveTickColor: Color = this.disabledActiveTickColor,
-        disabledInactiveTrackColor: Color = this.disabledInactiveTrackColor,
-        disabledInactiveTickColor: Color = this.disabledInactiveTickColor,
-    ) = SliderColors(thumbColor, activeTrackColor, activeTickColor, inactiveTrackColor, inactiveTickColor, disabledThumbColor, disabledActiveTrackColor, disabledActiveTickColor, disabledInactiveTrackColor, disabledInactiveTickColor)
-}
+    // Inactive window (unfocused)
+    val inactiveWindowActiveTrackColor: Color,
+    val inactiveWindowInactiveTrackColor: Color,
+)
 
 // ===========================================================================
 // SliderDefaults — mirrors M3's SliderDefaults
@@ -97,7 +88,14 @@ object SliderDefaults {
         disabledActiveTickColor: Color = activeTickColor.copy(0.38f),
         disabledInactiveTrackColor: Color = MacosTheme.componentStyling.slider.colors.disabledInactiveTrack,
         disabledInactiveTickColor: Color = inactiveTickColor.copy(0.38f),
-    ) = SliderColors(thumbColor, activeTrackColor, activeTickColor, inactiveTrackColor, inactiveTickColor, disabledThumbColor, disabledActiveTrackColor, disabledActiveTickColor, disabledInactiveTrackColor, disabledInactiveTickColor)
+        inactiveWindowActiveTrackColor: Color = MacosTheme.componentStyling.slider.colors.inactiveWindowActiveTrack,
+        inactiveWindowInactiveTrackColor: Color = MacosTheme.componentStyling.slider.colors.inactiveWindowInactiveTrack,
+    ) = SliderColors(
+        thumbColor, activeTrackColor, activeTickColor, inactiveTrackColor, inactiveTickColor,
+        disabledThumbColor, disabledActiveTrackColor, disabledActiveTickColor,
+        disabledInactiveTrackColor, disabledInactiveTickColor,
+        inactiveWindowActiveTrackColor, inactiveWindowInactiveTrackColor,
+    )
 }
 
 // ===========================================================================
@@ -147,6 +145,7 @@ fun Slider(
     showValue: Boolean = false,
 ) {
     val controlSize = LocalControlSize.current
+    val isWindowActive = LocalWindowActive.current
     val metrics = MacosTheme.componentStyling.slider.metrics
     val thumbShape = RoundedCornerShape(metrics.thumbCornerRadiusFor(controlSize))
 
@@ -186,8 +185,16 @@ fun Slider(
         return snapToStep(min + rawFraction * (max - min))
     }
 
-    val trackColor = if (enabled) colors.inactiveTrackColor else colors.disabledInactiveTrackColor
-    val fillColor = if (enabled) colors.activeTrackColor else colors.disabledActiveTrackColor
+    val trackColor = when {
+        !enabled -> colors.disabledInactiveTrackColor
+        !isWindowActive -> colors.inactiveWindowInactiveTrackColor
+        else -> colors.inactiveTrackColor
+    }
+    val fillColor = when {
+        !enabled -> colors.disabledActiveTrackColor
+        !isWindowActive -> colors.inactiveWindowActiveTrackColor
+        else -> colors.activeTrackColor
+    }
 
     val thumbColor = if (enabled) colors.thumbColor else colors.disabledThumbColor
 
@@ -309,6 +316,7 @@ fun RangeSlider(
     track: @Composable ((ClosedFloatingPointRange<Float>) -> Unit)? = null,
 ) {
     val controlSize = LocalControlSize.current
+    val isWindowActive = LocalWindowActive.current
     val metrics = MacosTheme.componentStyling.slider.metrics
     val thumbShape = RoundedCornerShape(metrics.thumbCornerRadiusFor(controlSize))
 
@@ -328,8 +336,16 @@ fun RangeSlider(
     fun valueFromFraction(f: Float): Float = (min + f * (max - min)).coerceIn(min, max)
     fun fractionFromX(x: Float) = (x / containerSize.width.toFloat()).coerceIn(0f, 1f)
 
-    val trackColor = if (enabled) colors.inactiveTrackColor else colors.disabledInactiveTrackColor
-    val fillColor = if (enabled) colors.activeTrackColor else colors.disabledActiveTrackColor
+    val trackColor = when {
+        !enabled -> colors.disabledInactiveTrackColor
+        !isWindowActive -> colors.inactiveWindowInactiveTrackColor
+        else -> colors.inactiveTrackColor
+    }
+    val fillColor = when {
+        !enabled -> colors.disabledActiveTrackColor
+        !isWindowActive -> colors.inactiveWindowActiveTrackColor
+        else -> colors.activeTrackColor
+    }
     val thumbColor = if (enabled) colors.thumbColor else colors.disabledThumbColor
 
     val parentLiquidState = LocalLiquidState.current

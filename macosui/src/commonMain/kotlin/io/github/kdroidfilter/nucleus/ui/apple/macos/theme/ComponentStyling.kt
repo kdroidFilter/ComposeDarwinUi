@@ -261,6 +261,9 @@ private fun defaultSliderStyle(cs: ColorScheme) = SliderStyle(
         thumbDisabled = Color.White.copy(alpha = 0.7f),
         tickMark = if (cs.isDark) Color(0xFF636366) else Color(0xFFAEAEB2),
         tickMarkActive = cs.onAccent,
+        // Inactive window: accent track becomes neutral gray (same as Switch)
+        inactiveWindowActiveTrack = if (cs.isDark) Color(0xFF636366) else Color(0xFFAEAEB2),
+        inactiveWindowInactiveTrack = if (cs.isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.06f),
     ),
 )
 
