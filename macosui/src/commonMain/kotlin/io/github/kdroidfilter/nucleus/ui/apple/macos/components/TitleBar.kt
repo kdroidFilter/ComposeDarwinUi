@@ -368,12 +368,11 @@ fun TitleBarGroupButton(
  */
 @Composable
 fun ToolbarSeparator(modifier: Modifier = Modifier) {
-    val isDark = MacosTheme.colorScheme.isDark
     Spacer(
         modifier = modifier
             .width(1.dp)
             .height(16.dp)
-            .background(if (isDark) Color.White.copy(alpha = 0.18f) else Color.Black.copy(alpha = 0.15f)),
+            .background(MacosTheme.colorScheme.borderSubtle),
     )
 }
 
