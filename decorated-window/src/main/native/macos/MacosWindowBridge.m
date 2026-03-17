@@ -676,7 +676,9 @@ Java_io_github_kdroidfilter_nucleus_ui_apple_macos_window_MacosWindowBridge_nati
     float capturedHeight = heightPt;
 
     void *rawPtr = (void *)nsWindowPtr;
-    dispatch_async(dispatch_get_main_queue(), ^{
+
+    // Use a block for the actual work so it can be called from either path.
+    void (^applyBlock)(void) = ^{
         if (atomic_load(&sShutdownInProgress)) return;
         @autoreleasepool {
             NSWindow *w = nil;
@@ -711,7 +713,16 @@ Java_io_github_kdroidfilter_nucleus_ui_apple_macos_window_MacosWindowBridge_nati
 
             applyConstraints(w, capturedHeight);
         }
-    });
+    };
+
+    // Synchronous dispatch ensures the titlebar is fully configured before
+    // Compose continues composition — prevents the window from briefly
+    // appearing at minimum size with only highlights visible.
+    if ([NSThread isMainThread]) {
+        applyBlock();
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), applyBlock);
+    }
 
     return leftInset;
 }
