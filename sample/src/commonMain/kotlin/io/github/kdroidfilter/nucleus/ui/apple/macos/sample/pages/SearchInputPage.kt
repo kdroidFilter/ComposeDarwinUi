@@ -14,8 +14,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.AddressBar
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchField
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchFieldDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchSuggestionHeader
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchSuggestionItem
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchSuggestionSeparator
@@ -183,6 +185,39 @@ fun SearchInputToolbarSearchExample() {
     }
 }
 
+@GalleryExample("SearchInput", "Custom Colors")
+@Composable
+fun SearchInputCustomColorsExample() {
+    val accent = MacosTheme.colorScheme.accent
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        var q1 by remember { mutableStateOf("") }
+        SearchField(
+            value = q1,
+            onValueChange = { q1 = it },
+            placeholder = "Accent-tinted search",
+            modifier = Modifier.fillMaxWidth(0.5f),
+            colors = SearchFieldDefaults.colors(
+                backgroundColor = accent.copy(alpha = 0.10f),
+                borderColor = accent.copy(alpha = 0.30f),
+                iconColor = accent,
+            ),
+        )
+        var q2 by remember { mutableStateOf("") }
+        SearchField(
+            value = q2,
+            onValueChange = { q2 = it },
+            placeholder = "Green search",
+            modifier = Modifier.fillMaxWidth(0.5f),
+            colors = SearchFieldDefaults.colors(
+                backgroundColor = Color(0xFF34C759).copy(alpha = 0.10f),
+                borderColor = Color(0xFF34C759).copy(alpha = 0.30f),
+                iconColor = Color(0xFF34C759),
+                textColor = Color(0xFF34C759),
+            ),
+        )
+    }
+}
+
 @Composable
 internal fun SearchInputPage() {
     GalleryPage("Search Input", "Text inputs designed for search and URL navigation.") {
@@ -218,6 +253,13 @@ internal fun SearchInputPage() {
             description = "Address bar with a customisable leading icon slot",
             sourceCode = GallerySources.SearchInputAddressBarWithIconExample,
         ) { SearchInputAddressBarWithIconExample() }
+
+        SectionHeader("Custom Colors")
+        ExampleCard(
+            title = "Custom Colors",
+            description = "Search fields with custom background, border, text and icon colors",
+            sourceCode = GallerySources.SearchInputCustomColorsExample,
+        ) { SearchInputCustomColorsExample() }
 
         SectionHeader("Toolbar Search")
         ExampleCard(

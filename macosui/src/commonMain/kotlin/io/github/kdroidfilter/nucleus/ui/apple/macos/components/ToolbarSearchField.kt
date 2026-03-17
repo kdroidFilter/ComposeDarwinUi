@@ -140,6 +140,7 @@ fun ToolbarSearchField(
     onExpandedChange: (Boolean) -> Unit = {},
     expandedWidth: Dp = 200.dp,
     onSearch: ((String) -> Unit)? = null,
+    colors: SearchFieldColors? = null,
     suggestions: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     val focusRequester = remember { FocusRequester() }
@@ -196,6 +197,7 @@ fun ToolbarSearchField(
                     onExpandedChange(false)
                 },
                 keyboardState = if (showSuggestions) keyboardState else null,
+                colors = colors,
             )
         }
 
@@ -226,10 +228,11 @@ private fun ExpandedField(
     onClose: () -> Unit,
     onFocusLost: () -> Unit = {},
     keyboardState: SearchKeyboardState? = null,
+    colors: SearchFieldColors? = null,
 ) {
-    val colors = MacosTheme.colorScheme
+    val scheme = MacosTheme.colorScheme
     val typography = MacosTheme.typography
-    val isDark = colors.isDark
+    val isDark = scheme.isDark
     val style = LocalTitleBarStyle.current
 
     // Adapt dimensions to title bar style
@@ -257,11 +260,15 @@ private fun ExpandedField(
     }
 
     val shape = MacosTheme.shapes.full
-    val bgColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.055f)
-    val ringColor = colors.accent.copy(alpha = 0.4f)
-    val textColor = colors.textPrimary
-    val placeholderColor = colors.textTertiary
-    val iconColor = colors.textTertiary
+    val bgColor = if (colors?.backgroundColor != null && colors.backgroundColor != Color.Unspecified) {
+        colors.backgroundColor
+    } else {
+        if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.055f)
+    }
+    val ringColor = scheme.accent.copy(alpha = 0.4f)
+    val textColor = colors?.textColor ?: scheme.textPrimary
+    val placeholderColor = colors?.placeholderColor ?: scheme.textTertiary
+    val iconColor = colors?.iconColor ?: scheme.textTertiary
 
     // Track whether the field has received focus at least once to avoid
     // triggering onFocusLost during initial composition
@@ -305,7 +312,7 @@ private fun ExpandedField(
             },
         singleLine = true,
         textStyle = textStyle.copy(color = textColor),
-        cursorBrush = SolidColor(colors.accent),
+        cursorBrush = SolidColor(scheme.accent),
         keyboardActions = KeyboardActions(
             onSearch = onSearch?.let { { it(value) } },
         ),
@@ -319,8 +326,8 @@ private fun ExpandedField(
                         elevation = 4.dp,
                         shape = shape,
                         clip = false,
-                        ambientColor = colors.accent.copy(alpha = 0.25f),
-                        spotColor = colors.accent.copy(alpha = 0.25f),
+                        ambientColor = scheme.accent.copy(alpha = 0.25f),
+                        spotColor = scheme.accent.copy(alpha = 0.25f),
                     )
                     .clip(shape)
                     .background(bgColor, shape)

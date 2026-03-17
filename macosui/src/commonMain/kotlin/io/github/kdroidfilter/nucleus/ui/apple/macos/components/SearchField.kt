@@ -52,6 +52,40 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalContentColor
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSurface
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTextStyle
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
+import androidx.compose.runtime.Immutable
+
+// ===========================================================================
+// SearchFieldColors — public customizable colors
+// ===========================================================================
+
+@Immutable
+class SearchFieldColors(
+    val backgroundColor: Color,
+    val textColor: Color,
+    val placeholderColor: Color,
+    val iconColor: Color,
+    val borderColor: Color,
+) {
+    fun copy(
+        backgroundColor: Color = this.backgroundColor,
+        textColor: Color = this.textColor,
+        placeholderColor: Color = this.placeholderColor,
+        iconColor: Color = this.iconColor,
+        borderColor: Color = this.borderColor,
+    ) = SearchFieldColors(backgroundColor, textColor, placeholderColor, iconColor, borderColor)
+}
+
+object SearchFieldDefaults {
+
+    @Composable
+    fun colors(
+        backgroundColor: Color = Color.Unspecified,
+        textColor: Color = MacosTheme.colorScheme.textPrimary,
+        placeholderColor: Color = MacosTheme.colorScheme.textSecondary,
+        iconColor: Color = MacosTheme.colorScheme.textPrimary,
+        borderColor: Color = Color.Unspecified,
+    ) = SearchFieldColors(backgroundColor, textColor, placeholderColor, iconColor, borderColor)
+}
 
 @Composable
 fun SearchField(
@@ -64,13 +98,14 @@ fun SearchField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     focusRequester: FocusRequester = remember { FocusRequester() },
+    colors: SearchFieldColors? = null,
 ) {
     val controlSize = LocalControlSize.current
     val tfColors = MacosTheme.componentStyling.textField.colors
     val tfMetrics = MacosTheme.componentStyling.textField.metrics
-    val colors = MacosTheme.colorScheme
+    val scheme = MacosTheme.colorScheme
     val typography = MacosTheme.typography
-    val accent = colors.accent
+    val accent = scheme.accent
     val surface = LocalSurface.current
     val isOverGlass = surface == Surface.OverGlass
 
@@ -100,9 +135,11 @@ fun SearchField(
         else -> 16.dp
     }
 
-    // Background — reuses TextField component styling
+    // Background — custom colors take priority
     val backgroundColor by animateColorAsState(
-        targetValue = when {
+        targetValue = if (colors?.backgroundColor != null && colors.backgroundColor != Color.Unspecified) {
+            colors.backgroundColor
+        } else when {
             !enabled -> if (isOverGlass) tfColors.overGlassDisabledBackground else tfColors.backgroundDisabled
             isFocused && isOverGlass -> tfColors.overGlassFocusedBackground
             isOverGlass -> tfColors.overGlassBackground
@@ -112,9 +149,11 @@ fun SearchField(
         label = "search_bg",
     )
 
-    // Border — Sketch: 1dp #00000014 idle, #0000000a disabled
+    // Border — custom colors take priority
     val borderColor by animateColorAsState(
-        targetValue = when {
+        targetValue = if (colors?.borderColor != null && colors.borderColor != Color.Unspecified) {
+            colors.borderColor
+        } else when {
             !enabled -> if (isOverGlass) Color.Transparent else tfColors.borderDisabled
             isOverGlass -> Color.Transparent
             else -> tfColors.border
@@ -123,11 +162,10 @@ fun SearchField(
         label = "search_border",
     )
 
-    // Sketch: magnifying glass = Primary, placeholder = Secondary, clear = Secondary
-    val textColor = colors.textPrimary
-    val placeholderColor = colors.textSecondary
-    val searchIconColor = colors.textPrimary
-    val clearButtonColor = colors.textSecondary
+    val textColor = colors?.textColor ?: scheme.textPrimary
+    val placeholderColor = colors?.placeholderColor ?: scheme.textSecondary
+    val searchIconColor = colors?.iconColor ?: scheme.textPrimary
+    val clearButtonColor = colors?.iconColor ?: scheme.textSecondary
 
     // Focus ring — Sketch: 3.5dp accent@25% + 1dp accent@15%
     val pillCornerRadius = fieldHeight / 2
