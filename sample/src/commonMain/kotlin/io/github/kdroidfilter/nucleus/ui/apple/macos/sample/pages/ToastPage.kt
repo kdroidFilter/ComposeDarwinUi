@@ -35,15 +35,43 @@ fun ToastClickToShowExample(toastState: ToastState) {
                     title = "Messages",
                     message = "John: Hey, are you free for lunch today?",
                     timestamp = "2m ago",
+                    showCloseButton = true,
                 )
             },
         )
         PushButton(
-            text = "Download",
+            text = "Download (10s)",
             onClick = {
                 toastState.show(
                     title = "Downloads",
                     message = "Your file has been downloaded successfully.",
+                    showCloseButton = true,
+                    duration = 10_000L,
+                    onDismiss = { println("Download toast dismissed") },
+                )
+            },
+        )
+        PushButton(
+            text = "Clickable",
+            onClick = {
+                toastState.show(
+                    title = "Update Available",
+                    message = "Click to install the latest version.",
+                    showCloseButton = true,
+                    duration = 5000L,
+                    onClick = { println("Toast clicked — opening update…") },
+                    onDismiss = { println("Update toast dismissed") },
+                )
+            },
+        )
+        PushButton(
+            text = "Persistent",
+            onClick = {
+                toastState.show(
+                    title = "Connection lost",
+                    message = "Check your internet connection and try again.",
+                    showCloseButton = true,
+                    duration = null,
                 )
             },
         )

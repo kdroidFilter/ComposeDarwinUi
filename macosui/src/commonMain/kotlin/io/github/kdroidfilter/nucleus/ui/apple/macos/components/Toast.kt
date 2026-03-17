@@ -2,11 +2,17 @@ package io.github.kdroidfilter.nucleus.ui.apple.macos.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,8 +29,13 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,11 +43,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
+import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
+import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.GlassMaterialSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosGlassMaterial
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 // ===========================================================================
 // Toast Data
@@ -51,7 +64,9 @@ import kotlinx.coroutines.delay
  * @param timestamp Optional timestamp text (e.g. "now", "2m ago").
  * @param icon Optional leading icon composable (e.g. an app icon).
  * @param trailingContent Optional trailing composable (e.g. an image thumbnail).
+ * @param showCloseButton Whether to display a close button on the trailing edge.
  * @param duration How long (in milliseconds) the toast remains visible before auto-dismissing.
+ *                 Pass `null` to make the toast persistent (only dismissible via close button or tap).
  */
 data class ToastData(
     val id: Long = nextToastId(),
@@ -60,7 +75,10 @@ data class ToastData(
     val timestamp: String? = null,
     val icon: (@Composable () -> Unit)? = null,
     val trailingContent: (@Composable () -> Unit)? = null,
-    val duration: Long = 3000L,
+    val showCloseButton: Boolean = false,
+    val duration: Long? = 3000L,
+    val onClick: (() -> Unit)? = null,
+    val onDismiss: (() -> Unit)? = null,
 )
 
 /** Simple incrementing counter for generating unique toast IDs. */
@@ -103,7 +121,9 @@ class ToastState {
      * @param timestamp Optional timestamp text (e.g. "now").
      * @param icon Optional leading icon composable.
      * @param trailingContent Optional trailing composable.
+     * @param showCloseButton Whether to display a close button.
      * @param duration How long (in milliseconds) the toast remains visible.
+     *                 Pass `null` for a persistent toast.
      */
     fun show(
         title: String,
@@ -111,7 +131,10 @@ class ToastState {
         timestamp: String? = null,
         icon: (@Composable () -> Unit)? = null,
         trailingContent: (@Composable () -> Unit)? = null,
-        duration: Long = 3000L,
+        showCloseButton: Boolean = false,
+        duration: Long? = 3000L,
+        onClick: (() -> Unit)? = null,
+        onDismiss: (() -> Unit)? = null,
     ) {
         _toasts.add(
             ToastData(
@@ -120,7 +143,10 @@ class ToastState {
                 timestamp = timestamp,
                 icon = icon,
                 trailingContent = trailingContent,
+                showCloseButton = showCloseButton,
                 duration = duration,
+                onClick = onClick,
+                onDismiss = onDismiss,
             )
         )
     }
@@ -161,22 +187,21 @@ fun ToastHost(
     state: ToastState,
     modifier: Modifier = Modifier,
 ) {
-    if (state.toasts.isEmpty()) return
-
     Popup(
         alignment = Alignment.TopEnd,
         properties = PopupProperties(focusable = false),
     ) {
         Column(
             modifier = modifier.padding(top = 12.dp, end = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.End,
         ) {
             state.toasts.forEach { toast ->
-                ToastItem(
-                    toast = toast,
-                    onDismiss = { state.dismiss(toast.id) },
-                )
+                key(toast.id) {
+                    ToastItem(
+                        toast = toast,
+                        onDismiss = { state.dismiss(toast.id) },
+                    )
+                }
             }
         }
     }
@@ -203,84 +228,145 @@ private fun ToastItem(
 
     val shape = RoundedCornerShape(14.dp)
 
-    // Auto-dismiss
+    var visible by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    // Animated dismiss helper
+    fun animatedDismiss() {
+        scope.launch {
+            toast.onDismiss?.invoke()
+            visible = false
+            delay(300)
+            onDismiss()
+        }
+    }
+
+    // Trigger enter animation, then auto-dismiss if duration is set
     LaunchedEffect(toast.id) {
-        delay(toast.duration)
-        onDismiss()
+        visible = true
+        if (toast.duration != null) {
+            delay(toast.duration)
+            toast.onDismiss?.invoke()
+            visible = false
+            delay(300)
+            onDismiss()
+        }
     }
 
     AnimatedVisibility(
-        visible = true,
-        enter = slideInVertically(
-            initialOffsetY = { fullHeight -> -fullHeight },
-            animationSpec = tween(durationMillis = 300),
-        ) + fadeIn(animationSpec = tween(durationMillis = 300)),
-        exit = slideOutVertically(
-            targetOffsetY = { fullHeight -> -fullHeight },
-            animationSpec = tween(durationMillis = 200),
+        visible = visible,
+        enter = slideInHorizontally(
+            initialOffsetX = { fullWidth -> fullWidth },
+            animationSpec = tween(durationMillis = 350),
+        ) + fadeIn(animationSpec = tween(durationMillis = 250)),
+        exit = slideOutHorizontally(
+            targetOffsetX = { fullWidth -> fullWidth },
+            animationSpec = tween(durationMillis = 250),
+        ) + shrinkVertically(
+            shrinkTowards = Alignment.Top,
+            animationSpec = tween(durationMillis = 250, delayMillis = 200),
         ) + fadeOut(animationSpec = tween(durationMillis = 200)),
     ) {
+        // Outer box with padding to allow the close badge to overflow
         Box(
-            modifier = Modifier
-                .widthIn(max = 360.dp)
-                .macosGlassMaterial(shape = shape, materialSize = GlassMaterialSize.Medium)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onDismiss,
-                ),
+            modifier = Modifier.padding(
+                top = if (toast.showCloseButton) 5.dp else 0.dp,
+                end = if (toast.showCloseButton) 5.dp else 0.dp,
+                bottom = 8.dp,
+            ),
         ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
+            // Toast card
+            Box(
+                modifier = Modifier
+                    .widthIn(max = 360.dp)
+                    .macosGlassMaterial(shape = shape, materialSize = GlassMaterialSize.Medium)
+                    .border(width = 0.5.dp, color = colors.borderSubtle, shape = shape)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {
+                            toast.onClick?.invoke()
+                            animatedDismiss()
+                        },
+                    ),
             ) {
-                // Leading icon
-                if (toast.icon != null) {
-                    Box(modifier = Modifier.size(36.dp)) {
-                        toast.icon.invoke()
-                    }
-                    Spacer(modifier = Modifier.width(10.dp))
-                }
-
-                // Title + Message
-                Column(
-                    modifier = Modifier.weight(1f),
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = toast.title,
-                            style = typography.caption1,
-                            color = textColor,
-                            fontWeight = FontWeight.SemiBold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f, fill = false),
-                        )
-                        if (toast.timestamp != null) {
-                            Spacer(modifier = Modifier.width(6.dp))
+                    // Leading icon
+                    if (toast.icon != null) {
+                        Box(modifier = Modifier.size(36.dp)) {
+                            toast.icon.invoke()
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                    }
+
+                    // Title + Message
+                    Column(
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = toast.timestamp,
-                                style = typography.caption2,
-                                color = secondaryTextColor,
+                                text = toast.title,
+                                style = typography.caption1,
+                                color = textColor,
+                                fontWeight = FontWeight.SemiBold,
                                 maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false),
                             )
+                            if (toast.timestamp != null) {
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = toast.timestamp,
+                                    style = typography.caption2,
+                                    color = secondaryTextColor,
+                                    maxLines = 1,
+                                )
+                            }
+                        }
+                        Text(
+                            text = toast.message,
+                            style = typography.caption2,
+                            color = secondaryTextColor,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+
+                    // Trailing content
+                    if (toast.trailingContent != null) {
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Box(modifier = Modifier.size(36.dp)) {
+                            toast.trailingContent.invoke()
                         }
                     }
-                    Text(
-                        text = toast.message,
-                        style = typography.caption2,
-                        color = secondaryTextColor,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
                 }
+            }
 
-                // Trailing content
-                if (toast.trailingContent != null) {
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Box(modifier = Modifier.size(36.dp)) {
-                        toast.trailingContent.invoke()
-                    }
+            // Close badge — floating circle at top-end, overlapping the card
+            if (toast.showCloseButton) {
+                val closeBg = if (isDark) Color(0xFF3A3A3C) else Color(0xFFB0B0B0)
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(x = 5.dp, y = (-5).dp)
+                        .size(16.dp)
+                        .background(closeBg, CircleShape)
+                        .border(0.5.dp, colors.borderSubtle, CircleShape)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = { animatedDismiss() },
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        icon = Icons.X,
+                        modifier = Modifier.size(8.dp),
+                        tint = if (isDark) Color.White.copy(alpha = 0.9f) else Color.White,
+                    )
                 }
             }
         }

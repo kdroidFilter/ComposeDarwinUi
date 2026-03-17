@@ -114,6 +114,7 @@ fun AlertBanner(
         modifier = modifier
             .widthIn(max = 360.dp)
             .macosGlassMaterial(shape = shape, materialSize = GlassMaterialSize.Medium)
+            .border(width = 0.5.dp, color = colors.borderSubtle, shape = shape)
             .then(
                 if (onDismiss != null) {
                     Modifier.clickable(
@@ -336,8 +337,6 @@ private fun AlertDialogContent(
     // macOS native alert panel appearance — frosted glass vibrancy
     val fallbackBg = if (isDark) Color(0xFF262626).copy(alpha = 0.85f)
     else Color(0xFFF5F5F5).copy(alpha = 0.82f)
-    val borderColor = if (isDark) Color(0xFF5E5E5E).copy(alpha = 0.6f)
-    else Color(0xFFC1C1C1).copy(alpha = 0.45f)
     val textColor = if (isDark) Color.White else Color.Black.copy(alpha = 0.85f)
 
     val shape = RoundedCornerShape(26.dp)
@@ -347,7 +346,7 @@ private fun AlertDialogContent(
             .widthIn(max = 260.dp)
             .shadow(elevation = 25.dp, shape = shape, clip = false, ambientColor = Color.Black.copy(alpha = 0.5f))
             .macosGlassMaterial(shape = shape, materialSize = GlassMaterialSize.Large)
-            .border(width = 0.5.dp, color = borderColor, shape = shape)
+            .border(width = 0.5.dp, color = colors.borderSubtle, shape = shape)
             // Prevent click-through to scrim
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -468,30 +467,27 @@ private fun AlertPillButton(
     style: AlertPillButtonStyle,
     modifier: Modifier = Modifier,
 ) {
-    val isDark = MacosTheme.colorScheme.isDark
+    val colors = MacosTheme.colorScheme
+    val isDark = colors.isDark
     val interactionSource = remember { MutableInteractionSource() }
 
     val pillShape = RoundedCornerShape(14.dp)
 
     val backgroundColor: Color
     val textColor: Color
-    val borderColor: Color
 
     when (style) {
         AlertPillButtonStyle.Accent -> {
             backgroundColor = Color(0xFF0088FF)
             textColor = Color.White
-            borderColor = Color.Transparent
         }
         AlertPillButtonStyle.Destructive -> {
             backgroundColor = Color(0xFFFF383C).copy(alpha = 0.23f)
             textColor = Color(0xFFFF383C)
-            borderColor = Color.Transparent
         }
         AlertPillButtonStyle.Secondary -> {
             backgroundColor = if (isDark) Color.White.copy(alpha = 0.12f) else Color(0xFFE6E6E6)
             textColor = if (isDark) Color.White else Color.Black.copy(alpha = 0.85f)
-            borderColor = Color.Transparent
         }
     }
 
@@ -501,10 +497,7 @@ private fun AlertPillButton(
             .height(28.dp)
             .clip(pillShape)
             .background(backgroundColor, pillShape)
-            .then(
-                if (borderColor != Color.Transparent) Modifier.border(0.5.dp, borderColor, pillShape)
-                else Modifier,
-            )
+            .border(0.5.dp, colors.borderSubtle, pillShape)
             .clickable(
                 interactionSource = interactionSource,
                 indication = null,
@@ -571,7 +564,6 @@ fun AlertDialog(
         // macOS native alert panel colors
         val fallbackBg = if (containerColor != Color.Unspecified) containerColor
         else if (isDark) Color(0xFF262626).copy(alpha = 0.85f) else Color(0xFFF5F5F5).copy(alpha = 0.82f)
-        val borderColor = if (isDark) Color(0xFF5E5E5E).copy(alpha = 0.6f) else Color(0xFFC1C1C1).copy(alpha = 0.45f)
         val nativeTextColor = if (isDark) Color.White else Color.Black.copy(alpha = 0.85f)
         val resolvedIconColor = if (iconContentColor != Color.Unspecified) iconContentColor else nativeTextColor
         val resolvedTitleColor = if (titleContentColor != Color.Unspecified) titleContentColor else nativeTextColor
@@ -594,7 +586,7 @@ fun AlertDialog(
                     .widthIn(max = 260.dp)
                     .shadow(elevation = 25.dp, shape = shape, clip = false, ambientColor = Color.Black.copy(alpha = 0.5f))
                     .macosGlassMaterial(shape = shape, materialSize = GlassMaterialSize.Large)
-                    .border(width = 0.5.dp, color = borderColor, shape = shape)
+                    .border(width = 0.5.dp, color = colors.borderSubtle, shape = shape)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
