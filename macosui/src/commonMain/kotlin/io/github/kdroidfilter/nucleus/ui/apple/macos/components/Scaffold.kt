@@ -5,6 +5,8 @@ import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,6 +29,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.fletchmckee.liquid.liquefiable
 import io.github.fletchmckee.liquid.liquid
@@ -39,11 +42,17 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarResize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarWidth
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTitleBarHeight
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SidebarResizeCallbacks
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.GlassType
-import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalGlassType
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalToolbarGlassState
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarHide
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarVisible
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.offset
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 
 /**
  * macOS-style scaffold layout with optional sidebar, content list, inspector,
@@ -93,6 +102,8 @@ fun Scaffold(
     titleBar: (@Composable () -> Unit)? = null,
     titleBarStyle: TitleBarStyle = TitleBarStyle.Unified,
     titleBarHeight: Int = titleBarStyle.height,
+    titleBarGlassTint: Color = Color.Transparent,
+    showDividers: Boolean = false,
     bottomBar: (@Composable () -> Unit)? = null,
     bottomBarHeight: Int = 38,
     content: @Composable (PaddingValues) -> Unit,
@@ -133,16 +144,20 @@ fun Scaffold(
     val bottomBarGlassState = rememberLiquidState()
     val rootLiquidState = LocalLiquidState.current
 
-    val isDark = MacosTheme.colorScheme.isDark
-    val glassType = LocalGlassType.current
-    // Tinted = more opaque tint → glass surface appears denser
-    val glassTint = when {
-        glassType == GlassType.Tinted && isDark -> Color.Black.copy(alpha = 0.30f)
-        glassType == GlassType.Tinted -> Color.White.copy(alpha = 0.30f)
-        isDark -> Color.Black.copy(alpha = 0.15f)
-        else -> Color.White.copy(alpha = 0.15f)
+    // Re-apply native titlebar constraints after sidebar show/hide animation.
+    // macOS may invalidate the titlebar view hierarchy during content relayout.
+    val revalidateTitleBar = LocalTitleBarRevalidate.current
+    LaunchedEffect(showSidebar) {
+        revalidateTitleBar?.invoke()
     }
-    val borderColor = if (isDark) Color.Black.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.1f)
+
+    val isDark = MacosTheme.colorScheme.isDark
+    val glassTint = titleBarGlassTint
+    val borderColor = if (showDividers) {
+        if (isDark) Color.Black.copy(alpha = 0.5f) else Color.Black.copy(alpha = 0.1f)
+    } else {
+        Color.Transparent
+    }
 
     Row(
         modifier = modifier
@@ -151,14 +166,22 @@ fun Scaffold(
     ) {
         // ---- Sidebar (full height, side-by-side with the title bar) ----
         if (sidebar != null) {
+            val sidebarSizeTween = tween<IntSize>(durationMillis = 250, easing = FastOutSlowInEasing)
+            val sidebarOffsetTween = tween<IntOffset>(durationMillis = 250, easing = FastOutSlowInEasing)
             AnimatedVisibility(
                 visible = showSidebar,
-                enter = expandHorizontally(
-                    animationSpec = macosSpring(SpringPreset.Snappy),
+                enter = slideInHorizontally(
+                    animationSpec = sidebarOffsetTween,
+                    initialOffsetX = { -it },
+                ) + expandHorizontally(
+                    animationSpec = sidebarSizeTween,
                     expandFrom = Alignment.Start,
                 ),
-                exit = shrinkHorizontally(
-                    animationSpec = macosSpring(SpringPreset.Snappy),
+                exit = slideOutHorizontally(
+                    animationSpec = sidebarOffsetTween,
+                    targetOffsetX = { -it },
+                ) + shrinkHorizontally(
+                    animationSpec = sidebarSizeTween,
                     shrinkTowards = Alignment.Start,
                 ),
             ) {
@@ -175,9 +198,12 @@ fun Scaffold(
                     null
                 }
 
+                val hideCallback: (() -> Unit)? = if (managedToggle) toggleSidebar else null
                 CompositionLocalProvider(
                     LocalSidebarWidth provides currentSidebarWidth,
                     LocalSidebarResize provides sidebarResizeCallbacks,
+                    LocalSidebarHide provides hideCallback,
+                    LocalSidebarVisible provides showSidebar,
                 ) {
                     sidebar()
                 }
@@ -360,18 +386,21 @@ fun Scaffold(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         if (managedToggle) {
+                            val toggleTween = tween<IntSize>(durationMillis = 200, easing = FastOutSlowInEasing)
                             AnimatedVisibility(
                                 visible = !showSidebar,
                                 enter = expandHorizontally(
-                                    animationSpec = macosSpring(SpringPreset.Snappy),
+                                    animationSpec = toggleTween,
                                     expandFrom = Alignment.Start,
-                                ) + fadeIn(macosTween(MacosDuration.Normal)),
+                                ) + fadeIn(tween(durationMillis = 200, easing = FastOutSlowInEasing)),
                                 exit = shrinkHorizontally(
-                                    animationSpec = macosSpring(SpringPreset.Snappy),
+                                    animationSpec = toggleTween,
                                     shrinkTowards = Alignment.Start,
-                                ) + fadeOut(macosTween(MacosDuration.Fast)),
+                                ) + fadeOut(tween(durationMillis = 100, easing = FastOutSlowInEasing)),
                             ) {
-                                Box(modifier = Modifier.padding(start = 12.dp)) {
+                                val windowControlInset = LocalWindowControlInset.current
+                                val startPadding = if (windowControlInset != Dp.Unspecified) windowControlInset else 12.dp
+                                Box(modifier = Modifier.padding(start = startPadding)) {
                                     SidebarButton(onClick = toggleSidebar)
                                 }
                             }

@@ -60,10 +60,17 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.GlassMaterialSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarResize
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalWindowActive
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SidebarStyle
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarHide
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarVisible
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarWidth
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosDuration
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosGlassMaterial
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosSpring
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosTween
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
@@ -168,6 +175,9 @@ class SidebarItem(
  * @param scrollbarTrackClickBehavior Scrollbar track click behavior.
  * @param header Optional composable header above the items.
  * @param pinnedItems Items pinned to the bottom of the sidebar.
+ * @param onHideSidebar Optional callback to hide the sidebar. When non-null (or when
+ *   [LocalSidebarHide] is provided by a [Scaffold]), a hide button is shown in the
+ *   top-right corner of the sidebar header area.
  */
 @Composable
 fun Sidebar(
@@ -185,11 +195,16 @@ fun Sidebar(
     scrollbarTrackClickBehavior: TrackClickBehavior = TrackClickBehavior.Jump,
     header: (@Composable () -> Unit)? = null,
     pinnedItems: List<SidebarItem> = emptyList(),
+    onHideSidebar: (() -> Unit)? = null,
 ) {
     val controlSize = LocalControlSize.current
     val sidebarMetrics = MacosTheme.componentStyling.sidebar.metrics
     val colors = MacosTheme.colorScheme
     val isDark = colors.isDark
+
+    // Resolve hide callback: explicit parameter takes precedence, then CompositionLocal
+    val scaffoldHide = LocalSidebarHide.current
+    val effectiveHide = onHideSidebar ?: scaffoldHide
 
     // Scaffold-provided width takes precedence over the parameter
     val scaffoldWidth = LocalSidebarWidth.current
@@ -204,18 +219,18 @@ fun Sidebar(
         animationSpec = sidebarSpring(),
     )
 
-    // Animated padding: collapsed=4dp, expanded=4dp
+    // Animated padding: collapsed=6dp, expanded=6dp
     val animatedPadding by animateDpAsState(
-        targetValue = if (collapsed) 4.dp else 4.dp,
+        targetValue = if (collapsed) 6.dp else 6.dp,
         animationSpec = sidebarSpring(),
     )
 
     val animatedTrackStartPadding by animateDpAsState(
-        targetValue = if (collapsed) 4.dp else 9.dp,
+        targetValue = if (collapsed) 4.dp else 2.dp,
         animationSpec = sidebarSpring(),
     )
     val animatedTrackEndPadding by animateDpAsState(
-        targetValue = if (collapsed) 4.dp else 9.dp,
+        targetValue = if (collapsed) 4.dp else 11.dp,
         animationSpec = sidebarSpring(),
     )
 
@@ -223,7 +238,22 @@ fun Sidebar(
     val hasBottomSection = collapsible || pinnedItems.isNotEmpty() || onLogout != null
 
     val sidebarContentShape = MacosTheme.shapes.extraLarge
-    val sidebarBorderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.08f)
+
+    // Window active state: macOS instantly removes glass vibrancy from inactive windows
+    val isWindowActive = LocalWindowActive.current
+
+    val sidebarBorderColor = if (isWindowActive) {
+        if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.08f)
+    } else {
+        if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.04f)
+    }
+
+    // Opaque background that covers the glass material when the window is inactive
+    val inactiveOverlay = if (isWindowActive) {
+        Color.Transparent
+    } else {
+        if (isDark) Color(0xFF282828) else Color(0xFFF4F4F4)
+    }
 
     Box(
         modifier = modifier
@@ -237,31 +267,62 @@ fun Sidebar(
                 .width(animatedWidth)
                 .padding(animatedPadding)
                 .drawBehind {
-                    // Soft outer shadow: concentric stroke rings, no fill
-                    val steps = 5
-                    val maxExpand = 6.dp.toPx()
-                    val baseAlpha = if (isDark) 0.02f else 0.03f
-                    val cornerRad = 16.dp.toPx()
-                    val strokeWidth = maxExpand / steps
-                    for (i in 1..steps) {
-                        val expand = maxExpand * (i.toFloat() / steps)
-                        val alpha = baseAlpha * ((steps - i + 1).toFloat() / steps)
-                        val shadowBase = if (isDark) Color.White else Color.Black
-                        drawRoundRect(
-                            color = shadowBase.copy(alpha = alpha),
-                            topLeft = Offset(-expand, -expand),
-                            size = Size(size.width + expand * 2, size.height + expand * 2),
-                            cornerRadius = CornerRadius(cornerRad + expand),
-                            style = Stroke(width = strokeWidth),
-                        )
+                    // Soft outer shadow: concentric stroke rings, no fill (hidden when inactive)
+                    if (isWindowActive) {
+                        val steps = 5
+                        val maxExpand = 6.dp.toPx()
+                        val baseAlpha = if (isDark) 0.02f else 0.03f
+                        val cornerRad = 16.dp.toPx()
+                        val strokeWidth = maxExpand / steps
+                        for (i in 1..steps) {
+                            val expand = maxExpand * (i.toFloat() / steps)
+                            val alpha = baseAlpha * ((steps - i + 1).toFloat() / steps)
+                            val shadowBase = if (isDark) Color.White else Color.Black
+                            drawRoundRect(
+                                color = shadowBase.copy(alpha = alpha),
+                                topLeft = Offset(-expand, -expand),
+                                size = Size(size.width + expand * 2, size.height + expand * 2),
+                                cornerRadius = CornerRadius(cornerRad + expand),
+                                style = Stroke(width = strokeWidth),
+                            )
+                        }
                     }
                 }
                 .macosGlassMaterial(
                     shape = sidebarContentShape,
                     materialSize = GlassMaterialSize.Large,
                 )
+                .background(inactiveOverlay, sidebarContentShape)
                 .border(1.dp, sidebarBorderColor, sidebarContentShape),
         ) {
+            // ---- Hide button (matches title bar height, aligned to end) ----
+            if (effectiveHide != null) {
+                val sidebarVisible = LocalSidebarVisible.current
+                val hideFraction by animateFloatAsState(
+                    targetValue = if (collapsed) 0f else 1f,
+                    animationSpec = sidebarSpring(),
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clipToBounds()
+                        .graphicsLayer {
+                            // Instant hide when sidebar is animating out
+                            alpha = if (sidebarVisible) hideFraction else 0f
+                        }
+                        .layout { measurable, constraints ->
+                            val placeable = measurable.measure(constraints)
+                            val h = (placeable.height * hideFraction).toInt()
+                            layout(placeable.width, h) {
+                                placeable.placeRelative(0, 0)
+                            }
+                        },
+                    contentAlignment = Alignment.CenterEnd,
+                ) {
+                    SidebarHideButton(onClick = effectiveHide)
+                }
+            }
+
             // ---- Pinned header (height fraction + alpha, stays in tree) ----
             if (header != null) {
                 val headerFraction by animateFloatAsState(
@@ -695,18 +756,12 @@ private fun SidebarItemRow(
 
     val isDark = colors.isDark
     // Sketch: selected background — light: #0000001c, dark: use white overlay
-    val backgroundColor by animateColorAsState(
-        targetValue = if (active) {
-            if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.11f)
-        } else {
-            Color.Transparent
-        },
-        animationSpec = macosSpring(SpringPreset.Snappy),
-    )
-    val contentColor by animateColorAsState(
-        targetValue = if (active) colors.accent else colors.textPrimary,
-        animationSpec = macosSpring(SpringPreset.Snappy),
-    )
+    val backgroundColor = if (active) {
+        if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.11f)
+    } else {
+        Color.Transparent
+    }
+    val contentColor = if (active) colors.accent else colors.textPrimary
 
     val itemShape = MacosTheme.shapes.small
 
@@ -798,6 +853,57 @@ private fun CollapseToggle(
         iconModifier = Modifier.graphicsLayer { rotationZ = iconRotation },
         iconContentDescription = if (isCollapsed) "Expand sidebar" else "Collapse sidebar",
     )
+}
+
+// =============================================================================
+// SidebarHideButton — icon-only toggle with flattened oval hover
+// =============================================================================
+
+private val SidebarHideButtonShape = RoundedCornerShape(32.dp)
+
+/**
+ * A minimal sidebar hide button showing only the panel-left icon.
+ * On hover, a flattened oval (wider than tall) background appears.
+ */
+@Composable
+private fun SidebarHideButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val isDark = MacosTheme.colorScheme.isDark
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val bgColor by animateColorAsState(
+        targetValue = when {
+            isPressed -> if (isDark) Color.White.copy(alpha = 0.15f) else Color.Black.copy(alpha = 0.10f)
+            isHovered -> if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.06f)
+            else -> Color.Transparent
+        },
+        animationSpec = macosTween(MacosDuration.Fast),
+        label = "sidebar_hide_bg",
+    )
+
+    val contentColor = if (isDark) Color.White.copy(alpha = 0.85f) else Color(0xFF1A1A1A)
+
+    Box(
+        modifier = modifier
+            .padding(horizontal = 8.dp, vertical = 10.dp)
+            .clip(SidebarHideButtonShape)
+            .background(bgColor, SidebarHideButtonShape)
+            .hoverable(interactionSource)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                role = Role.Button,
+                onClick = onClick,
+            )
+            .padding(horizontal = 6.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(icon = Icons.PanelLeft, modifier = Modifier.size(22.dp), tint = contentColor)
+    }
 }
 
 @Preview

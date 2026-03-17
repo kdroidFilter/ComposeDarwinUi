@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
+import com.composables.icons.lucide.Monitor
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -82,7 +82,6 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchSuggestion
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SearchSuggestionSeparator
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SegmentedControl
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Sidebar
-import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SidebarButton
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SidebarItem
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Switch
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
@@ -159,6 +158,8 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.VibrantColors
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.vibrant
 
+internal enum class ThemeMode { System, Light, Dark }
+
 // Navigation data
 internal data class SidebarEntryDef(val id: String, val label: String, val group: String, val icon: ImageVector)
 
@@ -215,9 +216,16 @@ internal val sidebarEntryDefs = listOf(
 
 @Composable
 fun App() {
-    val systemTheme = isSystemInDarkTheme()
-    var isDark by remember { mutableStateOf(systemTheme) }
-    var accentColor by remember { mutableStateOf(AccentColor.Blue) }
+    var themeMode by remember { mutableStateOf(ThemeMode.System) }
+    val systemDark = isSystemDarkMode()
+    val isDark = when (themeMode) {
+        ThemeMode.System -> systemDark
+        ThemeMode.Light -> false
+        ThemeMode.Dark -> true
+    }
+    val systemRawColor = systemAccentRawColor()
+    var overriddenAccent by remember { mutableStateOf<AccentColor?>(null) }
+    val accentColor = overriddenAccent ?: AccentColor.Blue
     var sidebarControlSize by remember { mutableStateOf(ControlSize.Regular) }
     var isVibrant by remember { mutableStateOf(false) }
     var glassType by remember { mutableStateOf(GlassType.Regular) }
@@ -227,11 +235,24 @@ fun App() {
     } else {
         io.github.kdroidfilter.nucleus.ui.apple.macos.theme.lightColorScheme(accentColor)
     }
-    val colorScheme = if (isVibrant) {
-        val vibrant = if (isDark) VibrantColors.dark() else VibrantColors.light()
-        baseColorScheme.vibrant(vibrant, accentColor)
+    // Override accent with exact system color when no manual override is set
+    val withSystemColor = if (systemRawColor != null && overriddenAccent == null) {
+        baseColorScheme.copy(
+            accent = systemRawColor,
+            info = systemRawColor,
+            ring = systemRawColor,
+            inputFocusBorder = systemRawColor,
+            surfaceTint = systemRawColor,
+            tertiary = systemRawColor,
+        )
     } else {
         baseColorScheme
+    }
+    val colorScheme = if (isVibrant) {
+        val vibrant = if (isDark) VibrantColors.dark() else VibrantColors.light()
+        withSystemColor.vibrant(vibrant, accentColor)
+    } else {
+        withSystemColor
     }
 
     MacosTheme(darkTheme = isDark, accentColor = accentColor, colorScheme = colorScheme, glassType = glassType) {
@@ -278,33 +299,6 @@ fun App() {
                             collapsed = sidebarCollapsed,
                             onCollapsedChange = { sidebarCollapsed = it },
                             collapsible = true,
-                            header = {
-                                // Title + toggle — aligns vertically with 52dp title bar
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                ) {
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = "macOS UI",
-                                            fontSize = 18.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = MacosTheme.colorScheme.textPrimary,
-                                        )
-                                        Text(
-                                            text = "Component Docs",
-                                            style = MacosTheme.typography.caption1,
-                                            color = MacosTheme.colorScheme.textTertiary,
-                                        )
-                                    }
-                                    SidebarButton(
-                                        onClick = { columnVisibility = ColumnVisibility.DoubleColumn },
-                                    )
-                                }
-                            },
                         )
                     }
                 },
@@ -345,7 +339,7 @@ fun App() {
                                     )
                                     AccentColorPicker(
                                         selected = accentColor,
-                                        onSelect = { accentColor = it },
+                                        onSelect = { overriddenAccent = it },
                                     )
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
@@ -403,8 +397,21 @@ fun App() {
                                 }
                             }
                             TitleBarButtonGroup {
-                                TitleBarGroupButton(onClick = { isDark = !isDark }) {
-                                    Icon(if (isDark) LucideSun else LucideMoon, modifier = Modifier.size(14.dp))
+                                TitleBarGroupButton(onClick = {
+                                    themeMode = when (themeMode) {
+                                        ThemeMode.System -> ThemeMode.Light
+                                        ThemeMode.Light -> ThemeMode.Dark
+                                        ThemeMode.Dark -> ThemeMode.System
+                                    }
+                                }) {
+                                    Icon(
+                                        when (themeMode) {
+                                            ThemeMode.System -> Lucide.Monitor
+                                            ThemeMode.Light -> LucideSun
+                                            ThemeMode.Dark -> LucideMoon
+                                        },
+                                        modifier = Modifier.size(14.dp),
+                                    )
                                 }
                             }
                             ToolbarSearchField(
@@ -597,3 +604,9 @@ private fun AccentColorPicker(
 
 @Composable
 internal expect fun BrowserNavigation(backStack: androidx.compose.runtime.snapshots.SnapshotStateList<AppNavKey>)
+
+@Composable
+internal expect fun isSystemDarkMode(): Boolean
+
+@Composable
+internal expect fun systemAccentRawColor(): androidx.compose.ui.graphics.Color?

@@ -103,16 +103,6 @@ fun ScaffoldFullLayoutExample() {
                                     color = MacosTheme.colorScheme.textTertiary,
                                 )
                             }
-                            Icon(
-                                LucidePanelLeft,
-                                modifier = Modifier
-                                    .size(20.dp)
-                                    .clickable(
-                                        interactionSource = null,
-                                        indication = null,
-                                        onClick = { columnVisibility = ColumnVisibility.DoubleColumn },
-                                    ),
-                            )
                         }
                     },
                 )

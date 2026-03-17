@@ -19,7 +19,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
@@ -58,7 +60,7 @@ fun TitleBar(
     title: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     backgroundColor: Color = MacosTheme.colorScheme.background,
-    showBottomBorder: Boolean = true,
+    showBottomBorder: Boolean = false,
     glass: Boolean = false,
     height: Int = style.height,
 ) {
@@ -281,6 +283,7 @@ fun TitleBarGroupButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     iconScale: Float = 1.2f,
+    circularHighlight: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val isDark = MacosTheme.colorScheme.isDark
@@ -309,8 +312,21 @@ fun TitleBarGroupButton(
         label = "tbar_grp_btn_content",
     )
 
-    // Icon area size matches Sketch: XL=28dp, Medium=20dp
     val iconAreaSize = style.buttonHeight - (style.buttonPadding * 2)
+
+    // Scale icons by increasing density so vectors render natively at the larger size
+    // (avoids graphicsLayer bitmap scaling which causes blur)
+    val currentDensity = LocalDensity.current
+    val scaledDensity = remember(currentDensity.density, currentDensity.fontScale, iconScale) {
+        if (iconScale != 1f) {
+            Density(
+                density = currentDensity.density * iconScale,
+                fontScale = currentDensity.fontScale,
+            )
+        } else {
+            currentDensity
+        }
+    }
 
     CompositionLocalProvider(
         LocalContentColor provides contentColor,
@@ -319,6 +335,7 @@ fun TitleBarGroupButton(
         Box(
             modifier = modifier
                 .size(style.buttonHeight)
+                .then(if (!circularHighlight) Modifier.background(bgOverlay) else Modifier)
                 .hoverable(interactionSource = interactionSource)
                 .clickable(
                     interactionSource = interactionSource,
@@ -329,19 +346,14 @@ fun TitleBarGroupButton(
                 ),
             contentAlignment = Alignment.Center,
         ) {
-            // Circular hover/press highlight inside the button
-            Box(
-                modifier = Modifier
-                    .size(iconAreaSize)
-                    .background(bgOverlay, CircleShape),
-            )
-            if (iconScale != 1f) {
+            if (circularHighlight) {
                 Box(
-                    modifier = Modifier.graphicsLayer {
-                        scaleX = iconScale; scaleY = iconScale; clip = true
-                    },
-                ) { content() }
-            } else {
+                    modifier = Modifier
+                        .size(iconAreaSize)
+                        .background(bgOverlay, CircleShape),
+                )
+            }
+            CompositionLocalProvider(LocalDensity provides scaledDensity) {
                 content()
             }
         }
@@ -392,6 +404,7 @@ fun NavigationButtons(
             onClick = onBack,
             enabled = backEnabled,
             iconScale = 1f,
+            circularHighlight = true,
         ) {
             Icon(icon = Icons.ChevronLeft, modifier = Modifier.size(style.iconSize + 4.dp))
         }
@@ -400,6 +413,7 @@ fun NavigationButtons(
             onClick = onForward,
             enabled = forwardEnabled,
             iconScale = 1f,
+            circularHighlight = true,
         ) {
             Icon(icon = Icons.ChevronRight, modifier = Modifier.size(style.iconSize + 4.dp))
         }
@@ -446,6 +460,7 @@ fun SidebarButton(
             TitleBarGroupButton(
                 onClick = onClick,
                 enabled = enabled,
+                circularHighlight = true,
             ) {
                 icon()
             }
@@ -454,6 +469,7 @@ fun SidebarButton(
                 TitleBarGroupButton(
                     onClick = { menuExpanded = true },
                     enabled = enabled,
+                    circularHighlight = true,
                 ) {
                     Icon(icon = Icons.ChevronDown, modifier = Modifier.size(12.dp))
                 }

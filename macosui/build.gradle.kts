@@ -99,7 +99,7 @@ kotlin {
             api(projects.macosuiIcons)
         }
         jvmMain.dependencies {
-            implementation(libs.jna)
+            api(projects.decoratedWindow)
         }
     }
 }

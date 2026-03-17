@@ -146,6 +146,7 @@ fun ToolbarSearchField(
     val showSuggestions = expanded && suggestions != null && value.isNotEmpty()
     // Create a fresh keyboard state for each search query so items re-register
     val keyboardState = remember(value) { SearchKeyboardState() }
+    val style = LocalTitleBarStyle.current
 
     LaunchedEffect(expanded) {
         if (expanded) focusRequester.requestFocus()
@@ -160,7 +161,7 @@ fun ToolbarSearchField(
         ) {
             TitleBarButtonGroup {
                 TitleBarGroupButton(onClick = { onExpandedChange(true) }) {
-                    Icon(icon = Icons.Search, modifier = Modifier.size(16.dp))
+                    Icon(icon = Icons.Search, modifier = Modifier.size(style.iconSize + 2.dp))
                 }
             }
         }
@@ -202,6 +203,7 @@ fun ToolbarSearchField(
         if (showSuggestions) {
             SearchSuggestionsPopup(
                 expandedWidth = expandedWidth,
+                fieldHeight = style.buttonHeight,
                 keyboardState = keyboardState,
                 content = suggestions,
             )
@@ -228,6 +230,31 @@ private fun ExpandedField(
     val colors = MacosTheme.colorScheme
     val typography = MacosTheme.typography
     val isDark = colors.isDark
+    val style = LocalTitleBarStyle.current
+
+    // Adapt dimensions to title bar style
+    val fieldHeight = style.buttonHeight
+    val searchIconSize = style.iconSize + 2.dp
+    val closeButtonSize = when (style) {
+        TitleBarStyle.UnifiedCompact -> 14.dp
+        else -> 16.dp
+    }
+    val closeIconSize = when (style) {
+        TitleBarStyle.UnifiedCompact -> 8.dp
+        else -> 10.dp
+    }
+    val textStyle = when (style) {
+        TitleBarStyle.UnifiedCompact -> typography.caption2
+        else -> typography.caption1
+    }
+    val hPadding = when (style) {
+        TitleBarStyle.UnifiedCompact -> 6.dp
+        else -> 8.dp
+    }
+    val itemSpacing = when (style) {
+        TitleBarStyle.UnifiedCompact -> 4.dp
+        else -> 6.dp
+    }
 
     val shape = MacosTheme.shapes.full
     val bgColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.055f)
@@ -277,7 +304,7 @@ private fun ExpandedField(
                 }
             },
         singleLine = true,
-        textStyle = typography.caption1.copy(color = textColor),
+        textStyle = textStyle.copy(color = textColor),
         cursorBrush = SolidColor(colors.accent),
         keyboardActions = KeyboardActions(
             onSearch = onSearch?.let { { it(value) } },
@@ -287,7 +314,7 @@ private fun ExpandedField(
             Row(
                 modifier = Modifier
                     .width(expandedWidth)
-                    .height(30.dp)
+                    .height(fieldHeight)
                     .shadow(
                         elevation = 4.dp,
                         shape = shape,
@@ -298,22 +325,22 @@ private fun ExpandedField(
                     .clip(shape)
                     .background(bgColor, shape)
                     .border(1.5.dp, ringColor, shape)
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = hPadding),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(itemSpacing),
             ) {
                 // Search icon
                 Icon(
                     icon = Icons.Search,
                     tint = iconColor,
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier.size(searchIconSize),
                 )
 
                 // Text field
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
                     if (value.isEmpty()) {
                         CompositionLocalProvider(
-                            LocalTextStyle provides typography.caption1.copy(
+                            LocalTextStyle provides textStyle.copy(
                                 color = placeholderColor,
                             ),
                         ) {
@@ -324,7 +351,12 @@ private fun ExpandedField(
                 }
 
                 // Close button
-                CloseCircleButton(onClick = onClose, isDark = isDark)
+                CloseCircleButton(
+                    onClick = onClose,
+                    isDark = isDark,
+                    buttonSize = closeButtonSize,
+                    iconSize = closeIconSize,
+                )
             }
         },
     )
@@ -338,6 +370,8 @@ private fun ExpandedField(
 private fun CloseCircleButton(
     onClick: () -> Unit,
     isDark: Boolean,
+    buttonSize: Dp = 16.dp,
+    iconSize: Dp = 10.dp,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
@@ -361,7 +395,7 @@ private fun CloseCircleButton(
 
     Box(
         modifier = Modifier
-            .size(16.dp)
+            .size(buttonSize)
             .clip(CircleShape)
             .background(bgColor, CircleShape)
             .hoverable(interactionSource = interactionSource)
@@ -376,7 +410,7 @@ private fun CloseCircleButton(
         Icon(
             icon = Icons.X,
             tint = iconColor,
-            modifier = Modifier.size(10.dp),
+            modifier = Modifier.size(iconSize),
         )
     }
 }
@@ -388,6 +422,7 @@ private fun CloseCircleButton(
 @Composable
 private fun SearchSuggestionsPopup(
     expandedWidth: Dp,
+    fieldHeight: Dp,
     keyboardState: SearchKeyboardState,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -399,8 +434,8 @@ private fun SearchSuggestionsPopup(
     val fallbackBg = if (isDark) Zinc900.copy(alpha = 0.95f) else Color.White.copy(alpha = 0.95f)
     val borderColor = if (isDark) Color.White.copy(alpha = 0.10f) else Color.Black.copy(alpha = 0.10f)
 
-    // 30dp field height + 4dp gap, converted to pixels
-    val offsetY = with(density) { 34.dp.roundToPx() }
+    // Field height + 4dp gap, converted to pixels
+    val offsetY = with(density) { (fieldHeight + 4.dp).roundToPx() }
 
     Popup(
         alignment = Alignment.TopEnd,

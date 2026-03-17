@@ -23,8 +23,8 @@ data class Shapes(
     /** 12dp — cards, dialogs, default buttons */
     val large: Shape = RoundedCornerShape(12.dp),
 
-    /** 16dp — large cards, modals */
-    val extraLarge: Shape = RoundedCornerShape(16.dp),
+    /** 20dp — large cards, modals */
+    val extraLarge: Shape = RoundedCornerShape(20.dp),
 
     /** Full rounded: pills, avatar, circular — macOS extension (not in M3). */
     val full: Shape = RoundedCornerShape(50),
