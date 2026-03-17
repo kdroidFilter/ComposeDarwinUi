@@ -82,7 +82,44 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.tooling.preview.Preview
+
+// =============================================================================
+// SidebarItemColors — customizable colors for sidebar items
+// =============================================================================
+
+@Immutable
+class SidebarItemColors(
+    val activeBackgroundColor: Color,
+    val inactiveBackgroundColor: Color,
+    val activeContentColor: Color,
+    val inactiveContentColor: Color,
+) {
+    fun copy(
+        activeBackgroundColor: Color = this.activeBackgroundColor,
+        inactiveBackgroundColor: Color = this.inactiveBackgroundColor,
+        activeContentColor: Color = this.activeContentColor,
+        inactiveContentColor: Color = this.inactiveContentColor,
+    ) = SidebarItemColors(activeBackgroundColor, inactiveBackgroundColor, activeContentColor, inactiveContentColor)
+}
+
+// =============================================================================
+// SidebarDefaults
+// =============================================================================
+
+object SidebarDefaults {
+
+    @Composable
+    fun itemColors(
+        activeBackgroundColor: Color = with(MacosTheme.colorScheme) {
+            if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.11f)
+        },
+        inactiveBackgroundColor: Color = Color.Transparent,
+        activeContentColor: Color = MacosTheme.colorScheme.accent,
+        inactiveContentColor: Color = MacosTheme.colorScheme.textPrimary,
+    ) = SidebarItemColors(activeBackgroundColor, inactiveBackgroundColor, activeContentColor, inactiveContentColor)
+}
 
 // =============================================================================
 // Animation helper — critically damped spring (no overshoot) with Smooth stiffness
@@ -196,6 +233,7 @@ fun Sidebar(
     header: (@Composable () -> Unit)? = null,
     pinnedItems: List<SidebarItem> = emptyList(),
     onHideSidebar: (() -> Unit)? = null,
+    itemColors: SidebarItemColors = SidebarDefaults.itemColors(),
 ) {
     val controlSize = LocalControlSize.current
     val sidebarMetrics = MacosTheme.componentStyling.sidebar.metrics
@@ -226,11 +264,11 @@ fun Sidebar(
     )
 
     val animatedTrackStartPadding by animateDpAsState(
-        targetValue = if (collapsed) 4.dp else 2.dp,
+        targetValue = if (collapsed) 4.dp else 4.dp,
         animationSpec = sidebarSpring(),
     )
     val animatedTrackEndPadding by animateDpAsState(
-        targetValue = if (collapsed) 4.dp else 11.dp,
+        targetValue = if (collapsed) 4.dp else 13.dp,
         animationSpec = sidebarSpring(),
     )
 
@@ -357,7 +395,7 @@ fun Sidebar(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(itemsScrollState)
-                        .padding(start = animatedTrackStartPadding, end = animatedTrackEndPadding, top = 2.dp, bottom = 2.dp),
+                        .padding(start = animatedTrackStartPadding, end = animatedTrackEndPadding, top = 6.dp, bottom = 2.dp),
                     verticalArrangement = Arrangement.spacedBy(sidebarMetrics.itemSpacingFor(controlSize)),
                 ) {
                     if (hasGroups && groupedItems != null) {
@@ -373,6 +411,7 @@ fun Sidebar(
                                         collapsed = collapsed,
                                         controlSize = controlSize,
                                         sidebarMetrics = sidebarMetrics,
+                                        itemColors = itemColors,
                                     )
                                 }
                             }
@@ -386,6 +425,7 @@ fun Sidebar(
                                     collapsed = collapsed,
                                     controlSize = controlSize,
                                     sidebarMetrics = sidebarMetrics,
+                                    itemColors = itemColors,
                                 )
                             }
                         }
@@ -424,6 +464,7 @@ fun Sidebar(
                                 collapsed = collapsed,
                                 controlSize = controlSize,
                                 sidebarMetrics = sidebarMetrics,
+                                itemColors = itemColors,
                             )
                         }
                     }
@@ -437,6 +478,7 @@ fun Sidebar(
                             isCollapsed = collapsed,
                             controlSize = controlSize,
                             sidebarMetrics = sidebarMetrics,
+                            itemColors = itemColors,
                         )
                     }
                 }
@@ -499,6 +541,7 @@ private fun SidebarItemWithVisibility(
     collapsed: Boolean,
     controlSize: ControlSize,
     sidebarMetrics: SidebarStyle.Metrics,
+    itemColors: SidebarItemColors,
     indentLevel: Int = 0,
 ) {
     if (item.children.isNotEmpty()) {
@@ -508,17 +551,17 @@ private fun SidebarItemWithVisibility(
             collapsed = collapsed,
             controlSize = controlSize,
             sidebarMetrics = sidebarMetrics,
+            itemColors = itemColors,
             indentLevel = indentLevel,
         )
         return
     }
 
-    // Leaf items add disclosureWidth so their content aligns with disclosure parents at the same level,
-    // and is properly indented one level deeper than the parent above.
-    // Animates to 0 when collapsed so icons can center in the narrow sidebar.
-    val disclosureWidth = sidebarMetrics.disclosureWidthFor(controlSize)
+    // Leaf items inside a disclosure group add disclosureWidth so their content aligns
+    // with disclosure parents. Top-level items (indentLevel == 0) get no extra indent.
+    val extraIndent = if (indentLevel > 0) sidebarMetrics.disclosureWidthFor(controlSize) else 0.dp
     val indentPadding by animateDpAsState(
-        targetValue = if (collapsed) 0.dp else sidebarMetrics.indentFor(indentLevel, controlSize) + disclosureWidth,
+        targetValue = if (collapsed) 0.dp else sidebarMetrics.indentFor(indentLevel, controlSize) + extraIndent,
         animationSpec = sidebarSpring(),
     )
 
@@ -531,6 +574,7 @@ private fun SidebarItemWithVisibility(
             isCollapsed = collapsed,
             controlSize = controlSize,
             sidebarMetrics = sidebarMetrics,
+            itemColors = itemColors,
             modifier = Modifier.padding(start = indentPadding),
         )
     } else {
@@ -557,6 +601,7 @@ private fun SidebarItemWithVisibility(
                 isCollapsed = false,
                 controlSize = controlSize,
                 sidebarMetrics = sidebarMetrics,
+                itemColors = itemColors,
                 modifier = Modifier.padding(start = indentPadding),
             )
         }
@@ -574,6 +619,7 @@ private fun DisclosureItem(
     collapsed: Boolean,
     controlSize: ControlSize,
     sidebarMetrics: SidebarStyle.Metrics,
+    itemColors: SidebarItemColors,
     indentLevel: Int = 0,
 ) {
     var expanded by remember { mutableStateOf(true) }
@@ -637,6 +683,7 @@ private fun DisclosureItem(
                 isCollapsed = collapsed,
                 controlSize = controlSize,
                 sidebarMetrics = sidebarMetrics,
+                itemColors = itemColors,
             )
         }
     }
@@ -672,6 +719,7 @@ private fun DisclosureItem(
                         collapsed = collapsed,
                         controlSize = controlSize,
                         sidebarMetrics = sidebarMetrics,
+                        itemColors = itemColors,
                         indentLevel = indentLevel + 1,
                     )
                 }
@@ -722,7 +770,7 @@ private fun GroupHeader(text: String, isCollapsed: Boolean, controlSize: Control
             text = text,
             style = headerStyle,
             color = headerColor,
-            modifier = Modifier.padding(start = sidebarMetrics.hPaddingFor(controlSize) + 8.dp, end = 8.dp, bottom = 4.dp),
+            modifier = Modifier.padding(start = sidebarMetrics.hPaddingFor(controlSize), end = 8.dp, bottom = 4.dp),
         )
     }
 }
@@ -746,22 +794,15 @@ private fun SidebarItemRow(
     isCollapsed: Boolean,
     controlSize: ControlSize,
     sidebarMetrics: SidebarStyle.Metrics,
+    itemColors: SidebarItemColors = SidebarDefaults.itemColors(),
     modifier: Modifier = Modifier,
     iconModifier: Modifier = Modifier,
     iconContentDescription: String? = null,
 ) {
-    val colors = MacosTheme.colorScheme
-
     val interactionSource = remember { MutableInteractionSource() }
 
-    val isDark = colors.isDark
-    // Sketch: selected background — light: #0000001c, dark: use white overlay
-    val backgroundColor = if (active) {
-        if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.11f)
-    } else {
-        Color.Transparent
-    }
-    val contentColor = if (active) colors.accent else colors.textPrimary
+    val backgroundColor = if (active) itemColors.activeBackgroundColor else itemColors.inactiveBackgroundColor
+    val contentColor = if (active) itemColors.activeContentColor else itemColors.inactiveContentColor
 
     val itemShape = MacosTheme.shapes.small
 

@@ -21,8 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Card
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Sidebar
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SidebarDefaults
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SidebarItem
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Switcher
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
@@ -203,6 +205,40 @@ fun SidebarDisclosureExample() {
     }
 }
 
+@GalleryExample("Sidebar", "Custom Item Colors")
+@Composable
+fun SidebarCustomColorsExample() {
+    var active by remember { mutableStateOf("Home") }
+    val items = remember {
+        listOf(
+            SidebarItem("Home", onClick = { active = "Home" }, icon = LucideHome),
+            SidebarItem("Favorites", onClick = { active = "Favorites" }, icon = LucideStar),
+            SidebarItem("Downloads", onClick = { active = "Downloads" }, icon = LucideDownload),
+            SidebarItem("Trash", onClick = { active = "Trash" }, icon = LucideTrash2),
+        )
+    }
+    val accentColor = MacosTheme.colorScheme.accent
+    val customColors = SidebarDefaults.itemColors(
+        activeBackgroundColor = accentColor,
+        activeContentColor = Color.White,
+    )
+    Card(modifier = Modifier.fillMaxWidth().height(260.dp)) {
+        Row(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.fillMaxHeight().background(MacosTheme.colorScheme.muted)) {
+                Sidebar(
+                    items = items,
+                    activeItem = active,
+                    itemColors = customColors,
+                )
+            }
+            Box(modifier = Modifier.width(1.dp).fillMaxHeight().background(MacosTheme.colorScheme.border))
+            Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(16.dp), contentAlignment = Alignment.Center) {
+                Text(text = "Selected: $active", color = MacosTheme.colorScheme.textSecondary)
+            }
+        }
+    }
+}
+
 @Composable
 internal fun SidebarPage() {
     GalleryPage("Sidebar", "A macOS-style navigation sidebar with collapsible state.") {
@@ -218,5 +254,10 @@ internal fun SidebarPage() {
             description = "Sidebar with collapsible children using disclosure chevrons",
             sourceCode = GallerySources.SidebarDisclosureExample,
         ) { SidebarDisclosureExample() }
+        ExampleCard(
+            title = "Custom Item Colors",
+            description = "Sidebar with accent background and white text for active items",
+            sourceCode = GallerySources.SidebarCustomColorsExample,
+        ) { SidebarCustomColorsExample() }
     }
 }
