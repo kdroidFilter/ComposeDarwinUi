@@ -64,6 +64,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.GlassType
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalGlassType
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalSidebarResize
+import io.github.kdroidfilter.nucleus.ui.apple.macos.components.LocalTitleBarDoubleClick
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalTitleBarHeight
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalWindowActive
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SidebarStyle
@@ -83,6 +84,8 @@ import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
@@ -490,6 +493,34 @@ fun Sidebar(
                                 edge = 0f
                                 refraction = 0f
                                 curve = 0f
+                            },
+                    )
+                    // ---- Pointer interceptor: block item clicks, forward double-click to window ----
+                    val onTitleBarDoubleClick = LocalTitleBarDoubleClick.current
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .fillMaxWidth()
+                            .height(glassHeight)
+                            .pointerInput(onTitleBarDoubleClick) {
+                                awaitPointerEventScope {
+                                    var lastPressTime = 0L
+                                    while (true) {
+                                        val event = awaitPointerEvent(PointerEventPass.Main)
+                                        if (event.type == PointerEventType.Press) {
+                                            if (event.changes.none { it.isConsumed }) {
+                                                val now = event.changes.first().uptimeMillis
+                                                if (now - lastPressTime < viewConfiguration.doubleTapTimeoutMillis) {
+                                                    onTitleBarDoubleClick?.invoke()
+                                                    lastPressTime = 0L
+                                                } else {
+                                                    lastPressTime = now
+                                                }
+                                            }
+                                            event.changes.forEach { it.consume() }
+                                        }
+                                    }
+                                }
                             },
                     )
                     // Hide button (separate, not affected by the fade mask)
