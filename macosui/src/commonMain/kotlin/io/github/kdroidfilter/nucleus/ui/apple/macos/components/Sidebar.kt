@@ -207,6 +207,11 @@ class SidebarItem(
  * @param collapsed Whether the sidebar is in collapsed (icon-only) mode.
  * @param onCollapsedChange Called when the collapse toggle is clicked.
  * @param collapsible Whether the collapse toggle is shown.
+ *   **Note:** Collapse mode is designed for secondary panels and web layouts
+ *   where an icon-only sidebar is useful. Do not use it for the primary macOS
+ *   app sidebar inside a [Scaffold] — the collapsed rendering breaks the
+ *   glass material highlight alignment. Use [Scaffold]'s
+ *   [onColumnVisibilityChange][Scaffold] to hide/show the sidebar instead.
  * @param showBorder Whether to show a right border on the sidebar.
  * @param scrollbarTrackClickBehavior Scrollbar track click behavior.
  * @param header Optional composable header above the items.
@@ -453,7 +458,9 @@ fun Sidebar(
             // ---- Bottom section ----
             if (hasBottomSection) {
                 Column(
-                    modifier = Modifier.padding(top = 6.dp, start = 4.dp, end = 4.dp),
+                    modifier = Modifier
+                        .background(if (isWindowActive) MacosTheme.colorScheme.background else inactiveOverlay)
+                        .padding(top = 6.dp, start = 4.dp, end = 4.dp),
                     verticalArrangement = Arrangement.spacedBy(sidebarMetrics.itemSpacingFor(controlSize)),
                 ) {
                     if (collapsible) {
