@@ -12,7 +12,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TextArea
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
@@ -212,6 +216,31 @@ fun TextAreaCustomColorsExample() {
     }
 }
 
+@GalleryExample("TextArea", "Custom Font")
+@Composable
+fun TextAreaCustomFontExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+        var bold by remember { mutableStateOf("Bold text area") }
+        TextArea(
+            value = bold,
+            onValueChange = { bold = it },
+            label = { Text("Bold") },
+            textStyle = TextStyle(fontWeight = FontWeight.Bold),
+            minLines = 2,
+            maxLines = 3,
+        )
+        var large by remember { mutableStateOf("Larger font") }
+        TextArea(
+            value = large,
+            onValueChange = { large = it },
+            label = { Text("Large (18sp)") },
+            textStyle = TextStyle(fontSize = 18.sp),
+            minLines = 2,
+            maxLines = 3,
+        )
+    }
+}
+
 @Composable
 internal fun TextAreaPage() {
     GalleryPage("Textarea", "A multi-line text input for longer form content.") {
@@ -236,6 +265,13 @@ internal fun TextAreaPage() {
             description = "Disabled text areas with and without value",
             sourceCode = GallerySources.TextAreaDisabledExample,
         ) { TextAreaDisabledExample() }
+
+        SectionHeader("Custom Font")
+        ExampleCard(
+            title = "Custom Font",
+            description = "TextArea with bold and custom font size",
+            sourceCode = GallerySources.TextAreaCustomFontExample,
+        ) { TextAreaCustomFontExample() }
 
         SectionHeader("Custom Colors")
         ExampleCard(

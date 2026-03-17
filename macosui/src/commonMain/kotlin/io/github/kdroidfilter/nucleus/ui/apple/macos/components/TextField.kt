@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -117,6 +118,7 @@ fun TextField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     focusRequester: FocusRequester = remember { FocusRequester() },
     colors: TextFieldColors? = null,
+    textStyle: TextStyle? = null,
 ) {
     val themeColors = MacosTheme.componentStyling.textField.colors
     val metrics = MacosTheme.componentStyling.textField.metrics
@@ -133,11 +135,12 @@ fun TextField(
     val shape = RoundedCornerShape(cornerRadius)
 
     // Text style per control size — Sketch: XL/Lg/Md=13sp, Sm=11sp, Mn=10sp
-    val resolvedTextStyle = when (controlSize) {
+    val baseTextStyle = when (controlSize) {
         ControlSize.ExtraLarge, ControlSize.Large, ControlSize.Regular -> typography.caption1
         ControlSize.Small -> typography.caption2
         ControlSize.Mini -> typography.caption2.copy(fontSize = 10.sp)
     }
+    val resolvedTextStyle = if (textStyle != null) baseTextStyle.merge(textStyle) else baseTextStyle
 
     var isFocused by remember { mutableStateOf(false) }
 

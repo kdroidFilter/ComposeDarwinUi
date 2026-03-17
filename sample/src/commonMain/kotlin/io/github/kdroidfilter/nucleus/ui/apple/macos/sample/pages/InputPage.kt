@@ -13,9 +13,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontStyle
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TextField
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TextFieldDefaults
@@ -273,6 +277,34 @@ fun InputCustomColorsExample() {
     }
 }
 
+@GalleryExample("Input", "Custom Font")
+@Composable
+fun InputCustomFontExample() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(0.5f)) {
+        var bold by remember { mutableStateOf("Bold text") }
+        TextField(
+            value = bold,
+            onValueChange = { bold = it },
+            label = { Text("Bold") },
+            textStyle = TextStyle(fontWeight = FontWeight.Bold),
+        )
+        var italic by remember { mutableStateOf("Italic text") }
+        TextField(
+            value = italic,
+            onValueChange = { italic = it },
+            label = { Text("Italic") },
+            textStyle = TextStyle(fontStyle = FontStyle.Italic),
+        )
+        var large by remember { mutableStateOf("Larger font") }
+        TextField(
+            value = large,
+            onValueChange = { large = it },
+            label = { Text("Large (18sp)") },
+            textStyle = TextStyle(fontSize = 18.sp),
+        )
+    }
+}
+
 @Composable
 internal fun InputPage() {
     GalleryPage("Input", "A text input field with label, validation states, and password support.") {
@@ -326,6 +358,13 @@ TextField(
             description = "Text fields with leading icon, trailing icon, or both",
             sourceCode = GallerySources.InputWithIconsExample,
         ) { InputWithIconsExample() }
+
+        SectionHeader("Custom Font")
+        ExampleCard(
+            title = "Custom Font",
+            description = "TextField with bold, italic, and custom font size",
+            sourceCode = GallerySources.InputCustomFontExample,
+        ) { InputCustomFontExample() }
 
         SectionHeader("Custom Colors")
         ExampleCard(
