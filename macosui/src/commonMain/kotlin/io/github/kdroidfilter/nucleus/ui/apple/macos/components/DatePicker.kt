@@ -34,7 +34,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -53,7 +52,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import kotlinx.coroutines.flow.distinctUntilChanged
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.macosGlass
@@ -1243,8 +1241,11 @@ private fun <T> WheelColumn(
 
     val useVirtualScroll = items.size > visibleItems
     val paddedCount = if (useVirtualScroll) items.size * 1000 else items.size + halfVisible * 2
+    // midOffset is the largest multiple of items.size that is <= paddedCount/2,
+    // so that (absoluteIndex - midOffset).mod(items.size) == realIndex.
+    val midOffset = if (useVirtualScroll) (paddedCount / 2) - ((paddedCount / 2) % items.size) else 0
     val initialScroll = if (useVirtualScroll) {
-        (paddedCount / 2) - ((paddedCount / 2) % items.size) + initialIndex - halfVisible
+        midOffset + initialIndex - halfVisible
     } else {
         initialIndex
     }
@@ -1258,23 +1259,31 @@ private fun <T> WheelColumn(
     val topFade = Brush.verticalGradient(0f to fadeBgColor, 1f to Color.Transparent)
     val bottomFade = Brush.verticalGradient(0f to Color.Transparent, 1f to fadeBgColor)
 
-    val currentCenter by remember {
+    // Pixel-accurate: find the item whose center is closest to the viewport midpoint.
+    // This is more precise than firstVisibleItemIndex + halfVisible, which only updates
+    // when an item fully scrolls off screen rather than when it crosses the center.
+    val centerItemIndex by remember {
         derivedStateOf {
-            listState.firstVisibleItemIndex + halfVisible
+            with(listState.layoutInfo) {
+                val viewportMid = viewportSize.height / 2
+                visibleItemsInfo
+                    .minByOrNull { kotlin.math.abs(it.offset + it.size / 2 - viewportMid) }
+                    ?.index ?: (listState.firstVisibleItemIndex + halfVisible)
+            }
         }
     }
 
-    LaunchedEffect(Unit) {
-        snapshotFlow { currentCenter }
-            .distinctUntilChanged()
-            .collect { centerIndex ->
-                val realIndex = if (useVirtualScroll) {
-                    centerIndex % items.size
-                } else {
-                    (centerIndex - halfVisible).coerceIn(0, items.size - 1)
-                }
-                onSelectedChanged(realIndex)
+    // Notify the caller only once the scroll/fling has fully settled, not on every
+    // frame during a drag, to avoid spurious intermediate selection callbacks.
+    LaunchedEffect(listState.isScrollInProgress) {
+        if (!listState.isScrollInProgress) {
+            val realIndex = if (useVirtualScroll) {
+                (centerItemIndex - midOffset).mod(items.size)
+            } else {
+                (centerItemIndex - halfVisible).coerceIn(0, items.size - 1)
             }
+            onSelectedChanged(realIndex)
+        }
     }
 
     Box(
@@ -1296,7 +1305,7 @@ private fun <T> WheelColumn(
                 } else {
                     (index - halfVisible).coerceIn(0, items.size - 1)
                 }
-                val distFromCenter = kotlin.math.abs(index - currentCenter)
+                val distFromCenter = kotlin.math.abs(index - centerItemIndex)
                 val alpha = when {
                     isSpacerItem -> 0f
                     distFromCenter == 0 -> 1f
