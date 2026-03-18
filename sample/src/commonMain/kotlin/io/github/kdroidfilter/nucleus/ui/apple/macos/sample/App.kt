@@ -269,13 +269,6 @@ fun App() {
         var settingsExpanded by remember { mutableStateOf(false) }
         var inspectorVisible by remember { mutableStateOf(false) }
 
-        // Auto-hide inspector when navigating to a page without size variants
-        LaunchedEffect(nav.currentKey) {
-            if (!pageHasSizeVariants(nav.currentPageId)) {
-                inspectorVisible = false
-            }
-        }
-
         // Navigation helpers
         val currentPageLabel = sidebarEntryDefs.firstOrNull { it.id == nav.currentPageId }?.label ?: ""
 
@@ -340,6 +333,7 @@ fun App() {
                                 }
                             } else ({}),
                             title = { Text(currentPageLabel) },
+                            titleAlignment = Alignment.CenterStart,
                             actions = {
                                 val uriHandler = LocalUriHandler.current
                                 TitleBarButtonGroup {
@@ -438,11 +432,9 @@ fun App() {
                                         }
                                     }
                                 }
-                                if (pageHasSizeVariants(nav.currentPageId)) {
-                                    TitleBarButtonGroup {
-                                        TitleBarGroupButton(onClick = { inspectorVisible = !inspectorVisible }) {
-                                            Icon(Lucide.Ruler, modifier = Modifier.size(14.dp))
-                                        }
+                                TitleBarButtonGroup {
+                                    TitleBarGroupButton(onClick = { inspectorVisible = !inspectorVisible }) {
+                                        Icon(Lucide.Ruler, modifier = Modifier.size(14.dp))
                                     }
                                 }
                                 ToolbarSearchField(

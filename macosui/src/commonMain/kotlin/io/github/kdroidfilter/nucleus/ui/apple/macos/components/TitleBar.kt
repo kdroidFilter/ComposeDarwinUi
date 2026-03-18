@@ -106,6 +106,7 @@ fun TitleBar(
     forcedColorScheme: ColorScheme? = null,
     navigationActions: @Composable RowScope.() -> Unit = {},
     title: @Composable () -> Unit = {},
+    titleAlignment: Alignment = Alignment.Center,
     actions: @Composable RowScope.() -> Unit = {},
     backgroundColor: Color = MacosTheme.colorScheme.background,
     showBottomBorder: Boolean = false,
@@ -122,6 +123,7 @@ fun TitleBar(
             backgroundStyle = backgroundStyle,
             navigationActions = navigationActions,
             title = title,
+            titleAlignment = titleAlignment,
             actions = actions,
             backgroundColor = backgroundColor,
             showBottomBorder = showBottomBorder,
@@ -149,6 +151,7 @@ private fun TitleBarContent(
     backgroundStyle: TitleBarBackground,
     navigationActions: @Composable RowScope.() -> Unit,
     title: @Composable () -> Unit,
+    titleAlignment: Alignment = Alignment.Center,
     actions: @Composable RowScope.() -> Unit,
     backgroundColor: Color,
     showBottomBorder: Boolean,
@@ -254,7 +257,7 @@ private fun TitleBarContent(
                             .weight(1f)
                             .fillMaxHeight()
                             .graphicsLayer { alpha = if (showsTitle) 1f else 0f },
-                        contentAlignment = Alignment.Center,
+                        contentAlignment = titleAlignment,
                     ) {
                         title()
                     }
@@ -292,7 +295,7 @@ private fun TitleBarContent(
                         .weight(1f)
                         .fillMaxHeight()
                         .graphicsLayer { alpha = if (showsTitle) 1f else 0f },
-                    contentAlignment = Alignment.Center,
+                    contentAlignment = titleAlignment,
                 ) {
                     title()
                 }

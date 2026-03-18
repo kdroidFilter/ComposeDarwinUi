@@ -1,14 +1,17 @@
 package io.github.kdroidfilter.nucleus.ui.apple.macos.sample
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Inspector
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
@@ -36,20 +39,34 @@ fun pageHasSizeVariants(pageId: String): Boolean = pageId in sizeVariantPageIds
 @Composable
 fun InspectorSizePreview(pageId: String) {
     Inspector {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            Text(
-                text = "Size Variants",
-                style = MacosTheme.typography.headline,
-                fontWeight = FontWeight.SemiBold,
-                color = MacosTheme.colorScheme.textPrimary,
-            )
-            SizeVariantContent(pageId)
+        if (pageHasSizeVariants(pageId)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                Text(
+                    text = "Size Variants",
+                    style = MacosTheme.typography.headline,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MacosTheme.colorScheme.textPrimary,
+                )
+                SizeVariantContent(pageId)
+            }
+        } else {
+            Box(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "No size variants for this component",
+                    style = MacosTheme.typography.subheadline,
+                    color = MacosTheme.colorScheme.textTertiary,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
     }
 }
