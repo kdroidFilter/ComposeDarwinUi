@@ -60,6 +60,7 @@ import com.composables.icons.lucide.MousePointerClick
 import com.composables.icons.lucide.PanelTopOpen
 import com.composables.icons.lucide.Scan
 import com.composables.icons.lucide.Search
+import com.composables.icons.lucide.Ruler
 import com.composables.icons.lucide.SlidersHorizontal
 import com.composables.icons.lucide.SquareCheck
 import com.composables.icons.lucide.SquareDashed
@@ -266,6 +267,14 @@ fun App() {
         var searchQuery by remember { mutableStateOf("") }
         var searchExpanded by remember { mutableStateOf(false) }
         var settingsExpanded by remember { mutableStateOf(false) }
+        var inspectorVisible by remember { mutableStateOf(false) }
+
+        // Auto-hide inspector when navigating to a page without size variants
+        LaunchedEffect(nav.currentKey) {
+            if (!pageHasSizeVariants(nav.currentPageId)) {
+                inspectorVisible = false
+            }
+        }
 
         // Navigation helpers
         val currentPageLabel = sidebarEntryDefs.firstOrNull { it.id == nav.currentPageId }?.label ?: ""
@@ -300,6 +309,12 @@ fun App() {
                     onColumnVisibilityChange = { columnVisibility = it },
                     sidebarWidth = ColumnWidth.Fixed(240.dp),
                     pushContent = isCompact,
+                    inspector = {
+                        InspectorSizePreview(pageId = nav.currentPageId)
+                    },
+                    inspectorVisible = inspectorVisible && !isCompact,
+                    onInspectorVisibleChange = { inspectorVisible = it },
+                    inspectorWidth = ColumnWidth.Fixed(300.dp),
                     sidebar = {
                         ControlSize(sidebarControlSize) {
                             Sidebar(
@@ -420,6 +435,13 @@ fun App() {
                                                     onSelectedIndexChange = { sidebarControlSize = sizeOptions[it] },
                                                 )
                                             }
+                                        }
+                                    }
+                                }
+                                if (pageHasSizeVariants(nav.currentPageId)) {
+                                    TitleBarButtonGroup {
+                                        TitleBarGroupButton(onClick = { inspectorVisible = !inspectorVisible }) {
+                                            Icon(Lucide.Ruler, modifier = Modifier.size(14.dp))
                                         }
                                     }
                                 }
