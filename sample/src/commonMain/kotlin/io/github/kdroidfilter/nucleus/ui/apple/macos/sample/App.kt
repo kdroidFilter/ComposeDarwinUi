@@ -79,7 +79,10 @@ import com.composables.icons.lucide.TextAlignStart
 import com.composables.icons.lucide.TextCursorInput
 import com.composables.icons.lucide.ToggleLeft
 import com.composables.icons.lucide.TriangleAlert
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ColumnVisibility
+import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.LocalExampleCardBackgroundColor
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.ColumnWidth
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.NavigationButtons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Popover
@@ -329,6 +332,7 @@ fun App() {
     }
 
     MacosTheme(darkTheme = isDark, accentColor = accentColor, colorScheme = colorScheme, glassType = glassType) {
+        CompositionLocalProvider(LocalExampleCardBackgroundColor provides Color.Transparent) {
         val toastState = rememberToastState()
 
         // Navigation state — back stack + forward stack for browser-like history
@@ -583,7 +587,7 @@ fun App() {
                 ToastHost(state = toastState)
             }
         }
-    }
+    }}
 }
 
 @Composable
