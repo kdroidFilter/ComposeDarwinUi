@@ -59,6 +59,11 @@ mavenPublishing {
 }
 
 kotlin {
+    compilerOptions {
+        // Required for js() interop calls in webMain shared between js and wasmJs targets
+        optIn.add("kotlin.js.ExperimentalWasmJsInterop")
+    }
+
     @Suppress("DEPRECATION")
     androidTarget {
         compilerOptions {

@@ -1,19 +1,33 @@
 package io.github.kdroidfilter.nucleus.ui.apple.macos.util
 
-// Locale-aware formatting via the browser Intl API requires platform-specific JS interop
-// (js() blocks for Kotlin/JS, @JsFun for Kotlin/WASM) that cannot be shared in a common
-// webMain source set. English names are returned as a fallback.
-// TODO: split into jsMain / wasmJsMain source sets when the build is ready for it.
+import kotlinx.browser.window
 
-internal actual fun localizedMonthNames(): List<String> = listOf(
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
-)
+// Retrieve the browser's locale once; navigator.language is stable for the session.
+private val browserLocale: String get() = window.navigator.language
 
-internal actual fun localizedMonthShortNames(): List<String> = listOf(
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-)
+// js() blocks have access to the enclosing function's parameters as JS variables.
+// This compiles for both js and wasmJs targets (opt-in set in build.gradle.kts).
+@Suppress("UNUSED_PARAMETER")
+private fun jsFormatMonth(year: Int, month: Int, locale: String, style: String): String =
+    js("new Date(year, month, 1).toLocaleDateString(locale, {month: style})")
 
-internal actual fun localizedWeekdayShortNames(): List<String> =
-    listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+@Suppress("UNUSED_PARAMETER")
+private fun jsFormatWeekday(timestamp: Double, locale: String, style: String): String =
+    js("new Date(timestamp).toLocaleDateString(locale, {weekday: style})")
+
+internal actual fun localizedMonthNames(): List<String> {
+    val locale = browserLocale
+    return (0 until 12).map { jsFormatMonth(2000, it, locale, "long") }
+}
+
+internal actual fun localizedMonthShortNames(): List<String> {
+    val locale = browserLocale
+    return (0 until 12).map { jsFormatMonth(2000, it, locale, "short") }
+}
+
+internal actual fun localizedWeekdayShortNames(): List<String> {
+    val locale = browserLocale
+    // Jan 4, 1970 was a Sunday (3 * 86_400_000 ms from epoch)
+    val sundayMs = 259_200_000.0
+    return (0 until 7).map { jsFormatWeekday(sundayMs + it * 86_400_000.0, locale, "short") }
+}
