@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.ControlSize
+import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.LocalControlSize
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosDuration
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.SpringPreset
 import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.MacosTheme
@@ -76,8 +78,31 @@ enum class PopoverPlacement {
 
 private val ArrowHeight = 10.dp
 private val ArrowWidth = 24.dp
-private val CornerRadius = 10.dp
 private val PopoverSpacing = 4.dp
+
+private fun ControlSize.cornerRadius(): Dp = when (this) {
+    ControlSize.Mini -> 7.dp
+    ControlSize.Small -> 8.dp
+    ControlSize.Regular -> 10.dp
+    ControlSize.Large -> 12.dp
+    ControlSize.ExtraLarge -> 14.dp
+}
+
+private fun ControlSize.contentPadding(): Dp = when (this) {
+    ControlSize.Mini -> 8.dp
+    ControlSize.Small -> 10.dp
+    ControlSize.Regular -> 16.dp
+    ControlSize.Large -> 20.dp
+    ControlSize.ExtraLarge -> 24.dp
+}
+
+private fun ControlSize.minWidth(): Dp = when (this) {
+    ControlSize.Mini -> 120.dp
+    ControlSize.Small -> 150.dp
+    ControlSize.Regular -> 180.dp
+    ControlSize.Large -> 220.dp
+    ControlSize.ExtraLarge -> 260.dp
+}
 
 // =============================================================================
 // PopoverPositionProvider — positions popup and resolves auto placement
@@ -91,6 +116,7 @@ private class PopoverPositionProvider(
     private val requestedPlacement: PopoverPlacement,
     private val spacingPx: Float,
     private val arrowHeightPx: Float,
+    private val cornerRadiusDp: Float,
     private val onResolved: (resolvedPlacement: PopoverPlacement, arrowOffsetPx: Float) -> Unit,
 ) : PopupPositionProvider {
 
@@ -176,7 +202,7 @@ private class PopoverPositionProvider(
         }
 
         // Clamp arrow offset to valid range (within rounded corners)
-        val minArrow = arrowHeightPx + CornerRadius.value * LocalDensity.value
+        val minArrow = arrowHeightPx + cornerRadiusDp * LocalDensity.value
         val isHorizontal = placement == PopoverPlacement.Top || placement == PopoverPlacement.Bottom
         val maxArrow = if (isHorizontal) pw.toFloat() - minArrow else ph.toFloat() - minArrow
         arrowOffset = arrowOffset.coerceIn(minArrow, maxArrow.coerceAtLeast(minArrow))
@@ -266,7 +292,8 @@ private class PopoverBubbleShape(
             // === Top edge ===
             if (placement == PopoverPlacement.Bottom) {
                 // Arrow on top edge pointing up
-                val arrowCenter = arrowOffsetPx.coerceIn(bodyLeft + r + halfAw, bodyRight - r - halfAw)
+                val minH = bodyLeft + r + halfAw
+                val arrowCenter = arrowOffsetPx.coerceIn(minH, (bodyRight - r - halfAw).coerceAtLeast(minH))
                 val arrowLeft = arrowCenter - halfAw
                 val arrowRight = arrowCenter + halfAw
                 lineTo(arrowLeft, bodyTop)
@@ -294,7 +321,8 @@ private class PopoverBubbleShape(
             // === Right edge ===
             if (placement == PopoverPlacement.Start) {
                 // Arrow on right edge pointing right
-                val arrowCenter = arrowOffsetPx.coerceIn(bodyTop + r + halfAw, bodyBottom - r - halfAw)
+                val minV = bodyTop + r + halfAw
+                val arrowCenter = arrowOffsetPx.coerceIn(minV, (bodyBottom - r - halfAw).coerceAtLeast(minV))
                 val arrowTop = arrowCenter - halfAw
                 val arrowBottom = arrowCenter + halfAw
                 lineTo(bodyRight, arrowTop)
@@ -320,7 +348,8 @@ private class PopoverBubbleShape(
             // === Bottom edge ===
             if (placement == PopoverPlacement.Top) {
                 // Arrow on bottom edge pointing down
-                val arrowCenter = arrowOffsetPx.coerceIn(bodyLeft + r + halfAw, bodyRight - r - halfAw)
+                val minH = bodyLeft + r + halfAw
+                val arrowCenter = arrowOffsetPx.coerceIn(minH, (bodyRight - r - halfAw).coerceAtLeast(minH))
                 val arrowRight = arrowCenter + halfAw
                 val arrowLeft = arrowCenter - halfAw
                 lineTo(arrowRight, bodyBottom)
@@ -346,7 +375,8 @@ private class PopoverBubbleShape(
             // === Left edge ===
             if (placement == PopoverPlacement.End) {
                 // Arrow on left edge pointing left
-                val arrowCenter = arrowOffsetPx.coerceIn(bodyTop + r + halfAw, bodyBottom - r - halfAw)
+                val minV = bodyTop + r + halfAw
+                val arrowCenter = arrowOffsetPx.coerceIn(minV, (bodyBottom - r - halfAw).coerceAtLeast(minV))
                 val arrowBottom = arrowCenter + halfAw
                 val arrowTop = arrowCenter - halfAw
                 lineTo(bodyLeft, arrowBottom)
@@ -404,22 +434,28 @@ fun Popover(
 ) {
     val colors = MacosTheme.colorScheme
     val density = LocalDensity.current
+    val controlSize = LocalControlSize.current
     val fallbackBg = colors.card
     val borderColor = colors.border
 
+    val cornerRadius = controlSize.cornerRadius()
+    val contentPadding = controlSize.contentPadding()
+    val minWidth = controlSize.minWidth()
+
     val spacingPx = with(density) { PopoverSpacing.toPx() }
     val arrowHeightPx = with(density) { ArrowHeight.toPx() }
+    val cornerRadiusDp = cornerRadius.value
 
     // Resolved placement and arrow offset (updated by position provider)
     var resolvedPlacement by remember { mutableStateOf(PopoverPlacement.Bottom) }
     var arrowOffsetPx by remember { mutableStateOf(0f) }
     var popupSize by remember { mutableStateOf(IntSize.Zero) }
 
-    val bubbleShape = remember(resolvedPlacement, arrowOffsetPx) {
+    val bubbleShape = remember(resolvedPlacement, arrowOffsetPx, cornerRadius) {
         PopoverBubbleShape(
             placement = resolvedPlacement,
             arrowOffsetPx = arrowOffsetPx,
-            cornerRadius = CornerRadius,
+            cornerRadius = cornerRadius,
             arrowWidth = ArrowWidth,
             arrowHeight = ArrowHeight,
         )
@@ -471,11 +507,12 @@ fun Popover(
         trigger()
 
         if (expanded) {
-            val positionProvider = remember(placement, spacingPx, arrowHeightPx) {
+            val positionProvider = remember(placement, spacingPx, arrowHeightPx, cornerRadiusDp) {
                 PopoverPositionProvider(
                     requestedPlacement = placement,
                     spacingPx = spacingPx,
                     arrowHeightPx = arrowHeightPx,
+                    cornerRadiusDp = cornerRadiusDp,
                     onResolved = { p, offset ->
                         resolvedPlacement = p
                         arrowOffsetPx = offset
@@ -505,9 +542,9 @@ fun Popover(
                             color = borderColor,
                             shape = bubbleShape,
                         )
-                        .widthIn(min = 180.dp)
+                        .widthIn(min = minWidth)
                         .padding(arrowPadding)
-                        .padding(16.dp),
+                        .padding(contentPadding),
                 ) {
                     content()
                 }
