@@ -39,16 +39,9 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TitleBar
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.TitleBarStyle
 import io.github.kdroidfilter.nucleus.ui.apple.macos.gallery.GalleryExample
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideCalendar
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideDownload
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideFolder
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideHome
+import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideMoon
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSettings
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideStar
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSun
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideTrash2
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideInfo
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.ExampleCard
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.GalleryPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.SectionHeader
@@ -64,12 +57,12 @@ fun ScaffoldFullLayoutExample() {
 
     val sidebarItems = remember {
         listOf(
-            SidebarItem("Favorites", onClick = { selectedPage = "Favorites" }, icon = LucideStar, group = "Favorites"),
-            SidebarItem("Recents", onClick = { selectedPage = "Recents" }, icon = LucideCalendar, group = "Favorites"),
-            SidebarItem("Documents", onClick = { selectedPage = "Documents" }, icon = LucideFolder, group = "Favorites"),
-            SidebarItem("Downloads", onClick = { selectedPage = "Downloads" }, icon = LucideDownload, group = "Locations"),
-            SidebarItem("Home", onClick = { selectedPage = "Home" }, icon = LucideHome, group = "Locations"),
-            SidebarItem("Trash", onClick = { selectedPage = "Trash" }, icon = LucideTrash2, group = "Locations"),
+            SidebarItem("Favorites", onClick = { selectedPage = "Favorites" }, icon = Icons.Star, group = "Favorites"),
+            SidebarItem("Recents", onClick = { selectedPage = "Recents" }, icon = Icons.Calendar, group = "Favorites"),
+            SidebarItem("Documents", onClick = { selectedPage = "Documents" }, icon = Icons.Folder, group = "Favorites"),
+            SidebarItem("Downloads", onClick = { selectedPage = "Downloads" }, icon = Icons.Download, group = "Locations"),
+            SidebarItem("Home", onClick = { selectedPage = "Home" }, icon = Icons.Home, group = "Locations"),
+            SidebarItem("Trash", onClick = { selectedPage = "Trash" }, icon = Icons.Trash2, group = "Locations"),
         )
     }
 
@@ -121,7 +114,7 @@ fun ScaffoldFullLayoutExample() {
                     actions = {
                         TitleBarButtonGroup {
                             TitleBarGroupButton(onClick = {}) {
-                                Icon(LucideSettings, modifier = Modifier.size(16.dp))
+                                Icon(Icons.Settings, modifier = Modifier.size(16.dp))
                             }
                         }
                     },
@@ -213,15 +206,15 @@ fun ScaffoldThreeColumnsExample() {
     val sidebarItems = remember {
         listOf(
             SidebarItem(
-                "Inbox", onClick = { selectedMailbox = "Inbox" }, icon = LucideFolder,
+                "Inbox", onClick = { selectedMailbox = "Inbox" }, icon = Icons.Folder,
                 group = "Mailboxes",
                 children = listOf(
-                    SidebarItem("Primary", onClick = { selectedMailbox = "Primary" }, icon = LucideStar),
-                    SidebarItem("Updates", onClick = { selectedMailbox = "Updates" }, icon = LucideInfo),
+                    SidebarItem("Primary", onClick = { selectedMailbox = "Primary" }, icon = Icons.Star),
+                    SidebarItem("Updates", onClick = { selectedMailbox = "Updates" }, icon = Icons.Info),
                 ),
             ),
-            SidebarItem("Sent", onClick = { selectedMailbox = "Sent" }, icon = LucideFolder, group = "Mailboxes"),
-            SidebarItem("Trash", onClick = { selectedMailbox = "Trash" }, icon = LucideTrash2, group = "Mailboxes"),
+            SidebarItem("Sent", onClick = { selectedMailbox = "Sent" }, icon = Icons.Folder, group = "Mailboxes"),
+            SidebarItem("Trash", onClick = { selectedMailbox = "Trash" }, icon = Icons.Trash2, group = "Mailboxes"),
         )
     }
 
@@ -354,7 +347,7 @@ fun ScaffoldInspectorExample() {
                     actions = {
                         TitleBarButtonGroup {
                             TitleBarGroupButton(onClick = { inspectorVisible = !inspectorVisible }) {
-                                Icon(LucideInfo, modifier = Modifier.size(16.dp))
+                                Icon(Icons.Info, modifier = Modifier.size(16.dp))
                             }
                         }
                     },

@@ -39,7 +39,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -153,40 +152,29 @@ private fun <T> sidebarSpring() = spring<T>(
  *
  * @param label Display text for the item.
  * @param onClick Callback invoked when this item is clicked.
- * @param icon Optional Lucide-style [ImageVector] rendered before the label.
- * @param group Optional group header text. When any item has a non-null group,
- *   items are rendered in groups with a header label above each group.
- * @param id Unique identifier used for active-item matching. Defaults to [label].
- */
-/**
- * Data for a single sidebar navigation item.
- *
- * [onClick] is intentionally excluded from [equals]/[hashCode] to keep
- * [SidebarItem] stable for Compose's skipping mechanism (lambdas don't
- * implement structural equality).
- *
- * @param label Display text for the item.
- * @param onClick Callback invoked when this item is clicked.
- * @param icon Optional Lucide-style [ImageVector] rendered before the label.
+ * @param icon Optional [SystemIcon] rendered before the label. Supports SF Symbols on Apple platforms.
  * @param group Optional group header text. When any item has a non-null group,
  *   items are rendered in groups with a header label above each group.
  * @param id Unique identifier used for active-item matching. Defaults to [label].
  * @param children Child items displayed in a collapsible disclosure section.
  *   When non-empty, a disclosure chevron is shown that toggles visibility of children.
+ * @param initiallyExpanded Whether the disclosure section starts expanded. Defaults to `true`.
  */
 class SidebarItem(
     val label: String,
     val onClick: () -> Unit,
-    val icon: ImageVector? = null,
+    val icon: SystemIcon? = null,
     val group: String? = null,
     val id: String = label,
     val children: List<SidebarItem> = emptyList(),
+    val initiallyExpanded: Boolean = true,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is SidebarItem) return false
         return id == other.id && label == other.label && icon == other.icon
             && group == other.group && children == other.children
+            && initiallyExpanded == other.initiallyExpanded
     }
 
     override fun hashCode(): Int {
@@ -195,6 +183,7 @@ class SidebarItem(
         result = 31 * result + (group?.hashCode() ?: 0)
         result = 31 * result + id.hashCode()
         result = 31 * result + children.hashCode()
+        result = 31 * result + initiallyExpanded.hashCode()
         return result
     }
 }
@@ -680,7 +669,7 @@ private fun SidebarItemWithVisibility(
             label = item.label,
             onClick = item.onClick,
             active = activeItem == item.id,
-            icon = item.icon?.let { SystemIcon(it) },
+            icon = item.icon,
             isCollapsed = collapsed,
             controlSize = controlSize,
             sidebarMetrics = sidebarMetrics,
@@ -732,7 +721,7 @@ private fun DisclosureItem(
     itemColors: SidebarItemColors,
     indentLevel: Int = 0,
 ) {
-    var expanded by remember { mutableStateOf(true) }
+    var expanded by remember { mutableStateOf(item.initiallyExpanded) }
     val chevronRotation by animateFloatAsState(
         targetValue = if (expanded) 90f else 0f,
         animationSpec = sidebarSpring(),
@@ -783,13 +772,16 @@ private fun DisclosureItem(
             )
         }
 
-        // Item content
+        // Item content — clicking the row also toggles disclosure
         Box(modifier = Modifier.weight(1f)) {
             SidebarItemRow(
                 label = item.label,
-                onClick = item.onClick,
+                onClick = {
+                    expanded = !expanded
+                    item.onClick()
+                },
                 active = activeItem == item.id,
-                icon = item.icon?.let { SystemIcon(it) },
+                icon = item.icon,
                 isCollapsed = collapsed,
                 controlSize = controlSize,
                 sidebarMetrics = sidebarMetrics,

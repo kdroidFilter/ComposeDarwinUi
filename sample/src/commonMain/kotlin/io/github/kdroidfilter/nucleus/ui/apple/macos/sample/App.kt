@@ -34,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -58,8 +57,18 @@ import com.composables.icons.lucide.MessageCircle
 import com.composables.icons.lucide.MessageSquare
 import com.composables.icons.lucide.MousePointerClick
 import com.composables.icons.lucide.PanelTopOpen
-import com.composables.icons.lucide.Scan
+import com.composables.icons.lucide.ArrowUpDown
+import com.composables.icons.lucide.Box
+import com.composables.icons.lucide.ChevronDown
+import com.composables.icons.lucide.Component
+import com.composables.icons.lucide.Navigation
+import com.composables.icons.lucide.Paintbrush
+import com.composables.icons.lucide.Palette
+import com.composables.icons.lucide.RectangleHorizontal
 import com.composables.icons.lucide.Search
+import com.composables.icons.lucide.ShieldAlert
+import com.composables.icons.lucide.SquareMousePointer
+import com.composables.icons.lucide.Star
 import com.composables.icons.lucide.Ruler
 import com.composables.icons.lucide.SlidersHorizontal
 import com.composables.icons.lucide.SquareCheck
@@ -95,11 +104,11 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.components.VerticalScrollba
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.rememberScrollbarState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.rememberToastState
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icon
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideHome
+import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideMoon
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSettings
 import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSun
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.RadixPanelLeft
+import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.SystemIcon
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AccordionPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AddressBarPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.pages.AlertPage
@@ -158,58 +167,125 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.theme.vibrant
 internal enum class ThemeMode { System, Light, Dark }
 
 // Navigation data
-internal data class SidebarEntryDef(val id: String, val label: String, val group: String, val icon: ImageVector)
+internal data class SidebarEntryDef(val id: String, val label: String, val group: String, val icon: SystemIcon)
 
 internal val sidebarEntryDefs = listOf(
-    SidebarEntryDef("home", "Home", "GENERAL", LucideHome),
-    SidebarEntryDef("getting-started", "Getting Started", "GENERAL", Lucide.LayoutList),
-    SidebarEntryDef("license", "License", "GENERAL", Lucide.Tag),
-    SidebarEntryDef("button", "Button", "FORM CONTROLS", Lucide.MousePointerClick),
-    SidebarEntryDef("iconbutton", "Icon Button", "FORM CONTROLS", Lucide.CircleDot),
-    SidebarEntryDef("input", "Input", "FORM CONTROLS", Lucide.TextCursorInput),
-    SidebarEntryDef("textarea", "Textarea", "FORM CONTROLS", Lucide.TextAlignStart),
-    SidebarEntryDef("checkbox", "Checkbox", "FORM CONTROLS", Lucide.SquareCheck),
-    SidebarEntryDef("radiobutton", "Radio Button", "FORM CONTROLS", Lucide.CircleDot),
-    SidebarEntryDef("switch", "Switch", "FORM CONTROLS", Lucide.ToggleLeft),
-    SidebarEntryDef("combobox", "Combo Box", "FORM CONTROLS", Lucide.ChevronsUpDown),
-    SidebarEntryDef("multiselect", "Multi Select", "FORM CONTROLS", Lucide.ListChecks),
-    SidebarEntryDef("searchinput", "Search Input", "FORM CONTROLS", Lucide.Search),
-    SidebarEntryDef("slider", "Slider", "FORM CONTROLS", Lucide.SlidersHorizontal),
-    SidebarEntryDef("circularslider", "Circular Slider", "FORM CONTROLS", Lucide.Loader),
-    SidebarEntryDef("stepper", "Stepper", "FORM CONTROLS", Lucide.ChevronsUpDown),
-    SidebarEntryDef("popupbutton", "Pop-up Button", "FORM CONTROLS", Lucide.ChevronsUpDown),
-    SidebarEntryDef("datepicker", "Date Picker", "FORM CONTROLS", Lucide.Calendar),
-    SidebarEntryDef("colorwell", "Color Wells & Pickers", "FORM CONTROLS", Lucide.Scan),
-    SidebarEntryDef("scrollbar", "Scrollbar", "DATA DISPLAY", Lucide.GripVertical),
-    SidebarEntryDef("groupbox", "Group Box", "DATA DISPLAY", Lucide.SquareDashed),
-    SidebarEntryDef("groupedlist", "Grouped List", "DATA DISPLAY", Lucide.ListChecks),
-    SidebarEntryDef("form", "Form", "DATA DISPLAY", Lucide.LayoutList),
-    SidebarEntryDef("badge", "Badge", "DATA DISPLAY", Lucide.Tag),
-    SidebarEntryDef("avatar", "Avatar", "DATA DISPLAY", Lucide.CircleUser),
-    SidebarEntryDef("surface", "Surface", "DATA DISPLAY", Lucide.Layers),
-    SidebarEntryDef("card", "Card", "DATA DISPLAY", Lucide.CreditCard),
-    SidebarEntryDef("table", "Table", "DATA DISPLAY", Lucide.Table),
-    SidebarEntryDef("pagecontrol", "Page Control", "DATA DISPLAY", Lucide.CircleDot),
-    SidebarEntryDef("progress", "Progress", "DATA DISPLAY", Lucide.Loader),
-    SidebarEntryDef("skeleton", "Skeleton", "DATA DISPLAY", Lucide.Scan),
-    SidebarEntryDef("alert", "Alert", "FEEDBACK", Lucide.TriangleAlert),
-    SidebarEntryDef("toast", "Toast", "FEEDBACK", Lucide.Bell),
-    SidebarEntryDef("dialog", "Dialog", "OVERLAYS", Lucide.MessageSquare),
-    SidebarEntryDef("tooltip", "Tooltip", "OVERLAYS", Lucide.MessageCircle),
-    SidebarEntryDef("popover", "Popover", "OVERLAYS", Lucide.PanelTopOpen),
-    SidebarEntryDef("dropdown", "Dropdown Menu", "OVERLAYS", Lucide.Menu),
-    SidebarEntryDef("contextmenu", "Context Menu", "OVERLAYS", Lucide.Ellipsis),
-    SidebarEntryDef("tabs", "Tabs", "NAVIGATION", Lucide.Columns3),
-    SidebarEntryDef("accordion", "Accordion", "NAVIGATION", Lucide.ChevronsUpDown),
-    SidebarEntryDef("sidebar", "Sidebar", "NAVIGATION", RadixPanelLeft),
-    SidebarEntryDef("segmentedcontrol", "Segmented Control", "FORM CONTROLS", Lucide.Columns3),
-    SidebarEntryDef("titlebar", "Title Bar", "NAVIGATION", Lucide.PanelTopOpen),
-    SidebarEntryDef("addressbar", "Address Bar", "NAVIGATION", Lucide.Search),
-    SidebarEntryDef("scaffold", "Scaffold", "NAVIGATION", RadixPanelLeft),
-    SidebarEntryDef("icons", "Icons", "THEME", Lucide.Scan),
-    SidebarEntryDef("material", "Material", "THEME", Lucide.Scan),
-    SidebarEntryDef("controlsize", "Control Size", "THEME", Lucide.SlidersHorizontal),
+    // General
+    SidebarEntryDef("home", "Home", "GENERAL", Icons.Home),
+    SidebarEntryDef("getting-started", "Getting Started", "GENERAL", SystemIcon("list.bullet.rectangle", Lucide.LayoutList)),
+    SidebarEntryDef("license", "License", "GENERAL", Icons.Tag),
+
+    // Controls — Buttons
+    SidebarEntryDef("button", "Button", "CONTROLS", SystemIcon("cursorarrow.click", Lucide.MousePointerClick)),
+    SidebarEntryDef("iconbutton", "Icon Button", "CONTROLS", SystemIcon("square.and.arrow.up.on.square", Lucide.SquareMousePointer)),
+
+    // Controls — Text input
+    SidebarEntryDef("input", "Input", "CONTROLS", SystemIcon("character.cursor.ibeam", Lucide.TextCursorInput)),
+    SidebarEntryDef("textarea", "Textarea", "CONTROLS", SystemIcon("text.alignleft", Lucide.TextAlignStart)),
+    SidebarEntryDef("searchinput", "Search Input", "CONTROLS", Icons.Search),
+
+    // Controls — Selection
+    SidebarEntryDef("checkbox", "Checkbox", "CONTROLS", SystemIcon("checkmark.square", Lucide.SquareCheck)),
+    SidebarEntryDef("radiobutton", "Radio Button", "CONTROLS", SystemIcon("circle.inset.filled", Lucide.CircleDot)),
+    SidebarEntryDef("switch", "Switch", "CONTROLS", SystemIcon("switch.2", Lucide.ToggleLeft)),
+    SidebarEntryDef("segmentedcontrol", "Segmented Control", "CONTROLS", SystemIcon("rectangle.split.3x1", Lucide.Columns3)),
+    SidebarEntryDef("combobox", "Combo Box", "CONTROLS", Icons.ChevronsUpDown),
+    SidebarEntryDef("popupbutton", "Pop-up Button", "CONTROLS", Icons.ChevronDown),
+    SidebarEntryDef("multiselect", "Multi Select", "CONTROLS", SystemIcon("checklist", Lucide.ListChecks)),
+
+    // Controls — Value input
+    SidebarEntryDef("slider", "Slider", "CONTROLS", SystemIcon("slider.horizontal.3", Lucide.SlidersHorizontal)),
+    SidebarEntryDef("circularslider", "Circular Slider", "CONTROLS", SystemIcon("dial.min", Lucide.Loader)),
+    SidebarEntryDef("stepper", "Stepper", "CONTROLS", SystemIcon("plusminus", Lucide.ArrowUpDown)),
+    SidebarEntryDef("datepicker", "Date Picker", "CONTROLS", Icons.Calendar),
+    SidebarEntryDef("colorwell", "Color Wells & Pickers", "CONTROLS", SystemIcon("paintpalette", Lucide.Palette)),
+
+    // Layout & Containers
+    SidebarEntryDef("form", "Form", "LAYOUT", SystemIcon("list.bullet.rectangle", Lucide.LayoutList)),
+    SidebarEntryDef("groupbox", "Group Box", "LAYOUT", SystemIcon("rectangle.dashed", Lucide.SquareDashed)),
+    SidebarEntryDef("card", "Card", "LAYOUT", SystemIcon("rectangle.on.rectangle", Lucide.CreditCard)),
+    SidebarEntryDef("surface", "Surface", "LAYOUT", SystemIcon("square.stack", Lucide.Layers)),
+    SidebarEntryDef("accordion", "Accordion", "LAYOUT", Icons.ChevronsUpDown),
+    SidebarEntryDef("scaffold", "Scaffold", "LAYOUT", Icons.PanelLeft),
+
+    // Collections
+    SidebarEntryDef("groupedlist", "Grouped List", "COLLECTIONS", SystemIcon("checklist", Lucide.ListChecks)),
+    SidebarEntryDef("table", "Table", "COLLECTIONS", SystemIcon("tablecells", Lucide.Table)),
+
+    // Navigation
+    SidebarEntryDef("tabs", "Tabs", "NAVIGATION", SystemIcon("rectangle.split.3x1", Lucide.Columns3)),
+    SidebarEntryDef("sidebar", "Sidebar", "NAVIGATION", Icons.PanelLeft),
+    SidebarEntryDef("titlebar", "Title Bar", "NAVIGATION", SystemIcon("macwindow", Lucide.PanelTopOpen)),
+    SidebarEntryDef("addressbar", "Address Bar", "NAVIGATION", Icons.Search),
+    SidebarEntryDef("pagecontrol", "Page Control", "NAVIGATION", SystemIcon("circle.inset.filled", Lucide.CircleDot)),
+    SidebarEntryDef("scrollbar", "Scrollbar", "NAVIGATION", SystemIcon("arrow.up.and.down", Lucide.GripVertical)),
+
+    // Status & Feedback
+    SidebarEntryDef("badge", "Badge", "STATUS & FEEDBACK", Icons.Tag),
+    SidebarEntryDef("avatar", "Avatar", "STATUS & FEEDBACK", SystemIcon("person.circle", Lucide.CircleUser)),
+    SidebarEntryDef("progress", "Progress", "STATUS & FEEDBACK", SystemIcon("progress.indicator", Lucide.Loader)),
+    SidebarEntryDef("skeleton", "Skeleton", "STATUS & FEEDBACK", SystemIcon("rectangle.fill", Lucide.RectangleHorizontal)),
+    SidebarEntryDef("alert", "Alert", "STATUS & FEEDBACK", Icons.TriangleAlert),
+    SidebarEntryDef("toast", "Toast", "STATUS & FEEDBACK", SystemIcon("bell", Lucide.Bell)),
+
+    // Overlays
+    SidebarEntryDef("dialog", "Dialog", "OVERLAYS", SystemIcon("bubble.left.and.bubble.right", Lucide.MessageSquare)),
+    SidebarEntryDef("popover", "Popover", "OVERLAYS", SystemIcon("macwindow", Lucide.PanelTopOpen)),
+    SidebarEntryDef("tooltip", "Tooltip", "OVERLAYS", SystemIcon("text.bubble", Lucide.MessageCircle)),
+    SidebarEntryDef("dropdown", "Dropdown Menu", "OVERLAYS", SystemIcon("line.3.horizontal", Lucide.Menu)),
+    SidebarEntryDef("contextmenu", "Context Menu", "OVERLAYS", Icons.Ellipsis),
+
+    // Theme & Design
+    SidebarEntryDef("icons", "Icons", "THEME", Icons.Star),
+    SidebarEntryDef("material", "Material", "THEME", SystemIcon("paintpalette", Lucide.Palette)),
+    SidebarEntryDef("controlsize", "Control Size", "THEME", SystemIcon("slider.horizontal.3", Lucide.SlidersHorizontal)),
 )
+
+private fun buildSidebarItems(onNavigate: (String) -> Unit): List<SidebarItem> {
+    fun entry(id: String) = sidebarEntryDefs.first { it.id == id }
+    fun leaf(id: String) = entry(id).let { SidebarItem(it.label, onClick = { onNavigate(it.id) }, icon = it.icon, id = it.id) }
+
+    fun group(label: String, icon: SystemIcon, ids: List<String>) = SidebarItem(
+        label = label,
+        onClick = {},
+        icon = icon,
+        children = ids.map { leaf(it) },
+        initiallyExpanded = false,
+    )
+
+    return listOf(
+        leaf("home"),
+        leaf("getting-started"),
+        leaf("license"),
+
+        group("Controls", SystemIcon("slider.horizontal.below.rectangle", Lucide.Component), listOf(
+            "button", "iconbutton",
+            "input", "textarea", "searchinput",
+            "checkbox", "radiobutton", "switch", "segmentedcontrol",
+            "combobox", "popupbutton", "multiselect",
+            "slider", "circularslider", "stepper",
+            "datepicker", "colorwell",
+        )),
+        group("Layout", SystemIcon("rectangle.3.group", Lucide.Box), listOf(
+            "form", "groupbox", "card", "surface", "accordion", "scaffold",
+        )),
+        group("Collections", Icons.Folder, listOf(
+            "groupedlist", "table",
+        )),
+        group("Navigation", SystemIcon("arrow.triangle.turn.up.right.diamond", Lucide.Navigation), listOf(
+            "tabs", "sidebar", "titlebar", "addressbar", "pagecontrol", "scrollbar",
+        )),
+        group("Status & Feedback", SystemIcon("bell.badge", Lucide.ShieldAlert), listOf(
+            "badge", "avatar", "progress", "skeleton", "alert", "toast",
+        )),
+        group("Overlays", SystemIcon("bubble.left.and.bubble.right", Lucide.MessageSquare), listOf(
+            "dialog", "popover", "tooltip", "dropdown", "contextmenu",
+        )),
+        group("Theme", SystemIcon("paintbrush", Lucide.Paintbrush), listOf(
+            "icons", "material", "controlsize",
+        )),
+    )
+}
 
 @Composable
 fun App() {
@@ -272,14 +348,8 @@ fun App() {
         // Navigation helpers
         val currentPageLabel = sidebarEntryDefs.firstOrNull { it.id == nav.currentPageId }?.label ?: ""
 
-        val sidebarItems = sidebarEntryDefs.map { def ->
-            SidebarItem(
-                label = def.label,
-                onClick = { nav.navigateTo(def.id) },
-                icon = def.icon,
-                group = def.group,
-                id = def.id,
-            )
+        val sidebarItems = remember {
+            buildSidebarItems { id -> nav.navigateTo(id) }
         }
 
         BoxWithConstraints(modifier = Modifier.fillMaxSize()) {

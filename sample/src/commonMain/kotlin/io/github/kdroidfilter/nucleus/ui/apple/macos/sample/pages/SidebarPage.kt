@@ -29,15 +29,7 @@ import io.github.kdroidfilter.nucleus.ui.apple.macos.components.SidebarItem
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Switcher
 import io.github.kdroidfilter.nucleus.ui.apple.macos.components.Text
 import io.github.kdroidfilter.nucleus.ui.apple.macos.gallery.GalleryExample
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideBarChart3
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideCalendar
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideDownload
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideFolder
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideHome
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideSettings
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideStar
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideTrash2
-import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.LucideUpload
+import io.github.kdroidfilter.nucleus.ui.apple.macos.icons.Icons
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.ExampleCard
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.GalleryPage
 import io.github.kdroidfilter.nucleus.ui.apple.macos.sample.gallery.SectionHeader
@@ -51,19 +43,19 @@ fun SidebarPreviewExample() {
     var isCollapsed by remember { mutableStateOf(false) }
     val sidebarItems = remember {
         listOf(
-            SidebarItem("Favorites", onClick = { activeItem = "Favorites" }, icon = LucideStar, group = "Favorites"),
-            SidebarItem("Recents", onClick = { activeItem = "Recents" }, icon = LucideCalendar, group = "Favorites"),
-            SidebarItem("iCloud Shared", onClick = { activeItem = "iCloud Shared" }, icon = LucideFolder, group = "Favorites"),
-            SidebarItem("Documents", onClick = { activeItem = "Documents" }, icon = LucideFolder, group = "Favorites"),
-            SidebarItem("Downloads", onClick = { activeItem = "Downloads" }, icon = LucideDownload, group = "Favorites"),
-            SidebarItem("iCloud Drive", onClick = { activeItem = "iCloud Drive" }, icon = LucideUpload, group = "Locations"),
-            SidebarItem("Home", onClick = { activeItem = "Home" }, icon = LucideHome, group = "Locations"),
-            SidebarItem("Mac HD", onClick = { activeItem = "Mac HD" }, icon = LucideBarChart3, group = "Locations"),
-            SidebarItem("Trash", onClick = { activeItem = "Trash" }, icon = LucideTrash2, group = "Locations"),
+            SidebarItem("Favorites", onClick = { activeItem = "Favorites" }, icon = Icons.Star, group = "Favorites"),
+            SidebarItem("Recents", onClick = { activeItem = "Recents" }, icon = Icons.Calendar, group = "Favorites"),
+            SidebarItem("iCloud Shared", onClick = { activeItem = "iCloud Shared" }, icon = Icons.Folder, group = "Favorites"),
+            SidebarItem("Documents", onClick = { activeItem = "Documents" }, icon = Icons.Folder, group = "Favorites"),
+            SidebarItem("Downloads", onClick = { activeItem = "Downloads" }, icon = Icons.Download, group = "Favorites"),
+            SidebarItem("iCloud Drive", onClick = { activeItem = "iCloud Drive" }, icon = Icons.Upload, group = "Locations"),
+            SidebarItem("Home", onClick = { activeItem = "Home" }, icon = Icons.Home, group = "Locations"),
+            SidebarItem("Mac HD", onClick = { activeItem = "Mac HD" }, icon = Icons.BarChart3, group = "Locations"),
+            SidebarItem("Trash", onClick = { activeItem = "Trash" }, icon = Icons.Trash2, group = "Locations"),
         )
     }
     val pinnedItems = remember {
-        listOf(SidebarItem("Settings", onClick = { activeItem = "Settings" }, icon = LucideSettings))
+        listOf(SidebarItem("Settings", onClick = { activeItem = "Settings" }, icon = Icons.Settings))
     }
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -117,14 +109,14 @@ fun SidebarCollapsibleExample() {
     var collapsed by remember { mutableStateOf(false) }
     val items = remember {
         listOf(
-            SidebarItem("Favorites", onClick = { active = "Favorites" }, icon = LucideStar, group = "Favorites"),
-            SidebarItem("Recents", onClick = { active = "Recents" }, icon = LucideCalendar, group = "Favorites"),
-            SidebarItem("Home", onClick = { active = "Home" }, icon = LucideHome, group = "Locations"),
-            SidebarItem("Trash", onClick = { active = "Trash" }, icon = LucideTrash2, group = "Locations"),
+            SidebarItem("Favorites", onClick = { active = "Favorites" }, icon = Icons.Star, group = "Favorites"),
+            SidebarItem("Recents", onClick = { active = "Recents" }, icon = Icons.Calendar, group = "Favorites"),
+            SidebarItem("Home", onClick = { active = "Home" }, icon = Icons.Home, group = "Locations"),
+            SidebarItem("Trash", onClick = { active = "Trash" }, icon = Icons.Trash2, group = "Locations"),
         )
     }
     val pinnedItems = remember {
-        listOf(SidebarItem("Settings", onClick = { active = "Settings" }, icon = LucideSettings))
+        listOf(SidebarItem("Settings", onClick = { active = "Settings" }, icon = Icons.Settings))
     }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Switcher(checked = collapsed, onCheckedChange = { collapsed = it }, label = "Collapsed")
@@ -154,39 +146,39 @@ fun SidebarDisclosureExample() {
     val items = remember {
         listOf(
             SidebarItem(
-                "Mailboxes", onClick = {}, icon = LucideFolder, group = "Mail",
+                "Mailboxes", onClick = {}, icon = Icons.Folder, group = "Mail",
                 children = listOf(
-                    SidebarItem("Inbox", onClick = { active = "Inbox" }, icon = LucideStar),
+                    SidebarItem("Inbox", onClick = { active = "Inbox" }, icon = Icons.Star),
                     SidebarItem(
-                        "Work", onClick = { active = "Work" }, icon = LucideFolder,
+                        "Work", onClick = { active = "Work" }, icon = Icons.Folder,
                         children = listOf(
                             SidebarItem(
-                                "Projects", onClick = { active = "Projects" }, icon = LucideFolder,
+                                "Projects", onClick = { active = "Projects" }, icon = Icons.Folder,
                                 children = listOf(
                                     SidebarItem(
-                                        "2026", onClick = { active = "2026" }, icon = LucideFolder,
+                                        "2026", onClick = { active = "2026" }, icon = Icons.Folder,
                                         children = listOf(
-                                            SidebarItem("Q1 Report", onClick = { active = "Q1 Report" }, icon = LucideStar),
-                                            SidebarItem("Q2 Report", onClick = { active = "Q2 Report" }, icon = LucideCalendar),
+                                            SidebarItem("Q1 Report", onClick = { active = "Q1 Report" }, icon = Icons.Star),
+                                            SidebarItem("Q2 Report", onClick = { active = "Q2 Report" }, icon = Icons.Calendar),
                                         ),
                                     ),
                                 ),
                             ),
-                            SidebarItem("Archive", onClick = { active = "Archive" }, icon = LucideTrash2),
+                            SidebarItem("Archive", onClick = { active = "Archive" }, icon = Icons.Trash2),
                         ),
                     ),
-                    SidebarItem("Trash", onClick = { active = "Trash" }, icon = LucideTrash2),
+                    SidebarItem("Trash", onClick = { active = "Trash" }, icon = Icons.Trash2),
                 ),
             ),
             SidebarItem(
-                "Smart Mailboxes", onClick = {}, icon = LucideSettings, group = "Mail",
+                "Smart Mailboxes", onClick = {}, icon = Icons.Settings, group = "Mail",
                 children = listOf(
-                    SidebarItem("Unread", onClick = { active = "Unread" }, icon = LucideHome),
-                    SidebarItem("Flagged", onClick = { active = "Flagged" }, icon = LucideStar),
+                    SidebarItem("Unread", onClick = { active = "Unread" }, icon = Icons.Home),
+                    SidebarItem("Flagged", onClick = { active = "Flagged" }, icon = Icons.Star),
                 ),
             ),
-            SidebarItem("Downloads", onClick = { active = "Downloads" }, icon = LucideDownload, group = "Locations"),
-            SidebarItem("Documents", onClick = { active = "Documents" }, icon = LucideFolder, group = "Locations"),
+            SidebarItem("Downloads", onClick = { active = "Downloads" }, icon = Icons.Download, group = "Locations"),
+            SidebarItem("Documents", onClick = { active = "Documents" }, icon = Icons.Folder, group = "Locations"),
         )
     }
     Card(modifier = Modifier.fillMaxWidth().height(480.dp)) {
@@ -211,10 +203,10 @@ fun SidebarCustomColorsExample() {
     var active by remember { mutableStateOf("Home") }
     val items = remember {
         listOf(
-            SidebarItem("Home", onClick = { active = "Home" }, icon = LucideHome),
-            SidebarItem("Favorites", onClick = { active = "Favorites" }, icon = LucideStar),
-            SidebarItem("Downloads", onClick = { active = "Downloads" }, icon = LucideDownload),
-            SidebarItem("Trash", onClick = { active = "Trash" }, icon = LucideTrash2),
+            SidebarItem("Home", onClick = { active = "Home" }, icon = Icons.Home),
+            SidebarItem("Favorites", onClick = { active = "Favorites" }, icon = Icons.Star),
+            SidebarItem("Downloads", onClick = { active = "Downloads" }, icon = Icons.Download),
+            SidebarItem("Trash", onClick = { active = "Trash" }, icon = Icons.Trash2),
         )
     }
     val accentColor = MacosTheme.colorScheme.accent
