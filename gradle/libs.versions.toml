@@ -1,10 +1,10 @@
 [versions]
-agp = "8.13.2"
+agp = "9.1.1"
 kotlinMath = "1.8.0"
 liquid = "1.1.1"
-android-compileSdk = "36"
+android-compileSdk = "37"
 android-minSdk = "24"
-android-targetSdk = "36"
+android-targetSdk = "37"
 androidx-activity = "1.13.0"
 androidx-appcompat = "1.8.0"
 androidx-core = "1.19.0"
@@ -25,7 +25,6 @@ kotlin = "2.4.10"
 kotlinx-coroutines = "1.11.0"
 kotlinx-datetime = "0.8.0"
 ksp = "2.3.10"
-# 0.42.0+ requires compileSdk 37, which AGP 8.13.2 does not support.
 multiplatformMarkdownRenderer = "0.41.0"
 nucleus = "2.5.2"
 
