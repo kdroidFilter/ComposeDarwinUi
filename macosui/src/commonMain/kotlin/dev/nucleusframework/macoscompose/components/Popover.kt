@@ -1,6 +1,5 @@
 package dev.nucleusframework.macoscompose.components
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -11,8 +10,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -20,8 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
@@ -34,11 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
-import dev.nucleusframework.macoscompose.theme.MacosDuration
-import dev.nucleusframework.macoscompose.theme.SpringPreset
 import dev.nucleusframework.macoscompose.theme.MacosTheme
 import dev.nucleusframework.macoscompose.theme.macosGlass
-import dev.nucleusframework.macoscompose.theme.macosSpring
 
 // =============================================================================
 // PopoverPlacement — edge where the popover appears relative to the anchor
@@ -413,7 +405,6 @@ fun Popover(
     // Resolved placement and arrow offset (updated by position provider)
     var resolvedPlacement by remember { mutableStateOf(PopoverPlacement.Bottom) }
     var arrowOffsetPx by remember { mutableStateOf(0f) }
-    var popupSize by remember { mutableStateOf(IntSize.Zero) }
 
     val bubbleShape = remember(resolvedPlacement, arrowOffsetPx) {
         PopoverBubbleShape(
@@ -432,39 +423,6 @@ fun Popover(
         PopoverPlacement.Start -> androidx.compose.foundation.layout.PaddingValues(end = ArrowHeight)
         PopoverPlacement.End -> androidx.compose.foundation.layout.PaddingValues(start = ArrowHeight)
         PopoverPlacement.Auto -> androidx.compose.foundation.layout.PaddingValues()
-    }
-
-    // Animation
-    val animatedScale by animateFloatAsState(
-        targetValue = if (expanded) 1f else 0.92f,
-        animationSpec = macosSpring(SpringPreset.Snappy),
-        label = "popover_scale",
-    )
-    val animatedAlpha by animateFloatAsState(
-        targetValue = if (expanded) 1f else 0f,
-        animationSpec = macosSpring(SpringPreset.Snappy),
-        label = "popover_alpha",
-    )
-
-    // Transform origin based on arrow direction
-    val transformOrigin = when (resolvedPlacement) {
-        PopoverPlacement.Bottom -> TransformOrigin(
-            pivotFractionX = if (popupSize.width > 0) arrowOffsetPx / popupSize.width else 0.5f,
-            pivotFractionY = 0f,
-        )
-        PopoverPlacement.Top -> TransformOrigin(
-            pivotFractionX = if (popupSize.width > 0) arrowOffsetPx / popupSize.width else 0.5f,
-            pivotFractionY = 1f,
-        )
-        PopoverPlacement.End -> TransformOrigin(
-            pivotFractionX = 0f,
-            pivotFractionY = if (popupSize.height > 0) arrowOffsetPx / popupSize.height else 0.5f,
-        )
-        PopoverPlacement.Start -> TransformOrigin(
-            pivotFractionX = 1f,
-            pivotFractionY = if (popupSize.height > 0) arrowOffsetPx / popupSize.height else 0.5f,
-        )
-        PopoverPlacement.Auto -> TransformOrigin.Center
     }
 
     Box(modifier = modifier) {
@@ -490,9 +448,6 @@ fun Popover(
             ) {
                 Box(
                     modifier = Modifier
-                        .onGloballyPositioned { popupSize = it.size }
-                        .scale(animatedScale)
-                        .alpha(animatedAlpha)
                         .shadow(
                             elevation = 12.dp,
                             shape = bubbleShape,

@@ -1,11 +1,5 @@
 package dev.nucleusframework.macoscompose.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,7 +41,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -164,7 +157,6 @@ fun DropdownMenu(
 
     val density = LocalDensity.current
     val gapPx = with(density) { 4.dp.roundToPx() }
-    val origin = placement.transformOrigin(centerX = true)
 
     if (expanded) {
         val keyboardState = remember { DropdownMenuKeyboardState() }
@@ -193,64 +185,48 @@ fun DropdownMenu(
                     onClick = onDismissRequest,
                 ),
             ) {
-                AnimatedVisibility(
-                    visible = expanded,
-                    enter = fadeIn(tween(150)) +
-                            scaleIn(
-                                initialScale = 0.95f,
-                                transformOrigin = origin,
-                                animationSpec = tween(150),
-                            ),
-                    exit = fadeOut(tween(100)) +
-                            scaleOut(
-                                targetScale = 0.95f,
-                                transformOrigin = origin,
-                                animationSpec = tween(100),
-                            ),
-                ) {
-                    val scrollState = rememberScrollState()
+                val scrollState = rememberScrollState()
 
-                    CompositionLocalProvider(LocalDropdownMenuKeyboardState provides keyboardState) {
-                        Column(
-                            modifier = modifier
-                                .onKeyEvent { event ->
-                                    if (event.type != KeyEventType.KeyDown) return@onKeyEvent false
-                                    when (event.key) {
-                                        Key.DirectionDown -> {
-                                            keyboardState.moveFocus(1)
-                                            true
-                                        }
-                                        Key.DirectionUp -> {
-                                            keyboardState.moveFocus(-1)
-                                            true
-                                        }
-                                        Key.Enter -> {
-                                            keyboardState.activateFocused()
-                                            true
-                                        }
-                                        Key.Escape -> {
-                                            onDismissRequest()
-                                            true
-                                        }
-                                        else -> false
+                CompositionLocalProvider(LocalDropdownMenuKeyboardState provides keyboardState) {
+                    Column(
+                        modifier = modifier
+                            .onKeyEvent { event ->
+                                if (event.type != KeyEventType.KeyDown) return@onKeyEvent false
+                                when (event.key) {
+                                    Key.DirectionDown -> {
+                                        keyboardState.moveFocus(1)
+                                        true
                                     }
+                                    Key.DirectionUp -> {
+                                        keyboardState.moveFocus(-1)
+                                        true
+                                    }
+                                    Key.Enter -> {
+                                        keyboardState.activateFocused()
+                                        true
+                                    }
+                                    Key.Escape -> {
+                                        onDismissRequest()
+                                        true
+                                    }
+                                    else -> false
                                 }
-                                .width(IntrinsicSize.Max)
-                                .widthIn(min = 200.dp)
-                                .shadow(
-                                    elevation = 25.dp,
-                                    shape = menuShape,
-                                    ambientColor = Color.Black.copy(alpha = 0.10f),
-                                    spotColor = Color.Black.copy(alpha = 0.16f),
-                                )
-                                .macosGlass(shape = menuShape, fallbackColor = fallbackBg)
-                                .border(0.5.dp, borderColor, menuShape)
-                                .heightIn(max = 360.dp)
-                                .verticalScroll(scrollState)
-                                .padding(vertical = 5.dp),
-                            content = content,
-                        )
-                    }
+                            }
+                            .width(IntrinsicSize.Max)
+                            .widthIn(min = 200.dp)
+                            .shadow(
+                                elevation = 25.dp,
+                                shape = menuShape,
+                                ambientColor = Color.Black.copy(alpha = 0.10f),
+                                spotColor = Color.Black.copy(alpha = 0.16f),
+                            )
+                            .macosGlass(shape = menuShape, fallbackColor = fallbackBg)
+                            .border(0.5.dp, borderColor, menuShape)
+                            .heightIn(max = 360.dp)
+                            .verticalScroll(scrollState)
+                            .padding(vertical = 5.dp),
+                        content = content,
+                    )
                 }
             }
         }
