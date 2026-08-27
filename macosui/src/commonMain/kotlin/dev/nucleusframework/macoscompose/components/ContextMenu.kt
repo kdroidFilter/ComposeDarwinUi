@@ -2,12 +2,6 @@
 
 package dev.nucleusframework.macoscompose.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isSecondaryPressed
@@ -130,40 +123,24 @@ fun ContextMenu(
                         onClick = { isOpen = false },
                     ),
                 ) {
-                    AnimatedVisibility(
-                        visible = isOpen,
-                        enter = fadeIn(animationSpec = tween(150)) +
-                                scaleIn(
-                                    initialScale = 0.95f,
-                                    transformOrigin = TransformOrigin(0f, 0f),
-                                    animationSpec = tween(150),
-                                ),
-                        exit = fadeOut(animationSpec = tween(100)) +
-                                scaleOut(
-                                    targetScale = 0.95f,
-                                    transformOrigin = TransformOrigin(0f, 0f),
-                                    animationSpec = tween(100),
-                                ),
+                    CompositionLocalProvider(
+                        LocalContextMenuClose provides { isOpen = false },
                     ) {
-                        CompositionLocalProvider(
-                            LocalContextMenuClose provides { isOpen = false },
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .width(IntrinsicSize.Max)
-                                    .widthIn(min = 200.dp)
-                                    .shadow(
-                                        elevation = 25.dp,
-                                        shape = menuShape,
-                                        ambientColor = Color.Black.copy(alpha = 0.10f),
-                                        spotColor = Color.Black.copy(alpha = 0.16f),
-                                    )
-                                    .macosGlass(shape = menuShape, fallbackColor = fallbackBg)
-                                    .border(0.5.dp, borderColor, menuShape)
-                                    .padding(vertical = 5.dp),
-                                content = content,
-                            )
-                        }
+                        Column(
+                            modifier = Modifier
+                                .width(IntrinsicSize.Max)
+                                .widthIn(min = 200.dp)
+                                .shadow(
+                                    elevation = 25.dp,
+                                    shape = menuShape,
+                                    ambientColor = Color.Black.copy(alpha = 0.10f),
+                                    spotColor = Color.Black.copy(alpha = 0.16f),
+                                )
+                                .macosGlass(shape = menuShape, fallbackColor = fallbackBg)
+                                .border(0.5.dp, borderColor, menuShape)
+                                .padding(vertical = 5.dp),
+                            content = content,
+                        )
                     }
                 }
             }

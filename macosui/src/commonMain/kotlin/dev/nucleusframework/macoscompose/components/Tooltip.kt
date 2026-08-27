@@ -1,7 +1,5 @@
 package dev.nucleusframework.macoscompose.components
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -11,26 +9,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import dev.nucleusframework.macoscompose.components.Text
 import dev.nucleusframework.macoscompose.theme.MacosTheme
 import dev.nucleusframework.macoscompose.theme.Zinc100
 import dev.nucleusframework.macoscompose.theme.Zinc900
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -65,23 +68,17 @@ fun Tooltip(
     val shapes = MacosTheme.shapes
 
     var showTooltip by remember { mutableStateOf(false) }
+    val density = LocalDensity.current
+    val positionProvider = remember(density) { TooltipPositionProvider(density) }
 
-    // Fade animation
-    val alpha by animateFloatAsState(
-        targetValue = if (showTooltip) 1f else 0f,
-        animationSpec = tween(durationMillis = 100),
-        label = "tooltipAlpha",
-    )
-
-    // Tooltip colors: inverted from current theme
     val tooltipBackground = if (colors.isDark) Zinc100 else Zinc900
-
     val tooltipTextColor = if (colors.isDark) Zinc900 else Zinc100
 
     Box(
         modifier = modifier
-            .pointerInput(Unit) {
+            .pointerInput(delayMillis) {
                 coroutineScope {
+                    var showJob: Job? = null
                     awaitPointerEventScope {
                         val pass = PointerEventPass.Main
                         while (true) {
@@ -89,11 +86,16 @@ fun Tooltip(
                             val inputType = event.changes.firstOrNull()?.type
                             if (inputType == PointerType.Mouse) {
                                 when (event.type) {
-                                    PointerEventType.Enter -> launch {
-                                        delay(delayMillis)
-                                        showTooltip = true
+                                    PointerEventType.Enter -> {
+                                        showJob?.cancel()
+                                        showJob = launch {
+                                            delay(delayMillis)
+                                            showTooltip = true
+                                        }
                                     }
                                     PointerEventType.Exit -> {
+                                        showJob?.cancel()
+                                        showJob = null
                                         showTooltip = false
                                     }
                                 }
@@ -105,17 +107,15 @@ fun Tooltip(
     ) {
         content()
 
-        if (showTooltip || alpha > 0f) {
+        if (showTooltip) {
             Popup(
-                alignment = Alignment.TopCenter,
-                offset = IntOffset(0, -8),
+                popupPositionProvider = positionProvider,
                 properties = PopupProperties(
                     focusable = false,
                 ),
             ) {
                 Box(
                     modifier = Modifier
-                        .graphicsLayer { this.alpha = alpha }
                         .shadow(
                             elevation = 4.dp,
                             shape = shapes.small,
@@ -133,6 +133,33 @@ fun Tooltip(
                 }
             }
         }
+    }
+}
+
+/**
+ * Places the tooltip fully outside the anchor so it cannot sit under the cursor
+ * and retrigger hover Enter/Exit on desktop.
+ */
+private class TooltipPositionProvider(
+    private val density: Density,
+) : PopupPositionProvider {
+    override fun calculatePosition(
+        anchorBounds: IntRect,
+        windowSize: IntSize,
+        layoutDirection: LayoutDirection,
+        popupContentSize: IntSize,
+    ): IntOffset {
+        val gap = with(density) { 8.dp.roundToPx() }
+        val maxX = (windowSize.width - popupContentSize.width).coerceAtLeast(0)
+        val x = (anchorBounds.left + (anchorBounds.width - popupContentSize.width) / 2)
+            .coerceIn(0, maxX)
+        val yBelow = anchorBounds.bottom + gap
+        val y = if (yBelow + popupContentSize.height <= windowSize.height) {
+            yBelow
+        } else {
+            (anchorBounds.top - gap - popupContentSize.height).coerceAtLeast(0)
+        }
+        return IntOffset(x, y)
     }
 }
 

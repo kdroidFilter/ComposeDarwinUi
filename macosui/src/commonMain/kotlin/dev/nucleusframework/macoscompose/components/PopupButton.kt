@@ -1,12 +1,6 @@
 package dev.nucleusframework.macoscompose.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -273,8 +267,6 @@ private fun <T> PopupButtonMenu(
     val minMenuWidth = with(density) { anchorSize.width.toDp() }.coerceAtLeast(150.dp)
     val gapPx = with(density) { 4.dp.roundToPx() }
 
-    val origin = placement.transformOrigin()
-
     Popup(
         onDismissRequest = onDismissRequest,
         properties = PopupProperties(focusable = true),
@@ -299,42 +291,26 @@ private fun <T> PopupButtonMenu(
                 onClick = onDismissRequest,
             ),
         ) {
-            AnimatedVisibility(
-                visible = true,
-                enter = fadeIn(animationSpec = tween(150)) +
-                        scaleIn(
-                            initialScale = 0.95f,
-                            transformOrigin = origin,
-                            animationSpec = tween(150),
-                        ),
-                exit = fadeOut(animationSpec = tween(100)) +
-                        scaleOut(
-                            targetScale = 0.95f,
-                            transformOrigin = origin,
-                            animationSpec = tween(100),
-                        ),
+            Column(
+                modifier = Modifier
+                    .width(IntrinsicSize.Max)
+                    .widthIn(min = minMenuWidth)
+                    .shadow(
+                        elevation = 25.dp,
+                        shape = menuShape,
+                        ambientColor = Color.Black.copy(alpha = 0.10f),
+                        spotColor = Color.Black.copy(alpha = 0.16f),
+                    )
+                    .macosGlass(shape = menuShape, fallbackColor = fallbackBg)
+                    .border(0.5.dp, borderColor, menuShape)
+                    .padding(vertical = 5.dp),
             ) {
-                Column(
-                    modifier = Modifier
-                        .width(IntrinsicSize.Max)
-                        .widthIn(min = minMenuWidth)
-                        .shadow(
-                            elevation = 25.dp,
-                            shape = menuShape,
-                            ambientColor = Color.Black.copy(alpha = 0.10f),
-                            spotColor = Color.Black.copy(alpha = 0.16f),
-                        )
-                        .macosGlass(shape = menuShape, fallbackColor = fallbackBg)
-                        .border(0.5.dp, borderColor, menuShape)
-                        .padding(vertical = 5.dp),
-                ) {
-                    items.forEachIndexed { index, item ->
-                        PopupMenuItem(
-                            text = itemText(item),
-                            selected = index == selectedIndex,
-                            onClick = { onSelectedChange(index) },
-                        )
-                    }
+                items.forEachIndexed { index, item ->
+                    PopupMenuItem(
+                        text = itemText(item),
+                        selected = index == selectedIndex,
+                        onClick = { onSelectedChange(index) },
+                    )
                 }
             }
         }
