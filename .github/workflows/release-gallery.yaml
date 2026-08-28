@@ -8,14 +8,19 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: release-gallery-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
+  build-natives:
+    uses: ./.github/workflows/build-natives.yaml
+
   build:
     name: Gallery - ${{ matrix.name }}
+    needs: build-natives
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     strategy:
@@ -40,6 +45,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download native artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: 'natives-*'
+          merge-multiple: true
 
       # Gradle runs on 21: kotlin-math ships JVM target 21 bytecode that the
       # sample inlines, so a 17 toolchain fails to compile it. The GraalVM 25

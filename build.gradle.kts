@@ -1,3 +1,5 @@
+import dev.nucleusframework.gradle.NativeTarget
+
 plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
     // in each subproject's classloader
@@ -29,5 +31,22 @@ subprojects {
     dependencies {
         "detektPlugins"(rootProject.libs.detekt.formatting)
         "detektPlugins"(rootProject.libs.detekt.compose.rules)
+    }
+}
+
+val buildNative by tasks.registering {
+    group = "build"
+    description = "Builds native libraries for the current host platform."
+}
+
+gradle.projectsEvaluated {
+    buildNative.configure {
+        dependsOn(
+            subprojects.flatMap { project ->
+                NativeTarget.entries
+                    .filter { it.isHost }
+                    .mapNotNull { project.tasks.findByName(it.taskName) }
+            },
+        )
     }
 }

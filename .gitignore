@@ -18,5 +18,5 @@ captures
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
 
-# Compiled native JNI dylibs (built locally by build.sh)
-decorated-window/src/main/resources/macosui/native/
+# Native libraries (built on CI via build-natives.yaml)
+**/src/jvmMain/resources/nucleus/native/

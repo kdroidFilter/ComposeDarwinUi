@@ -1,0 +1,68 @@
+name: Build Native Libraries
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  actions: write
+
+# The native binaries are a pure function of the native sources, so each
+# platform job caches its whole output tree keyed on a hash of every
+# src/jvmMain/native/** file (plus this workflow, so adding a module's build
+# step invalidates the key). On a cache hit every compile/toolchain step is
+# skipped and the job only verifies the restored tree and re-publishes the
+# per-platform artifact that downstream jobs consume with a single
+# `pattern: natives-*` download. Bump the `natives-v1` prefix to force a
+# full rebuild.
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Restore native output cache
+        id: natives-cache
+        uses: actions/cache@v4
+        with:
+          path: '*/src/jvmMain/resources/nucleus/native/darwin-*'
+          key: natives-v1-macos-${{ hashFiles('**/src/jvmMain/native/**', '.github/workflows/build-natives.yaml') }}
+
+      - name: Setup JDK 21
+        if: steps.natives-cache.outputs.cache-hit != 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build macosui-icons macOS native dylibs
+        if: steps.natives-cache.outputs.cache-hit != 'true'
+        run: bash macosui-icons/src/jvmMain/native/macos/build.sh
+
+      - name: Verify macOS natives
+        run: |
+          FILES=(
+            "macosui-icons/libnucleus_sfsymbols.dylib"
+          )
+          MISSING=0
+          for arch in darwin-aarch64 darwin-x64; do
+            for e in "${FILES[@]}"; do
+              f="${e%%/*}/src/jvmMain/resources/nucleus/native/$arch/${e#*/}"
+              if [ -f "$f" ]; then
+                echo "OK: $f ($(wc -c < "$f") bytes)"
+              else
+                echo "MISSING: $f" >&2
+                MISSING=1
+              fi
+            done
+          done
+          if [ "$MISSING" = "1" ]; then exit 1; fi
+
+      - name: Upload macOS natives
+        uses: actions/upload-artifact@v4
+        with:
+          name: natives-macos
+          path: '*/src/jvmMain/resources/nucleus/native/darwin-*/'
+          retention-days: 1
