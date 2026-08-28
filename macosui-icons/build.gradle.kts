@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.vanniktechMavenPublish)
     alias(libs.plugins.dokka)
+    id("nucleus.native-module")
 }
 
 val ref = System.getenv("GITHUB_REF") ?: ""
@@ -93,7 +94,7 @@ kotlin {
             implementation(libs.compose.ui)
         }
         jvmMain.dependencies {
-            implementation(libs.jna)
+            implementation(libs.nucleus.core.runtime)
         }
     }
 }
@@ -110,4 +111,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+}
+
+nucleusNative {
+    macos("nucleus_sfsymbols")
 }

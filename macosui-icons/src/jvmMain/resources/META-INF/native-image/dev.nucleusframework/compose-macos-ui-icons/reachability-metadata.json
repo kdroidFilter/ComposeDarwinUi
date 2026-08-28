@@ -1,0 +1,12 @@
+{
+    "reflection": [
+        {
+            "type": "dev.nucleusframework.macoscompose.icons.NativeSFSymbolBridge",
+            "jniAccessible": true,
+            "methods": []
+        }
+    ],
+    "resources": [
+        { "glob": "nucleus/native/**" }
+    ]
+}

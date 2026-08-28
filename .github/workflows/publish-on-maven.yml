@@ -10,14 +10,19 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: publish-maven-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
+  build-natives:
+    uses: ./.github/workflows/build-natives.yaml
+
   publish:
     name: Publish libraries
+    needs: build-natives
     # macOS is required: the library modules declare Apple targets, whose klibs
     # can only be built (and therefore published) on a Mac.
     runs-on: macos-latest
@@ -25,6 +30,29 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download native artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: 'natives-*'
+          merge-multiple: true
+
+      - name: Verify all natives present
+        run: |
+          EXPECTED=(
+            "macosui-icons/src/jvmMain/resources/nucleus/native/darwin-aarch64/libnucleus_sfsymbols.dylib"
+            "macosui-icons/src/jvmMain/resources/nucleus/native/darwin-x64/libnucleus_sfsymbols.dylib"
+          )
+          MISSING=0
+          for f in "${EXPECTED[@]}"; do
+            if [ -f "$f" ]; then
+              echo "OK: $f ($(wc -c < "$f") bytes)"
+            else
+              echo "MISSING: $f" >&2
+              MISSING=1
+            fi
+          done
+          if [ "$MISSING" = "1" ]; then exit 1; fi
 
       # 21, not 17: some dependencies ship JVM target 21 bytecode that gets
       # inlined, which a 17 toolchain refuses to compile.
